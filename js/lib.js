@@ -60,6 +60,13 @@ export async function importProgress(file) {
   for (const w of file.data.words || []) await save('words', w);
 }
 
+// How to pin the site to the home screen on this phone (progress is safest that way in static mode).
+export const isStandalone = () => window.matchMedia?.('(display-mode: standalone)').matches || navigator.standalone === true;
+export const isAndroid = () => /Android/i.test(navigator.userAgent);
+export const installHint = () => (isAndroid()
+  ? 'Chrome → меню ⋮ → «Установить приложение» (или «Добавить на главный экран»).'
+  : 'Safari → «Поделиться» → «На экран „Домой“».');
+
 export const profile = () => S.profile.find((p) => p.id === 'amelie') || { id: 'amelie', stars: 0, stickers: [], days: {}, rate: 0.85, newPerDay: 6 };
 export const saveProfile = (patch) => save('profile', { ...profile(), ...patch, id: 'amelie' });
 

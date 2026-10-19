@@ -1,4 +1,4 @@
-import { S, esc, wordPic, speak, profile, todayKey, streak, DAY, $, STAR_STEP, topicOf, MODE } from '../lib.js';
+import { S, esc, wordPic, speak, profile, todayKey, streak, DAY, $, STAR_STEP, topicOf, MODE, isStandalone } from '../lib.js';
 import { todayQueue, seenWords, learned } from '../srs.js';
 
 const GAMES = [['listen', '👂', 'Listen & find', 'Послушай и найди'], ['spell', '🔤', 'Spell it', 'Собери слово'], ['sensei', '🥋', 'Sensei says', 'Сенсей говорит']];
@@ -52,7 +52,7 @@ export default function home(el) {
       <a class="tile painted" href="#/words" style="--c:#3BB273"><span class="big">📒</span><span class="t">${learnedN} слов</span><span class="s">уже знаю</span></a>
     </div>
 
-    ${MODE === 'static' && !(window.matchMedia?.('(display-mode: standalone)').matches || navigator.standalone) ? '<div class="note" style="margin-top:20px">📌 Попроси взрослого добавить меня на экран «Домой» — тогда звёзды и рисунки не потеряются.</div>' : ''}
+    ${MODE === 'static' && !isStandalone() ? '<div class="note" style="margin-top:20px">📌 Попроси взрослого добавить меня на экран «Домой» — тогда звёзды и рисунки не потеряются.</div>' : ''}
     <p style="text-align:center;margin:28px 0 8px"><a class="ru" href="#/parents" style="text-decoration:underline">Для родителей</a></p>`;
 
   $('#wod', el)?.addEventListener('click', () => { speak(wod.en); setTimeout(() => speak(wod.ex), 1200); });

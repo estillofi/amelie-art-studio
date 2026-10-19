@@ -1,8 +1,7 @@
-import { S, esc, profile, saveProfile, save, toast, todayKey, startOfDay, DAY, topicOf, $, MODE, exportProgress, importProgress } from '../lib.js';
+import { S, esc, profile, saveProfile, save, toast, speak, todayKey, startOfDay, DAY, topicOf, $, MODE, exportProgress, importProgress, isStandalone, isAndroid, installHint } from '../lib.js';
 import { topicStats, seenWords } from '../srs.js';
 
 let unlocked = false;
-const standalone = () => window.matchMedia?.('(display-mode: standalone)').matches || navigator.standalone === true;
 
 // #/parents — a simple grown-up gate, then progress, settings and "add a word from the textbook".
 export default function parents(el) {
@@ -37,6 +36,12 @@ export default function parents(el) {
       <div class="field"><label>Скорость голоса</label><select class="select" id="rate">${[['0.7', 'медленно'], ['0.85', 'спокойно'], ['1', 'обычно']].map(([v, t]) => `<option value="${v}" ${Number(v) === (p.rate || 0.85) ? 'selected' : ''}>${t}</option>`).join('')}</select></div>
     </div>
 
+    <div class="card" style="margin-top:14px">
+      <button class="btn sm full" id="voice" style="--c:#FFD447">🔊 Проверить голос</button>
+      <p class="sub" id="voiceInfo" style="margin:10px 0 0;font-size:14px"></p>
+      ${isAndroid() ? `<div class="note" style="margin-top:10px"><b>Не слышно английского или голос с акцентом?</b> На Xiaomi: Настройки → Дополнительные настройки → Язык и ввод → <b>Синтез речи</b> → выберите <b>«Синтез речи Google»</b> → шестерёнка → «Установить голосовые данные» → <b>English (United Kingdom)</b>. Потом перезапустите Chrome.</div>` : ''}
+    </div>
+
     <div class="h2">Добавить слово из учебника</div>
     <form class="card" id="add">
       <div class="field"><label>Слово по-английски</label><input class="input" name="en" required placeholder="giraffe"></div>
@@ -55,7 +60,9 @@ export default function parents(el) {
       <div class="row"><button class="btn sm grow" id="exp" style="--c:#9AD7C9">⬇️ Скачать прогресс</button>
         <label class="btn sm white grow">⬆️ Загрузить<input type="file" id="imp" accept="application/json,.json" hidden></label></div>
     </div>
-    ${MODE === 'static' && !standalone() ? `<div class="note" style="margin-top:12px">📌 <b>Важно для iPhone:</b> откройте сайт в Safari → «Поделиться» → «На экран „Домой“». Иначе Safari может стереть прогресс, если неделю не заходить. С иконки приложение открывается во весь экран.</div>` : ''}
+    ${MODE === 'static' && !isStandalone() ? `<div class="note" style="margin-top:12px">📌 <b>Установите на телефон:</b> ${installHint()} ${isAndroid()
+      ? 'Так приложение открывается во весь экран, а Chrome бережнее хранит прогресс. Не очищайте данные Chrome в «Очистке» Xiaomi.'
+      : 'Иначе Safari может стереть прогресс, если неделю не заходить.'}</div>` : ''}
 
     <div class="h2">Как пользоваться</div>
     <div class="note">
@@ -77,6 +84,13 @@ export default function parents(el) {
       if (!confirm('Заменить текущий прогресс прогрессом из файла?')) return;
       await importProgress(data); toast('Прогресс загружен'); parents(el);
     } catch (err) { toast(err.message || 'Не получилось прочитать файл'); }
+  };
+  $('#voice', el).onclick = () => {
+    speak('Hello, Amelie! Let\'s paint a rainbow.');
+    const en = ('speechSynthesis' in window) ? speechSynthesis.getVoices().filter((v) => v.lang?.toLowerCase().startsWith('en')) : [];
+    $('#voiceInfo', el).textContent = !('speechSynthesis' in window) ? 'Этот браузер не умеет озвучивать текст.'
+      : en.length ? `Английских голосов: ${en.length}. Должно звучать «Hello, Amelie!» с английским произношением.`
+        : 'Английский голос не найден — озвучка будет молчать или читать с акцентом. См. инструкцию ниже.';
   };
   $('#npd', el).onchange = (e) => { saveProfile({ newPerDay: Number(e.target.value) }); toast('Сохранено'); };
   $('#rate', el).onchange = (e) => { saveProfile({ rate: Number(e.target.value) }); toast('Сохранено'); };

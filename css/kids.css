@@ -1,0 +1,288 @@
+/* Amelie's Art Studio — handmade craft style.
+   Cardboard cut-outs, washi tape with polka dots, foam beads, construction paper,
+   gouache splotches and a paper garland on a white studio wall. Palette borrowed from
+   the art studio's cut-paper mural (teal, cobalt, coral, blush). Mobile first. */
+:root {
+  --wall: #F6F3EE;
+  --paper: #FFFDF8;
+  --kraft: #CDA67F;
+  --kraft-lt: #DCBD98;
+  --kraft-dk: #A07853;
+  --ink: #3A2E26;          /* brown-black felt pen */
+  --ink-2: #6E5B4C;
+  --line: #E6DCCD;
+  --tape: #E5453B;
+  --foam: #66C6EE;
+  --red: #E5453B; --coral: #F0855B; --orange: #F7A23B; --yellow: #FFD447;
+  --green: #8BC34A; --teal: #3FA796; --cobalt: #1F5BD8; --blue: #4C8DF6;
+  --purple: #9B6BE0; --pink: #F7A1C4; --blush: #F3B9C9;
+  --r-cut: 26px 14px 30px 18px / 18px 30px 16px 28px;   /* scissors-cut corners */
+  --r-cut2: 14px 28px 18px 30px / 30px 16px 28px 14px;
+  --shadow: 0 2px 0 rgba(58, 46, 38, .18), 0 10px 18px -8px rgba(58, 46, 38, .35);
+  --font: Nunito, 'Arial Rounded MT Bold', Arial, sans-serif;
+  --read: Andika, Nunito, Arial, sans-serif;     /* single-storey "a" for early readers */
+  --hand: Pangolin, 'Comic Sans MS', cursive;    /* felt-pen lettering */
+  --safe-b: env(safe-area-inset-bottom, 0px);
+  /* textures */
+  --corrugate: repeating-linear-gradient(90deg, rgba(90, 60, 30, .07) 0 2px, transparent 2px 8px);
+  --speckle: radial-gradient(circle at 20% 30%, rgba(90, 60, 30, .18) 0 1px, transparent 1.5px), radial-gradient(circle at 70% 60%, rgba(255, 255, 255, .25) 0 1px, transparent 1.5px);
+  --dots: radial-gradient(circle, #fff 2.1px, transparent 2.6px);
+  --beads: radial-gradient(circle at 35% 35%, #fff 0 1px, var(--foam) 1.5px 3.2px, transparent 3.6px);
+}
+
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html, body { margin: 0; }
+body {
+  background-color: var(--wall);
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .35 0 0 0 0 .3 0 0 0 0 .25 0 0 0 .05 0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
+  color: var(--ink); font: 600 16px/1.4 var(--font);
+  -webkit-font-smoothing: antialiased; overscroll-behavior-y: none;
+}
+button { font: inherit; color: inherit; cursor: pointer; border: 0; background: none; }
+a { color: inherit; text-decoration: none; }
+h1, h2, h3 { margin: 0; line-height: 1.15; }
+.hidden { display: none !important; }
+
+.app { max-width: 560px; margin: 0 auto; min-height: 100vh; padding: 0 16px calc(104px + var(--safe-b)); position: relative; }
+
+/* ── Paper garland across the top ────────────────────────── */
+.garland { display: block; width: 100%; max-width: 560px; height: 64px; margin: 0 auto -6px; pointer-events: none; }
+.garland .leaf { transform-box: fill-box; transform-origin: 50% 0; animation: sway 4s ease-in-out infinite; }
+.garland .leaf:nth-child(even) { animation-duration: 5s; animation-direction: alternate-reverse; }
+@keyframes sway { 0%, 100% { transform: rotate(-4deg); } 50% { transform: rotate(4deg); } }
+
+/* ── Top bar ─────────────────────────────────────────────── */
+.top { display: flex; align-items: center; gap: 10px; padding: 4px 0 10px; position: sticky; top: 0; z-index: 20; background: linear-gradient(var(--wall) 78%, transparent); }
+.logo { display: flex; align-items: center; gap: 8px; font: 400 28px/1 var(--hand); }
+.logo .pal { font-size: 26px; transform: rotate(-12deg); display: inline-block; }
+.top .sp { flex: 1; }
+/* stars chip = a paper luggage tag with a pom-pom */
+.chip { display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px 6px 12px; font: 400 18px var(--hand); background: var(--yellow); border-radius: var(--r-cut2); box-shadow: var(--shadow); position: relative; transform: rotate(2deg); }
+.chip::before { content: ''; position: absolute; left: -7px; top: 50%; width: 14px; height: 14px; margin-top: -7px; border-radius: 50%; background: radial-gradient(circle at 35% 35%, #FFC1D9, var(--pink) 60%, #E27BA5); box-shadow: 0 1px 2px rgba(0,0,0,.25); }
+.icon-btn { width: 46px; height: 46px; border-radius: 46% 54% 50% 50% / 52% 46% 54% 48%; display: inline-flex; align-items: center; justify-content: center; background: var(--paper); box-shadow: var(--shadow); flex: 0 0 auto; }
+.icon-btn svg { width: 22px; height: 22px; }
+.icon-btn:active, .btn:active, .tile:active, .opt:active, .step:active { transform: translateY(2px) rotate(0deg) !important; box-shadow: 0 1px 0 rgba(58, 46, 38, .2); }
+
+/* ── Bottom nav: a strip of cardboard taped to the wall ──── */
+.nav { position: fixed; left: 0; right: 0; bottom: 0; z-index: 30; padding-bottom: var(--safe-b);
+  background: var(--corrugate), var(--kraft);
+  clip-path: polygon(0 10px, 4% 4px, 9% 9px, 15% 3px, 22% 8px, 30% 2px, 38% 9px, 46% 4px, 54% 9px, 62% 3px, 70% 8px, 78% 2px, 86% 9px, 93% 4px, 100% 9px, 100% 100%, 0 100%);
+  filter: drop-shadow(0 -2px 3px rgba(0,0,0,.12)); }
+.nav-in { max-width: 560px; margin: 0 auto; display: grid; grid-template-columns: repeat(5, 1fr); padding-top: 8px; }
+.nav a { display: flex; flex-direction: column; align-items: center; gap: 1px; padding: 6px 0 9px; font: 400 14px var(--hand); color: #5A4433; }
+.nav a .e { font-size: 24px; line-height: 1; width: 44px; height: 40px; display: flex; align-items: center; justify-content: center; transition: transform .15s; }
+.nav a.on { color: var(--ink); }
+.nav a.on .e { background: var(--paper); border-radius: var(--r-cut); box-shadow: 0 2px 0 rgba(0,0,0,.15); transform: rotate(-4deg) translateY(-3px); }
+
+/* ── Type ────────────────────────────────────────────────── */
+.hello { font: 400 40px/1.05 var(--hand); margin: 6px 0 4px; display: inline-block; position: relative; z-index: 0; }
+/* gouache brush stroke behind headlines */
+.hello::after { content: ''; position: absolute; z-index: -1; left: -6px; right: -10px; bottom: 2px; height: 42%; background: var(--yellow); border-radius: 40% 60% 55% 45% / 60% 40% 60% 40%; transform: rotate(-1.5deg); opacity: .85; }
+.sub { color: var(--ink-2); font-weight: 700; }
+.h2 { font: 400 25px var(--hand); margin: 24px 0 12px; display: flex; align-items: baseline; gap: 8px; }
+.h2 small { font: 700 14px var(--font); color: var(--ink-2); }
+.en { font-family: var(--read); font-weight: 700; }
+.ru { color: var(--ink-2); font-weight: 700; }
+
+/* ── Washi tape (red with white dots by default) ─────────── */
+.tape, .card::before, .flash::after, .canvas::before {
+  content: ''; position: absolute; z-index: 3; width: 74px; height: 22px; top: -9px; left: 50%; margin-left: -37px;
+  background: var(--dots) 0 0 / 9px 9px, var(--tape); opacity: .92; transform: rotate(-4deg);
+  clip-path: polygon(0 0, 100% 0, 96% 25%, 100% 50%, 96% 75%, 100% 100%, 0 100%, 4% 75%, 0 50%, 4% 25%);
+}
+
+/* ── Cardboard & paper surfaces ──────────────────────────── */
+.card { background: var(--paper); border-radius: var(--r-cut); box-shadow: var(--shadow); padding: 18px 16px 16px; position: relative; }
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px 14px; }
+.grid3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+
+/* tiles = cardboard cut-outs with a gouache splotch, a strip of tape and foam beads */
+.tile { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; text-align: center;
+  background: var(--speckle) 0 0 / 23px 19px, var(--corrugate), var(--kraft);
+  border-radius: var(--r-cut); box-shadow: var(--shadow); padding: 18px 8px 16px; min-height: 116px; position: relative; overflow: visible; isolation: isolate; }
+.tile:nth-child(odd) { transform: rotate(-1.3deg); border-radius: var(--r-cut2); }
+.tile:nth-child(even) { transform: rotate(1.1deg); }
+.tile::after { content: ''; position: absolute; z-index: 3; width: 58px; height: 18px; top: -8px; left: 50%; margin-left: -29px;
+  background: var(--dots) 0 0 / 8px 8px, var(--tape); opacity: .9; transform: rotate(-5deg);
+  clip-path: polygon(0 0, 100% 0, 96% 25%, 100% 50%, 96% 75%, 100% 100%, 0 100%, 4% 75%, 0 50%, 4% 25%); }
+.tile:nth-child(3n+2)::after { background: repeating-linear-gradient(45deg, rgba(255,255,255,.55) 0 4px, transparent 4px 8px), var(--teal); transform: rotate(4deg); }
+.tile:nth-child(3n)::after { background: var(--dots) 0 0 / 8px 8px, var(--pink); transform: rotate(-2deg); left: 30%; }
+.tile .t { font: 400 20px var(--hand); position: relative; }
+.tile .s { color: #5A4433; font-size: 13px; font-weight: 800; position: relative; }
+.tile .big { font-size: 42px; line-height: 1; position: relative; filter: drop-shadow(0 2px 0 rgba(0,0,0,.12)); }
+.tile .bar { position: absolute; left: 14px; right: 14px; bottom: 9px; height: 7px; border-radius: 6px; background: rgba(255,255,255,.45); overflow: hidden; }
+.tile .bar i { display: block; height: 100%; border-radius: 6px; background: var(--c, var(--teal)); }
+.tile.painted::before { content: ''; position: absolute; z-index: -1; inset: 14px 12px 22px; background: var(--c); opacity: .6;
+  border-radius: 58% 42% 50% 50% / 46% 58% 42% 54%; transform: rotate(-6deg); }
+.tile svg { background: var(--paper); border-radius: 10px; }
+
+/* hero card = white paper "mask" with gouache washes and foam beads */
+.hero { overflow: hidden; padding: 20px 18px; min-height: 150px; display: flex; flex-direction: column; justify-content: flex-end; background: var(--paper); transform: rotate(-.6deg); }
+.hero .wash { position: absolute; border-radius: 48% 52% 63% 37% / 41% 47% 53% 59%; opacity: .55; }
+.hero > *:not(.wash) { position: relative; }
+.hero::after { content: ''; position: absolute; right: 18px; bottom: 14px; width: 62px; height: 40px; background: var(--beads) 0 0 / 8px 8px; border-radius: 50%; opacity: .95; }
+
+/* daily plan = paper strips taped to cardboard */
+.plan { display: grid; gap: 14px; }
+.step { display: flex; align-items: center; gap: 12px; background: var(--paper); border-radius: var(--r-cut2); box-shadow: var(--shadow); padding: 12px 14px; position: relative; }
+.step:nth-child(1) { transform: rotate(-.8deg); } .step:nth-child(2) { transform: rotate(.6deg); } .step:nth-child(3) { transform: rotate(-.4deg); }
+.step .ico { width: 54px; height: 54px; display: flex; align-items: center; justify-content: center; font-size: 28px; background: var(--c); flex: 0 0 54px;
+  border-radius: 52% 48% 44% 56% / 48% 56% 44% 52%; box-shadow: inset 0 -4px 0 rgba(0,0,0,.08); }
+.step .tx { flex: 1; min-width: 0; }
+.step .tx b { display: block; font: 400 21px var(--hand); line-height: 1.1; }
+.step .tx span { color: var(--ink-2); font-size: 13px; font-weight: 700; }
+/* empty = dashed felt-pen circle; done = a foam-bead pom-pom with a tick */
+.step .ok { width: 36px; height: 36px; border-radius: 50%; border: 2.5px dashed #CDBBA6; display: flex; align-items: center; justify-content: center; font-size: 18px; flex: 0 0 36px; }
+.step.done .ok { border: 0; background: radial-gradient(circle at 35% 35%, #FFE58A, var(--yellow) 55%, #E9B820); box-shadow: 0 2px 0 rgba(0,0,0,.15); font-weight: 900; }
+.step.done::after { content: ''; position: absolute; width: 46px; height: 16px; right: 6px; top: -7px; background: var(--dots) 0 0 / 8px 8px, var(--tape); transform: rotate(8deg); opacity: .9; }
+
+/* ── Buttons = construction paper ────────────────────────── */
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 56px; padding: 0 22px;
+  border-radius: var(--r-cut2); background: radial-gradient(rgba(255,255,255,.18) 1px, transparent 1.5px) 0 0 / 6px 6px, var(--c, var(--yellow));
+  box-shadow: var(--shadow); font: 400 22px var(--hand); color: var(--ink); position: relative; }
+.btn.full { width: 100%; }
+.btn.white { --c: var(--paper); }
+.btn.sm { min-height: 44px; font-size: 17px; padding: 0 14px; }
+.btn[disabled] { opacity: .45; pointer-events: none; }
+.row { display: flex; gap: 10px; align-items: center; }
+.row > .grow { flex: 1; }
+
+/* ── Word pictures ───────────────────────────────────────── */
+.emo { font-size: 44px; line-height: 1; display: inline-block; filter: drop-shadow(0 2px 0 rgba(0,0,0,.1)); }
+/* colours = gouache daubs */
+.blob { display: inline-block; width: 50px; height: 44px; background: radial-gradient(circle at 32% 30%, rgba(255,255,255,.45), transparent 35%), var(--c);
+  border-radius: 50% 46% 54% 48% / 56% 50% 50% 44%; box-shadow: inset 0 -5px 0 rgba(0,0,0,.1), 0 2px 0 rgba(0,0,0,.12); }
+/* numbers = paper circles */
+.num { display: inline-flex; align-items: center; justify-content: center; width: 54px; height: 54px; border-radius: 52% 48% 50% 50%; background: var(--yellow); font: 700 30px/1 var(--read); box-shadow: 0 2px 0 rgba(0,0,0,.15); }
+.xl.emo { font-size: 120px; }
+.xl.blob { width: 150px; height: 130px; }
+.xl.num { width: 150px; height: 150px; font-size: 84px; }
+.lg.emo { font-size: 64px; }
+.lg.blob { width: 74px; height: 66px; }
+.lg.num { width: 74px; height: 74px; font-size: 40px; }
+
+/* ── Word grid: paper cards pinned on cardboard ──────────── */
+.wgrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px 10px; padding: 14px 10px; border-radius: var(--r-cut);
+  background: var(--speckle) 0 0 / 23px 19px, var(--corrugate), var(--kraft); box-shadow: var(--shadow); }
+.w { background: var(--paper); border-radius: var(--r-cut2); box-shadow: 0 2px 0 rgba(0,0,0,.12), 0 6px 10px -6px rgba(0,0,0,.3); padding: 12px 4px 8px; display: flex; flex-direction: column; align-items: center; gap: 4px; position: relative; min-height: 114px; justify-content: center; }
+.w:nth-child(3n+1) { transform: rotate(-1.5deg); } .w:nth-child(3n+2) { transform: rotate(1deg); } .w:nth-child(3n) { transform: rotate(-.5deg); }
+.w::before { content: ''; position: absolute; top: -6px; left: 50%; width: 14px; height: 14px; margin-left: -7px; border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #fff 0 2px, var(--pin, var(--red)) 3px); box-shadow: 0 2px 2px rgba(0,0,0,.25); }
+.w:nth-child(4n+2)::before { --pin: var(--cobalt); } .w:nth-child(4n+3)::before { --pin: var(--teal); } .w:nth-child(4n)::before { --pin: var(--yellow); }
+.w .en { font-size: 17px; }
+.w .ru { font-size: 12px; text-align: center; line-height: 1.15; }
+.w .st { position: absolute; top: 4px; right: 6px; font-size: 14px; }
+.w.new { background: #FFFDF8; opacity: .93; }
+.w.new::after { content: 'new'; position: absolute; left: 6px; top: 5px; font: 400 12px var(--hand); color: var(--coral); }
+
+/* ── Flashcard = a white paper mask with tape and foam beads ─ */
+.flash { text-align: center; padding: 28px 16px 22px; min-height: 360px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; overflow: visible; }
+.flash::after { left: auto; right: 18px; margin: 0; transform: rotate(18deg); background: repeating-linear-gradient(45deg, rgba(255,255,255,.55) 0 4px, transparent 4px 8px), var(--teal); }
+.flash .q { font: 400 19px var(--hand); color: var(--ink-2); }
+.flash .word { font: 700 46px/1.05 var(--read); }
+.flash .word-ru { font: 400 22px var(--hand); color: var(--ink-2); }
+.flash .ex { background: var(--wall); border-radius: var(--r-cut2); padding: 10px 14px; font-size: 17px; }
+.flash .ex .ru { font-size: 14px; display: block; }
+.say { position: absolute; top: 14px; right: 14px; }
+.card.flash::before { left: 18px; margin: 0; transform: rotate(-14deg); }
+/* progress = a ribbon of paper in a cardboard slot */
+.progress { height: 14px; border-radius: 10px; background: var(--corrugate), var(--kraft-lt); overflow: hidden; margin: 6px 0 16px; box-shadow: inset 0 2px 3px rgba(0,0,0,.15); }
+.progress i { display: block; height: 100%; border-radius: 10px; background: var(--dots) 0 0 / 9px 9px, var(--teal); transition: width .3s; }
+.duo { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 16px; }
+
+/* ── Games: answer cards are paper cut-outs ──────────────── */
+.opts { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.opt { background: var(--paper); border-radius: var(--r-cut); box-shadow: var(--shadow); min-height: 128px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; padding: 8px; }
+.opt:nth-child(1) { transform: rotate(-1.2deg); } .opt:nth-child(2) { transform: rotate(1deg); border-radius: var(--r-cut2); } .opt:nth-child(3) { transform: rotate(.8deg); border-radius: var(--r-cut2); } .opt:nth-child(4) { transform: rotate(-.9deg); }
+.opt.right { background: #E9F7EF; box-shadow: 0 0 0 4px var(--teal), var(--shadow); }
+.opt.wrong { animation: shake .4s; background: #FFEDE8; }
+.opt .lab { font: 700 18px var(--read); }
+/* listen button = a big foam-bead pom-pom */
+.listen-btn { width: 116px; height: 116px; border-radius: 50%; margin: 6px auto 18px; display: flex; align-items: center; justify-content: center; font-size: 50px;
+  background: var(--beads) 0 0 / 9px 9px, radial-gradient(circle at 35% 35%, #9BDCF6, var(--foam) 60%, #3FA7D6); box-shadow: 0 4px 0 rgba(0,0,0,.15), 0 12px 20px -8px rgba(0,0,0,.35); }
+.listen-btn.pulse { animation: pulse 1.2s ease-in-out infinite; }
+.prompt { text-align: center; font: 400 24px var(--hand); margin-bottom: 6px; }
+.prompt .en { font-size: 24px; display: block; }
+.slots { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; margin: 16px 0; }
+.slot { width: 46px; height: 56px; border-radius: 10px; border: 2.5px dashed #CDBBA6; display: flex; align-items: center; justify-content: center; font: 700 30px var(--read); background: var(--wall); }
+.slot.f { border: 0; background: var(--paper); box-shadow: 0 2px 0 rgba(0,0,0,.15); transform: rotate(-2deg); }
+.slot.gap { width: 18px; border: 0; background: none; }
+/* letter tiles = paper squares cut by hand */
+.letters { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; }
+.letter { width: 54px; height: 60px; border-radius: 12px 6px 14px 8px; background: var(--c, #fff); box-shadow: var(--shadow); font: 700 30px var(--read); }
+.letter:nth-child(odd) { transform: rotate(-4deg); } .letter:nth-child(even) { transform: rotate(3deg); }
+.letter.used { visibility: hidden; }
+.letter.wrong { animation: shake .4s; }
+
+@keyframes shake { 0%, 100% { translate: 0; } 25% { translate: -7px; } 75% { translate: 7px; } }
+@keyframes pulse { 0%, 100% { scale: 1; } 50% { scale: 1.06; } }
+
+/* ── Paint (colouring) ───────────────────────────────────── */
+.canvas { background: #fff; border-radius: var(--r-cut2); box-shadow: var(--shadow); padding: 10px; position: relative; }
+.canvas::before { left: 12px; margin: 0; transform: rotate(-20deg); }
+.canvas::after { content: ''; position: absolute; z-index: 3; width: 74px; height: 22px; right: 10px; bottom: -8px; transform: rotate(-16deg); opacity: .9;
+  background: repeating-linear-gradient(45deg, rgba(255,255,255,.55) 0 4px, transparent 4px 8px), var(--teal); }
+.canvas svg { width: 100%; height: auto; display: block; touch-action: manipulation; }
+.canvas svg .rg { cursor: pointer; transition: fill .25s; }
+.canvas svg .hint { animation: glow 1s ease-in-out 3; }
+@keyframes glow { 50% { stroke: var(--pink); stroke-width: 7; } }
+.task { display: flex; align-items: center; gap: 10px; margin: 0 0 14px; }
+.task .tx { flex: 1; }
+.task .en { font-size: 22px; display: block; line-height: 1.15; }
+.task .ru { font-size: 13px; }
+/* palette = gouache pots */
+.palette { display: grid; grid-template-columns: repeat(6, 1fr); gap: 28px 10px; margin-top: 16px; padding: 14px 12px 26px; border-radius: var(--r-cut);
+  background: var(--speckle) 0 0 / 23px 19px, var(--corrugate), var(--kraft); box-shadow: var(--shadow); }
+.crayon { aspect-ratio: 1; border-radius: 50% 46% 54% 48% / 56% 50% 50% 44%; background: radial-gradient(circle at 32% 28%, rgba(255,255,255,.5), transparent 32%), var(--c); box-shadow: inset 0 -5px 0 rgba(0,0,0,.12), 0 3px 0 rgba(0,0,0,.18); position: relative; }
+.crayon.on { transform: scale(1.18) rotate(-6deg); box-shadow: 0 0 0 3px var(--paper), 0 0 0 6px var(--ink); }
+.crayon span { position: absolute; left: 50%; bottom: -19px; transform: translateX(-50%); font: 700 11px var(--read); white-space: nowrap; color: #4A3628; }
+.pics { display: grid; grid-template-columns: 1fr 1fr; gap: 16px 14px; }
+.pics .tile svg { width: 100%; height: auto; }
+
+/* ── ABC: letters cut from coloured paper ────────────────── */
+.abc { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+.abc button { aspect-ratio: 1; border-radius: var(--r-cut2); background: radial-gradient(rgba(255,255,255,.2) 1px, transparent 1.5px) 0 0 / 6px 6px, var(--c); box-shadow: var(--shadow); font: 700 30px/1 var(--read); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; }
+.abc button:nth-child(odd) { transform: rotate(-2deg); } .abc button:nth-child(3n) { transform: rotate(2deg); border-radius: var(--r-cut); }
+.abc button small { font-size: 14px; font-weight: 700; }
+.abc-card { text-align: center; }
+.abc-card .L { font: 700 92px/1 var(--read); }
+.abc-card .L span { color: var(--ink-2); font-size: 64px; margin-left: 10px; }
+
+/* ── Gallery: a cork-ish cardboard board of stickers ─────── */
+.stickers { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; }
+.stk { aspect-ratio: 1; border-radius: 50%; border: 2.5px dashed #CDBBA6; display: flex; align-items: center; justify-content: center; font-size: 30px; }
+.stk.got { border: 0; background: var(--paper); box-shadow: 0 2px 0 rgba(0,0,0,.14), 0 0 0 4px rgba(255,255,255,.7); transform: rotate(var(--rot, 0deg)); }
+
+/* ── Celebrate: paper confetti + foam beads ──────────────── */
+.celebrate { position: fixed; inset: 0; z-index: 100; background: rgba(58, 46, 38, .3); display: flex; align-items: center; justify-content: center; overflow: hidden; }
+.cel-card { background: var(--paper); border-radius: var(--r-cut); box-shadow: var(--shadow); padding: 24px 28px; text-align: center; max-width: 300px; animation: popin .35s ease-out; position: relative; transform: rotate(-2deg); }
+.cel-card::before { content: ''; position: absolute; top: -10px; left: 50%; width: 80px; height: 22px; margin-left: -40px; background: var(--dots) 0 0 / 9px 9px, var(--tape); transform: rotate(-4deg); }
+.cel-emo { font-size: 72px; line-height: 1; }
+.cel-msg { font: 400 24px var(--hand); margin-top: 8px; }
+.celebrate i { position: absolute; top: -20px; left: var(--x); width: 14px; height: 14px; animation: drop var(--d) ease-in forwards; transform: rotate(var(--r)); }
+.celebrate i:nth-child(3n) { clip-path: polygon(50% 0, 100% 100%, 0 100%); }
+.celebrate i:nth-child(3n+1) { border-radius: 50%; }
+.celebrate i:nth-child(5n) { width: 22px; height: 8px; }
+@keyframes drop { to { top: 105vh; transform: rotate(calc(var(--r) + 360deg)); } }
+@keyframes popin { from { scale: .6; opacity: 0; } to { scale: 1; opacity: 1; } }
+.toast { position: fixed; left: 50%; bottom: calc(96px + var(--safe-b)); transform: translateX(-50%) rotate(-1deg); background: var(--paper); box-shadow: var(--shadow); padding: 10px 18px; border-radius: var(--r-cut2); font: 400 19px var(--hand); z-index: 90; }
+.burst { position: absolute; z-index: 80; transform: translate(-50%, 0); font: 400 24px var(--hand); animation: up .9s ease-out forwards; pointer-events: none; }
+@keyframes up { to { transform: translate(-50%, -60px); opacity: 0; } }
+
+/* ── Parents ─────────────────────────────────────────────── */
+.field { display: flex; flex-direction: column; gap: 4px; margin-bottom: 10px; }
+.field label { font-size: 13px; font-weight: 800; color: var(--ink-2); }
+.input, .select { width: 100%; min-height: 48px; border-radius: 12px; border: 2px solid #D9CBB8; padding: 8px 12px; font: 700 16px var(--font); background: #fff; }
+.stat { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 2px dotted var(--line); font-weight: 800; }
+.note { background: var(--paper); border-radius: var(--r-cut2); padding: 12px 14px; font-size: 14px; font-weight: 700; color: var(--ink-2); box-shadow: 0 2px 0 rgba(0,0,0,.08); }
+
+/* ── Cut-paper leaves from the studio mural (decoration) ─── */
+.mural { position: absolute; z-index: 0; pointer-events: none; opacity: .9; }
+
+@media (min-width: 600px) {
+  .wgrid { grid-template-columns: repeat(4, 1fr); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .garland .leaf, .listen-btn.pulse { animation: none; }
+}

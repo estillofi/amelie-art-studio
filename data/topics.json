@@ -1,0 +1,98 @@
+[
+  {
+    "id": "hello",
+    "en": "Hello!",
+    "ru": "Привет!",
+    "icon": "👋",
+    "color": "#F7A23B",
+    "order": 0
+  },
+  {
+    "id": "colours",
+    "en": "Colours",
+    "ru": "Цвета",
+    "icon": "🎨",
+    "color": "#E5453B",
+    "order": 1
+  },
+  {
+    "id": "art",
+    "en": "Art studio",
+    "ru": "ИЗО-студия",
+    "icon": "🖌️",
+    "color": "#9B6BE0",
+    "order": 2
+  },
+  {
+    "id": "picture",
+    "en": "My picture",
+    "ru": "Мой рисунок",
+    "icon": "🌞",
+    "color": "#FFD447",
+    "order": 3
+  },
+  {
+    "id": "numbers",
+    "en": "Numbers",
+    "ru": "Числа",
+    "icon": "🔢",
+    "color": "#9AD7C9",
+    "order": 4
+  },
+  {
+    "id": "animals",
+    "en": "Animals",
+    "ru": "Животные",
+    "icon": "🐱",
+    "color": "#8BC34A",
+    "order": 5
+  },
+  {
+    "id": "family",
+    "en": "My family",
+    "ru": "Моя семья",
+    "icon": "💛",
+    "color": "#F7A1C4",
+    "order": 6
+  },
+  {
+    "id": "body",
+    "en": "My body",
+    "ru": "Тело",
+    "icon": "🙌",
+    "color": "#F0855B",
+    "order": 7
+  },
+  {
+    "id": "aikido",
+    "en": "Aikido",
+    "ru": "Айкидо",
+    "icon": "🥋",
+    "color": "#4C8DF6",
+    "order": 8
+  },
+  {
+    "id": "ican",
+    "en": "I can…",
+    "ru": "Я умею…",
+    "icon": "💃",
+    "color": "#3FA796",
+    "order": 9
+  },
+  {
+    "id": "toys",
+    "en": "Toys",
+    "ru": "Игрушки",
+    "icon": "🧸",
+    "color": "#C7A0F0",
+    "order": 10
+  },
+  {
+    "id": "food",
+    "en": "Food",
+    "ru": "Еда",
+    "icon": "🍎",
+    "color": "#FF8A80",
+    "order": 11
+  }
+]

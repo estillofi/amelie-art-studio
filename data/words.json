@@ -1,0 +1,1102 @@
+[
+  {
+    "id": "hello-hello",
+    "topic": "hello",
+    "en": "hello",
+    "ru": "привет",
+    "ex": "Hello! I am Amelie.",
+    "exRu": "Привет! Я Амели.",
+    "order": 0,
+    "pic": "👋"
+  },
+  {
+    "id": "hello-goodbye",
+    "topic": "hello",
+    "en": "goodbye",
+    "ru": "до свидания",
+    "ex": "Goodbye, teacher!",
+    "exRu": "До свидания, учитель!",
+    "order": 1,
+    "pic": "🙋‍♀️"
+  },
+  {
+    "id": "hello-yes",
+    "topic": "hello",
+    "en": "yes",
+    "ru": "да",
+    "ex": "Yes, I can draw!",
+    "exRu": "Да, я умею рисовать!",
+    "order": 2,
+    "pic": "✅"
+  },
+  {
+    "id": "hello-no",
+    "topic": "hello",
+    "en": "no",
+    "ru": "нет",
+    "ex": "No, thank you.",
+    "exRu": "Нет, спасибо.",
+    "order": 3,
+    "pic": "❌"
+  },
+  {
+    "id": "hello-please",
+    "topic": "hello",
+    "en": "please",
+    "ru": "пожалуйста",
+    "ex": "A pencil, please.",
+    "exRu": "Карандаш, пожалуйста.",
+    "order": 4,
+    "pic": "🙏"
+  },
+  {
+    "id": "hello-thank-you",
+    "topic": "hello",
+    "en": "thank you",
+    "ru": "спасибо",
+    "ex": "Thank you, Mummy!",
+    "exRu": "Спасибо, мама!",
+    "order": 5,
+    "pic": "💐"
+  },
+  {
+    "id": "hello-friend",
+    "topic": "hello",
+    "en": "friend",
+    "ru": "друг, подруга",
+    "ex": "This is my friend.",
+    "exRu": "Это мой друг.",
+    "order": 6,
+    "pic": "🤝"
+  },
+  {
+    "id": "hello-teacher",
+    "topic": "hello",
+    "en": "teacher",
+    "ru": "учитель",
+    "ex": "My teacher is nice.",
+    "exRu": "Мой учитель добрый.",
+    "order": 7,
+    "pic": "👩‍🏫"
+  },
+  {
+    "id": "colours-red",
+    "topic": "colours",
+    "en": "red",
+    "ru": "красный",
+    "ex": "I like red.",
+    "exRu": "Я люблю красный.",
+    "order": 0,
+    "color": "#FF4D4F"
+  },
+  {
+    "id": "colours-blue",
+    "topic": "colours",
+    "en": "blue",
+    "ru": "синий, голубой",
+    "ex": "The sky is blue.",
+    "exRu": "Небо голубое.",
+    "order": 1,
+    "color": "#3A86FF"
+  },
+  {
+    "id": "colours-yellow",
+    "topic": "colours",
+    "en": "yellow",
+    "ru": "жёлтый",
+    "ex": "The sun is yellow.",
+    "exRu": "Солнце жёлтое.",
+    "order": 2,
+    "color": "#FFD23F"
+  },
+  {
+    "id": "colours-green",
+    "topic": "colours",
+    "en": "green",
+    "ru": "зелёный",
+    "ex": "The grass is green.",
+    "exRu": "Трава зелёная.",
+    "order": 3,
+    "color": "#3BB273"
+  },
+  {
+    "id": "colours-orange",
+    "topic": "colours",
+    "en": "orange",
+    "ru": "оранжевый",
+    "ex": "An orange cat.",
+    "exRu": "Рыжий (оранжевый) кот.",
+    "order": 4,
+    "color": "#FF9F1C"
+  },
+  {
+    "id": "colours-purple",
+    "topic": "colours",
+    "en": "purple",
+    "ru": "фиолетовый",
+    "ex": "My brush is purple.",
+    "exRu": "Моя кисточка фиолетовая.",
+    "order": 5,
+    "color": "#8E5CF7"
+  },
+  {
+    "id": "colours-pink",
+    "topic": "colours",
+    "en": "pink",
+    "ru": "розовый",
+    "ex": "A pink flower.",
+    "exRu": "Розовый цветок.",
+    "order": 6,
+    "color": "#FF70A6"
+  },
+  {
+    "id": "colours-brown",
+    "topic": "colours",
+    "en": "brown",
+    "ru": "коричневый",
+    "ex": "A brown bear.",
+    "exRu": "Бурый (коричневый) медведь.",
+    "order": 7,
+    "color": "#A0522D"
+  },
+  {
+    "id": "colours-black",
+    "topic": "colours",
+    "en": "black",
+    "ru": "чёрный",
+    "ex": "A black pencil.",
+    "exRu": "Чёрный карандаш.",
+    "order": 8,
+    "color": "#222222"
+  },
+  {
+    "id": "colours-white",
+    "topic": "colours",
+    "en": "white",
+    "ru": "белый",
+    "ex": "White paper.",
+    "exRu": "Белая бумага.",
+    "order": 9,
+    "color": "#FFFFFF"
+  },
+  {
+    "id": "colours-grey",
+    "topic": "colours",
+    "en": "grey",
+    "ru": "серый",
+    "ex": "A grey mouse.",
+    "exRu": "Серая мышка.",
+    "order": 10,
+    "color": "#9AA0A6"
+  },
+  {
+    "id": "art-paint",
+    "topic": "art",
+    "en": "paint",
+    "ru": "краска; рисовать красками",
+    "ex": "I paint a rainbow.",
+    "exRu": "Я рисую радугу красками.",
+    "order": 0,
+    "pic": "🎨"
+  },
+  {
+    "id": "art-brush",
+    "topic": "art",
+    "en": "brush",
+    "ru": "кисточка",
+    "ex": "I have a big brush.",
+    "exRu": "У меня большая кисточка.",
+    "order": 1,
+    "pic": "🖌️"
+  },
+  {
+    "id": "art-pencil",
+    "topic": "art",
+    "en": "pencil",
+    "ru": "карандаш",
+    "ex": "A pencil, please.",
+    "exRu": "Карандаш, пожалуйста.",
+    "order": 2,
+    "pic": "✏️"
+  },
+  {
+    "id": "art-crayon",
+    "topic": "art",
+    "en": "crayon",
+    "ru": "мелок",
+    "ex": "I have ten crayons.",
+    "exRu": "У меня десять мелков.",
+    "order": 3,
+    "pic": "🖍️"
+  },
+  {
+    "id": "art-paper",
+    "topic": "art",
+    "en": "paper",
+    "ru": "бумага",
+    "ex": "White paper, please.",
+    "exRu": "Белую бумагу, пожалуйста.",
+    "order": 4,
+    "pic": "📄"
+  },
+  {
+    "id": "art-picture",
+    "topic": "art",
+    "en": "picture",
+    "ru": "картина, рисунок",
+    "ex": "Look at my picture!",
+    "exRu": "Посмотри на мой рисунок!",
+    "order": 5,
+    "pic": "🖼️"
+  },
+  {
+    "id": "art-scissors",
+    "topic": "art",
+    "en": "scissors",
+    "ru": "ножницы",
+    "ex": "Red scissors.",
+    "exRu": "Красные ножницы.",
+    "order": 6,
+    "pic": "✂️"
+  },
+  {
+    "id": "art-artist",
+    "topic": "art",
+    "en": "artist",
+    "ru": "художник",
+    "ex": "I am an artist.",
+    "exRu": "Я художница.",
+    "order": 7,
+    "pic": "🧑‍🎨"
+  },
+  {
+    "id": "art-rainbow",
+    "topic": "art",
+    "en": "rainbow",
+    "ru": "радуга",
+    "ex": "I can paint a rainbow.",
+    "exRu": "Я умею рисовать радугу.",
+    "order": 8,
+    "pic": "🌈"
+  },
+  {
+    "id": "art-draw",
+    "topic": "art",
+    "en": "draw",
+    "ru": "рисовать",
+    "ex": "I draw every day.",
+    "exRu": "Я рисую каждый день.",
+    "order": 9,
+    "pic": "✍️"
+  },
+  {
+    "id": "picture-sun",
+    "topic": "picture",
+    "en": "sun",
+    "ru": "солнце",
+    "ex": "Colour the sun yellow.",
+    "exRu": "Раскрась солнце жёлтым.",
+    "order": 0,
+    "pic": "☀️"
+  },
+  {
+    "id": "picture-house",
+    "topic": "picture",
+    "en": "house",
+    "ru": "дом",
+    "ex": "I draw a house.",
+    "exRu": "Я рисую дом.",
+    "order": 1,
+    "pic": "🏠"
+  },
+  {
+    "id": "picture-tree",
+    "topic": "picture",
+    "en": "tree",
+    "ru": "дерево",
+    "ex": "A big green tree.",
+    "exRu": "Большое зелёное дерево.",
+    "order": 2,
+    "pic": "🌳"
+  },
+  {
+    "id": "picture-flower",
+    "topic": "picture",
+    "en": "flower",
+    "ru": "цветок",
+    "ex": "A pink flower.",
+    "exRu": "Розовый цветок.",
+    "order": 3,
+    "pic": "🌸"
+  },
+  {
+    "id": "picture-grass",
+    "topic": "picture",
+    "en": "grass",
+    "ru": "трава",
+    "ex": "The grass is green.",
+    "exRu": "Трава зелёная.",
+    "order": 4,
+    "pic": "🌿"
+  },
+  {
+    "id": "picture-cloud",
+    "topic": "picture",
+    "en": "cloud",
+    "ru": "облако",
+    "ex": "A white cloud.",
+    "exRu": "Белое облако.",
+    "order": 5,
+    "pic": "☁️"
+  },
+  {
+    "id": "picture-star",
+    "topic": "picture",
+    "en": "star",
+    "ru": "звезда",
+    "ex": "A yellow star.",
+    "exRu": "Жёлтая звезда.",
+    "order": 6,
+    "pic": "⭐"
+  },
+  {
+    "id": "picture-moon",
+    "topic": "picture",
+    "en": "moon",
+    "ru": "луна",
+    "ex": "I can see the moon.",
+    "exRu": "Я вижу луну.",
+    "order": 7,
+    "pic": "🌙"
+  },
+  {
+    "id": "picture-heart",
+    "topic": "picture",
+    "en": "heart",
+    "ru": "сердечко",
+    "ex": "A red heart for Mummy.",
+    "exRu": "Красное сердечко для мамы.",
+    "order": 8,
+    "pic": "❤️"
+  },
+  {
+    "id": "picture-door",
+    "topic": "picture",
+    "en": "door",
+    "ru": "дверь",
+    "ex": "A brown door.",
+    "exRu": "Коричневая дверь.",
+    "order": 9,
+    "pic": "🚪"
+  },
+  {
+    "id": "picture-window",
+    "topic": "picture",
+    "en": "window",
+    "ru": "окно",
+    "ex": "A blue window.",
+    "exRu": "Синее окно.",
+    "order": 10,
+    "pic": "🪟"
+  },
+  {
+    "id": "picture-roof",
+    "topic": "picture",
+    "en": "roof",
+    "ru": "крыша",
+    "ex": "A red roof.",
+    "exRu": "Красная крыша.",
+    "order": 11,
+    "pic": "🔺"
+  },
+  {
+    "id": "numbers-one",
+    "topic": "numbers",
+    "en": "one",
+    "ru": "один",
+    "ex": "One brush.",
+    "exRu": "Одна кисточка.",
+    "order": 0,
+    "num": 1
+  },
+  {
+    "id": "numbers-two",
+    "topic": "numbers",
+    "en": "two",
+    "ru": "два",
+    "ex": "Two cats.",
+    "exRu": "Две кошки.",
+    "order": 1,
+    "num": 2
+  },
+  {
+    "id": "numbers-three",
+    "topic": "numbers",
+    "en": "three",
+    "ru": "три",
+    "ex": "Three stars.",
+    "exRu": "Три звезды.",
+    "order": 2,
+    "num": 3
+  },
+  {
+    "id": "numbers-four",
+    "topic": "numbers",
+    "en": "four",
+    "ru": "четыре",
+    "ex": "Four pencils.",
+    "exRu": "Четыре карандаша.",
+    "order": 3,
+    "num": 4
+  },
+  {
+    "id": "numbers-five",
+    "topic": "numbers",
+    "en": "five",
+    "ru": "пять",
+    "ex": "Five flowers.",
+    "exRu": "Пять цветов.",
+    "order": 4,
+    "num": 5
+  },
+  {
+    "id": "numbers-six",
+    "topic": "numbers",
+    "en": "six",
+    "ru": "шесть",
+    "ex": "I am… six? No, eight!",
+    "exRu": "Мне… шесть? Нет, восемь!",
+    "order": 5,
+    "num": 6
+  },
+  {
+    "id": "numbers-seven",
+    "topic": "numbers",
+    "en": "seven",
+    "ru": "семь",
+    "ex": "Seven colours in a rainbow.",
+    "exRu": "Семь цветов в радуге.",
+    "order": 6,
+    "num": 7
+  },
+  {
+    "id": "numbers-eight",
+    "topic": "numbers",
+    "en": "eight",
+    "ru": "восемь",
+    "ex": "I am eight.",
+    "exRu": "Мне восемь лет.",
+    "order": 7,
+    "num": 8
+  },
+  {
+    "id": "numbers-nine",
+    "topic": "numbers",
+    "en": "nine",
+    "ru": "девять",
+    "ex": "Nine crayons.",
+    "exRu": "Девять мелков.",
+    "order": 8,
+    "num": 9
+  },
+  {
+    "id": "numbers-ten",
+    "topic": "numbers",
+    "en": "ten",
+    "ru": "десять",
+    "ex": "Ten fingers.",
+    "exRu": "Десять пальцев.",
+    "order": 9,
+    "num": 10
+  },
+  {
+    "id": "animals-cat",
+    "topic": "animals",
+    "en": "cat",
+    "ru": "кошка, кот",
+    "ex": "I draw a cat.",
+    "exRu": "Я рисую кошку.",
+    "order": 0,
+    "pic": "🐱"
+  },
+  {
+    "id": "animals-dog",
+    "topic": "animals",
+    "en": "dog",
+    "ru": "собака",
+    "ex": "A brown dog.",
+    "exRu": "Коричневая собака.",
+    "order": 1,
+    "pic": "🐶"
+  },
+  {
+    "id": "animals-fish",
+    "topic": "animals",
+    "en": "fish",
+    "ru": "рыба",
+    "ex": "A blue fish.",
+    "exRu": "Синяя рыбка.",
+    "order": 2,
+    "pic": "🐟"
+  },
+  {
+    "id": "animals-bird",
+    "topic": "animals",
+    "en": "bird",
+    "ru": "птица",
+    "ex": "A little bird.",
+    "exRu": "Маленькая птичка.",
+    "order": 3,
+    "pic": "🐦"
+  },
+  {
+    "id": "animals-frog",
+    "topic": "animals",
+    "en": "frog",
+    "ru": "лягушка",
+    "ex": "A green frog can jump.",
+    "exRu": "Зелёная лягушка умеет прыгать.",
+    "order": 4,
+    "pic": "🐸"
+  },
+  {
+    "id": "animals-duck",
+    "topic": "animals",
+    "en": "duck",
+    "ru": "утка",
+    "ex": "A yellow duck.",
+    "exRu": "Жёлтая уточка.",
+    "order": 5,
+    "pic": "🦆"
+  },
+  {
+    "id": "animals-horse",
+    "topic": "animals",
+    "en": "horse",
+    "ru": "лошадь",
+    "ex": "A white horse.",
+    "exRu": "Белая лошадь.",
+    "order": 6,
+    "pic": "🐴"
+  },
+  {
+    "id": "animals-mouse",
+    "topic": "animals",
+    "en": "mouse",
+    "ru": "мышка",
+    "ex": "A grey mouse.",
+    "exRu": "Серая мышка.",
+    "order": 7,
+    "pic": "🐭"
+  },
+  {
+    "id": "animals-rabbit",
+    "topic": "animals",
+    "en": "rabbit",
+    "ru": "кролик",
+    "ex": "A white rabbit.",
+    "exRu": "Белый кролик.",
+    "order": 8,
+    "pic": "🐰"
+  },
+  {
+    "id": "animals-bear",
+    "topic": "animals",
+    "en": "bear",
+    "ru": "медведь",
+    "ex": "A brown bear.",
+    "exRu": "Бурый медведь.",
+    "order": 9,
+    "pic": "🐻"
+  },
+  {
+    "id": "animals-butterfly",
+    "topic": "animals",
+    "en": "butterfly",
+    "ru": "бабочка",
+    "ex": "A purple butterfly.",
+    "exRu": "Фиолетовая бабочка.",
+    "order": 10,
+    "pic": "🦋"
+  },
+  {
+    "id": "family-mummy",
+    "topic": "family",
+    "en": "mummy",
+    "ru": "мама",
+    "ex": "My mummy is an artist.",
+    "exRu": "Моя мама — художница.",
+    "order": 0,
+    "pic": "👩"
+  },
+  {
+    "id": "family-daddy",
+    "topic": "family",
+    "en": "daddy",
+    "ru": "папа",
+    "ex": "I love my daddy.",
+    "exRu": "Я люблю папу.",
+    "order": 1,
+    "pic": "👨"
+  },
+  {
+    "id": "family-sister",
+    "topic": "family",
+    "en": "sister",
+    "ru": "сестра",
+    "ex": "This is my sister.",
+    "exRu": "Это моя сестра.",
+    "order": 2,
+    "pic": "👧"
+  },
+  {
+    "id": "family-brother",
+    "topic": "family",
+    "en": "brother",
+    "ru": "брат",
+    "ex": "My brother can run.",
+    "exRu": "Мой брат умеет бегать.",
+    "order": 3,
+    "pic": "👦"
+  },
+  {
+    "id": "family-grandma",
+    "topic": "family",
+    "en": "grandma",
+    "ru": "бабушка",
+    "ex": "Grandma, look at my picture!",
+    "exRu": "Бабушка, посмотри на мой рисунок!",
+    "order": 4,
+    "pic": "👵"
+  },
+  {
+    "id": "family-grandpa",
+    "topic": "family",
+    "en": "grandpa",
+    "ru": "дедушка",
+    "ex": "Hello, Grandpa!",
+    "exRu": "Привет, дедушка!",
+    "order": 5,
+    "pic": "👴"
+  },
+  {
+    "id": "family-baby",
+    "topic": "family",
+    "en": "baby",
+    "ru": "малыш",
+    "ex": "A little baby.",
+    "exRu": "Маленький малыш.",
+    "order": 6,
+    "pic": "👶"
+  },
+  {
+    "id": "family-family",
+    "topic": "family",
+    "en": "family",
+    "ru": "семья",
+    "ex": "I draw my family.",
+    "exRu": "Я рисую свою семью.",
+    "order": 7,
+    "pic": "👨‍👩‍👧"
+  },
+  {
+    "id": "body-head",
+    "topic": "body",
+    "en": "head",
+    "ru": "голова",
+    "ex": "Touch your head.",
+    "exRu": "Дотронься до головы.",
+    "order": 0,
+    "pic": "🙂"
+  },
+  {
+    "id": "body-eyes",
+    "topic": "body",
+    "en": "eyes",
+    "ru": "глаза",
+    "ex": "I have blue eyes.",
+    "exRu": "У меня голубые глаза.",
+    "order": 1,
+    "pic": "👀"
+  },
+  {
+    "id": "body-ears",
+    "topic": "body",
+    "en": "ears",
+    "ru": "уши",
+    "ex": "Touch your ears.",
+    "exRu": "Дотронься до ушей.",
+    "order": 2,
+    "pic": "👂"
+  },
+  {
+    "id": "body-nose",
+    "topic": "body",
+    "en": "nose",
+    "ru": "нос",
+    "ex": "Touch your nose.",
+    "exRu": "Дотронься до носа.",
+    "order": 3,
+    "pic": "👃"
+  },
+  {
+    "id": "body-mouth",
+    "topic": "body",
+    "en": "mouth",
+    "ru": "рот",
+    "ex": "Open your mouth.",
+    "exRu": "Открой рот.",
+    "order": 4,
+    "pic": "👄"
+  },
+  {
+    "id": "body-hands",
+    "topic": "body",
+    "en": "hands",
+    "ru": "руки (кисти)",
+    "ex": "Clap your hands.",
+    "exRu": "Похлопай в ладоши.",
+    "order": 5,
+    "pic": "🙌"
+  },
+  {
+    "id": "body-arms",
+    "topic": "body",
+    "en": "arms",
+    "ru": "руки",
+    "ex": "Strong arms.",
+    "exRu": "Сильные руки.",
+    "order": 6,
+    "pic": "💪"
+  },
+  {
+    "id": "body-legs",
+    "topic": "body",
+    "en": "legs",
+    "ru": "ноги",
+    "ex": "Strong legs.",
+    "exRu": "Сильные ноги.",
+    "order": 7,
+    "pic": "🦵"
+  },
+  {
+    "id": "body-feet",
+    "topic": "body",
+    "en": "feet",
+    "ru": "ступни",
+    "ex": "Stamp your feet.",
+    "exRu": "Потопай ногами.",
+    "order": 8,
+    "pic": "🦶"
+  },
+  {
+    "id": "aikido-aikido",
+    "topic": "aikido",
+    "en": "aikido",
+    "ru": "айкидо",
+    "ex": "I do aikido.",
+    "exRu": "Я занимаюсь айкидо.",
+    "order": 0,
+    "pic": "🥋"
+  },
+  {
+    "id": "aikido-bow",
+    "topic": "aikido",
+    "en": "bow",
+    "ru": "поклон; кланяться",
+    "ex": "Bow to your sensei.",
+    "exRu": "Поклонись сэнсэю.",
+    "order": 1,
+    "pic": "🙇‍♀️"
+  },
+  {
+    "id": "aikido-stand-up",
+    "topic": "aikido",
+    "en": "stand up",
+    "ru": "встань",
+    "ex": "Stand up, please.",
+    "exRu": "Встань, пожалуйста.",
+    "order": 2,
+    "pic": "🧍‍♀️"
+  },
+  {
+    "id": "aikido-sit-down",
+    "topic": "aikido",
+    "en": "sit down",
+    "ru": "сядь",
+    "ex": "Sit down on the mat.",
+    "exRu": "Сядь на татами.",
+    "order": 3,
+    "pic": "🧎‍♀️"
+  },
+  {
+    "id": "aikido-turn-around",
+    "topic": "aikido",
+    "en": "turn around",
+    "ru": "повернись",
+    "ex": "Turn around!",
+    "exRu": "Повернись!",
+    "order": 4,
+    "pic": "🔄"
+  },
+  {
+    "id": "aikido-roll",
+    "topic": "aikido",
+    "en": "roll",
+    "ru": "кувырок; кувыркаться",
+    "ex": "I can roll.",
+    "exRu": "Я умею делать кувырок.",
+    "order": 5,
+    "pic": "🤸‍♀️"
+  },
+  {
+    "id": "aikido-left",
+    "topic": "aikido",
+    "en": "left",
+    "ru": "налево, левый",
+    "ex": "Step left.",
+    "exRu": "Шаг влево.",
+    "order": 6,
+    "pic": "⬅️"
+  },
+  {
+    "id": "aikido-right",
+    "topic": "aikido",
+    "en": "right",
+    "ru": "направо, правый",
+    "ex": "Step right.",
+    "exRu": "Шаг вправо.",
+    "order": 7,
+    "pic": "➡️"
+  },
+  {
+    "id": "aikido-strong",
+    "topic": "aikido",
+    "en": "strong",
+    "ru": "сильный",
+    "ex": "I am strong.",
+    "exRu": "Я сильная.",
+    "order": 8,
+    "pic": "💪"
+  },
+  {
+    "id": "ican-sing",
+    "topic": "ican",
+    "en": "sing",
+    "ru": "петь",
+    "ex": "I can sing.",
+    "exRu": "Я умею петь.",
+    "order": 0,
+    "pic": "🎤"
+  },
+  {
+    "id": "ican-dance",
+    "topic": "ican",
+    "en": "dance",
+    "ru": "танцевать",
+    "ex": "I can dance.",
+    "exRu": "Я умею танцевать.",
+    "order": 1,
+    "pic": "💃"
+  },
+  {
+    "id": "ican-jump",
+    "topic": "ican",
+    "en": "jump",
+    "ru": "прыгать",
+    "ex": "I can jump.",
+    "exRu": "Я умею прыгать.",
+    "order": 2,
+    "pic": "🦘"
+  },
+  {
+    "id": "ican-run",
+    "topic": "ican",
+    "en": "run",
+    "ru": "бегать",
+    "ex": "I can run fast.",
+    "exRu": "Я умею быстро бегать.",
+    "order": 3,
+    "pic": "🏃‍♀️"
+  },
+  {
+    "id": "ican-swim",
+    "topic": "ican",
+    "en": "swim",
+    "ru": "плавать",
+    "ex": "I can swim.",
+    "exRu": "Я умею плавать.",
+    "order": 4,
+    "pic": "🏊‍♀️"
+  },
+  {
+    "id": "ican-climb",
+    "topic": "ican",
+    "en": "climb",
+    "ru": "лазать",
+    "ex": "I can climb a tree.",
+    "exRu": "Я умею лазать по деревьям.",
+    "order": 5,
+    "pic": "🧗‍♀️"
+  },
+  {
+    "id": "ican-read",
+    "topic": "ican",
+    "en": "read",
+    "ru": "читать",
+    "ex": "I can read.",
+    "exRu": "Я умею читать.",
+    "order": 6,
+    "pic": "📖"
+  },
+  {
+    "id": "ican-fly",
+    "topic": "ican",
+    "en": "fly",
+    "ru": "летать",
+    "ex": "Birds can fly.",
+    "exRu": "Птицы умеют летать.",
+    "order": 7,
+    "pic": "🕊️"
+  },
+  {
+    "id": "toys-ball",
+    "topic": "toys",
+    "en": "ball",
+    "ru": "мяч",
+    "ex": "A red ball.",
+    "exRu": "Красный мяч.",
+    "order": 0,
+    "pic": "⚽"
+  },
+  {
+    "id": "toys-doll",
+    "topic": "toys",
+    "en": "doll",
+    "ru": "кукла",
+    "ex": "My doll is pink.",
+    "exRu": "Моя кукла розовая.",
+    "order": 1,
+    "pic": "🪆"
+  },
+  {
+    "id": "toys-teddy-bear",
+    "topic": "toys",
+    "en": "teddy bear",
+    "ru": "плюшевый мишка",
+    "ex": "I love my teddy bear.",
+    "exRu": "Я люблю своего мишку.",
+    "order": 2,
+    "pic": "🧸"
+  },
+  {
+    "id": "toys-car",
+    "topic": "toys",
+    "en": "car",
+    "ru": "машинка",
+    "ex": "A blue car.",
+    "exRu": "Синяя машинка.",
+    "order": 3,
+    "pic": "🚗"
+  },
+  {
+    "id": "toys-kite",
+    "topic": "toys",
+    "en": "kite",
+    "ru": "воздушный змей",
+    "ex": "A rainbow kite.",
+    "exRu": "Радужный воздушный змей.",
+    "order": 4,
+    "pic": "🪁"
+  },
+  {
+    "id": "toys-balloon",
+    "topic": "toys",
+    "en": "balloon",
+    "ru": "воздушный шарик",
+    "ex": "A red balloon.",
+    "exRu": "Красный шарик.",
+    "order": 5,
+    "pic": "🎈"
+  },
+  {
+    "id": "food-apple",
+    "topic": "food",
+    "en": "apple",
+    "ru": "яблоко",
+    "ex": "A red apple.",
+    "exRu": "Красное яблоко.",
+    "order": 0,
+    "pic": "🍎"
+  },
+  {
+    "id": "food-banana",
+    "topic": "food",
+    "en": "banana",
+    "ru": "банан",
+    "ex": "A yellow banana.",
+    "exRu": "Жёлтый банан.",
+    "order": 1,
+    "pic": "🍌"
+  },
+  {
+    "id": "food-cake",
+    "topic": "food",
+    "en": "cake",
+    "ru": "торт",
+    "ex": "A birthday cake.",
+    "exRu": "Праздничный торт.",
+    "order": 2,
+    "pic": "🎂"
+  },
+  {
+    "id": "food-ice-cream",
+    "topic": "food",
+    "en": "ice cream",
+    "ru": "мороженое",
+    "ex": "I like ice cream.",
+    "exRu": "Я люблю мороженое.",
+    "order": 3,
+    "pic": "🍦"
+  },
+  {
+    "id": "food-milk",
+    "topic": "food",
+    "en": "milk",
+    "ru": "молоко",
+    "ex": "Milk, please.",
+    "exRu": "Молока, пожалуйста.",
+    "order": 4,
+    "pic": "🥛"
+  },
+  {
+    "id": "food-juice",
+    "topic": "food",
+    "en": "juice",
+    "ru": "сок",
+    "ex": "Orange juice.",
+    "exRu": "Апельсиновый сок.",
+    "order": 5,
+    "pic": "🧃"
+  },
+  {
+    "id": "food-pizza",
+    "topic": "food",
+    "en": "pizza",
+    "ru": "пицца",
+    "ex": "I like pizza.",
+    "exRu": "Я люблю пиццу.",
+    "order": 6,
+    "pic": "🍕"
+  },
+  {
+    "id": "food-biscuit",
+    "topic": "food",
+    "en": "biscuit",
+    "ru": "печенье",
+    "ex": "A biscuit, please.",
+    "exRu": "Печенье, пожалуйста.",
+    "order": 7,
+    "pic": "🍪"
+  }
+]

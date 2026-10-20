@@ -13,7 +13,8 @@ export const learned = (wordId) => boxOf(wordId) >= LEARNED_BOX;
 export function grade(wordId, know, assignmentId = null) {
   const wasNew = !progOf(wordId);
   const p = progOf(wordId) || { id: wordId, box: 0, reps: 0, first: Date.now() };
-  const box = know ? Math.min(5, (p.box || 0) + 1) : 1;
+  // A missed card must return to a one-day interval after the in-session retry.
+  const box = know ? Math.min(5, (p.box || 0) + 1) : 0;
   const due = know ? startOfDay() + WAIT_DAYS[box] * DAY : 0;
   save('progress', { ...p, box, due, reps: (p.reps || 0) + 1, last: Date.now() });
   save('log', { word: wordId, ts: Date.now(), know, wasNew, day: todayKey(), ...(assignmentId ? { assignment: assignmentId } : {}) });

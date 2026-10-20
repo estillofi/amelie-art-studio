@@ -48,7 +48,7 @@ def homework(page, server):
     page.locator('#homework-form button[type="submit"]').click()
     expect(page.locator('#hw-message')).to_contain_text('Задание сохранено')
     if server:
-        assert data('await m.flushSaves()')
+        assert data('await m.flushSaves()'), data('m.SYNC')
     assignment = data('m.S.assignments[0]')
     assert data('m.S.progress') == before
     queue = page.evaluate("async () => (await import('./js/srs.js')).todayQueue().map(x=>x.w.id)")
@@ -65,9 +65,12 @@ def homework(page, server):
     assert 'colours-red' not in ids and 'colours-blue' not in ids
     original_now = page.evaluate('Date.now()')
     next_day = data('m.S.progress.find(x=>x.id==="colours-red").due') + 3600000
-    page.clock.set_fixed_time(next_day)
+    page.clock.set_fixed_time(next_day / 1000)
     assert page.evaluate("async () => (await import('./js/srs.js')).assignmentQueue((await import('./js/lib.js')).S.assignments[0]).length") == 2
-    page.clock.set_fixed_time(original_now)
+    page.evaluate("async () => {const srs=await import('./js/srs.js'); srs.grade('colours-red',false); srs.grade('colours-red',true);}")
+    assert data('m.S.progress.find(x=>x.id==="colours-red").box') == 1
+    assert page.evaluate("async () => {const m=await import('./js/lib.js'); return m.S.progress.find(x=>x.id==='colours-red').due===m.startOfDay()+m.DAY;}")
+    page.clock.set_fixed_time(original_now / 1000)
     parents(page)
     page.locator(f'[data-edit="{assignment["id"]}"]').click()
     page.locator('#hw-pages').fill('70')
@@ -76,7 +79,7 @@ def homework(page, server):
     after = data('structuredClone(m.S.progress)')
     backup = data('m.exportProgress()')
     if server:
-        assert data('await m.flushSaves()')
+        assert data('await m.flushSaves()'), data('m.SYNC')
     page.locator('#imp').set_input_files({'name':'with-homework.json','mimeType':'application/json','buffer':json.dumps(backup).encode()})
     expect(page.locator('#ans')).to_be_visible()
     parents(page)
@@ -119,17 +122,17 @@ def exercise(browser, base, server=False):
     route('/learn', '#next')
     page.locator('#next').click()
     if server:
-        assert data('await m.flushSaves()')
+        assert data('await m.flushSaves()'), data('m.SYNC')
         assert len(page.evaluate("async () => (await fetch('api/db/progress')).json()")) == 1
         # A failed POST must be retained, overlaid after reload, and eventually sent exactly once.
         page.route('**/api/db/**', lambda r: r.abort() if r.request.method == 'POST' else r.continue_())
         page.locator('#next').click()
         page.wait_for_function('JSON.parse(localStorage.getItem("amelie:v1:pending") || "[]").length>0')
-        assert data('await m.flushSaves()') is False
+        assert data('await m.flushSaves()') is False, data('m.SYNC')
         page.reload(wait_until='networkidle')
         assert data('m.S.progress.length') == 2
         page.unroute('**/api/db/**')
-        assert data('await m.flushSaves()')
+        assert data('await m.flushSaves()'), data('m.SYNC')
         assert len(page.evaluate("async () => (await fetch('api/db/progress')).json()")) == 2
         assert len(data('m.S.progress')) == 2
         assert page.evaluate('JSON.parse(localStorage.getItem("amelie:v1:pending")).length') == 0
@@ -142,7 +145,7 @@ def exercise(browser, base, server=False):
         page.unroute('**/api/db/**')
         # Wait for the failed in-flight request before explicitly retrying.
         data('await m.flushSaves()')
-        assert data('await m.flushSaves()')
+        assert data('await m.flushSaves()'), data('m.SYNC')
         print('PASS: failed saves survive reload and synchronize without duplicated records')
     page.reload(wait_until='networkidle')
     assert data('m.S.progress.length') == (2 if server else 1)
@@ -162,14 +165,14 @@ def exercise(browser, base, server=False):
     page.locator('#save').click()
     page.wait_for_function('JSON.parse(localStorage.getItem("amelie:v1:gallery") || "[]").length===1')
     if server:
-        assert data('await m.flushSaves()')
+        assert data('await m.flushSaves()'), data('m.SYNC')
     route('/gallery', '#view .pics')
     page.reload(wait_until='networkidle')
     expect(page.locator('#view .pics [data-w="sun"]')).to_have_attribute('fill', '#FF4D4F')
     parents(page)
     page.locator('#npd').select_option('2')
     if server:
-        assert data('await m.flushSaves()')
+        assert data('await m.flushSaves()'), data('m.SYNC')
         expect(page.locator('#sync-status')).to_have_text('Все результаты сохранены на сервере.')
     with page.expect_download() as download:
         page.locator('#exp').click()

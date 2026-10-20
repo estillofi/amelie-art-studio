@@ -1,5 +1,5 @@
 import { S, esc, wordPic, speak, profile, todayKey, DAY, $, STAR_STEP, topicOf, MODE, isStandalone } from '../lib.js';
-import { todayQueue, seenWords, learned } from '../srs.js';
+import { todayQueue, seenWords, learned, activeAssignments, assignmentQueue } from '../srs.js';
 
 const GAMES = [['listen', '👂', 'Listen & find', 'Послушай и найди'], ['spell', '🔤', 'Spell it', 'Собери слово'], ['sensei', '🥋', 'Sensei says', 'Сенсей говорит']];
 
@@ -27,6 +27,11 @@ export default function home(el) {
       <a class="btn full welcome-cta" href="${next}">${complete ? 'Порисуем ещё? →' : day.words ? 'Продолжим играть →' : 'Откроем альбом →'}</a>
       <p class="welcome-footnote">${complete ? 'Ты сегодня столько попробовала. Здорово!' : 'Можно заниматься в своём темпе'}</p>
     </section>
+
+    ${activeAssignments().length ? `<section class="school-section" aria-label="Задания из учебника"><div class="h2">My school · <small>Из учебника</small></div>${activeAssignments().map((a) => {
+      const count = assignmentQueue(a).length;
+      return `<article class="card homework-card"><b>${esc(a.book)} · стр. ${esc(a.pages)}</b>${a.task ? `<p>${esc(a.task)}</p>` : ''}${a.dueDate ? `<p class="ru">К ${esc(a.dueDate.split('-').reverse().join('.'))}</p>` : ''}<a class="btn sm full" href="#/homework/${encodeURIComponent(a.id)}">${count ? `Повторить слова · ${count}` : 'На сегодня достаточно ✓'}</a></article>`;
+    }).join('')}</section>` : ''}
 
     <div class="h2">Today · <small>Выбери занятие</small></div>
     <div class="plan">

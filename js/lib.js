@@ -1,7 +1,7 @@
 // Shared helpers: data store, DOM, speech, sounds, rewards.
 
-export const COLS = ['words', 'topics', 'progress', 'log', 'profile', 'gallery'];
-export const STATE = ['progress', 'log', 'profile', 'gallery']; // Amelie's own data (everything else is content)
+export const COLS = ['words', 'topics', 'progress', 'log', 'profile', 'gallery', 'assignments'];
+export const STATE = ['progress', 'log', 'profile', 'gallery', 'assignments']; // Amelie's own data (everything else is content)
 export const S = Object.fromEntries(COLS.map((c) => [c, []]));
 
 // Two ways to run:
@@ -101,6 +101,7 @@ export function exportProgress() {
 }
 
 export async function importProgress(file) {
+  if (file?.data && file.data.assignments === undefined) file = { ...file, data: { ...file.data, assignments: [] } };
   if (file?.app !== 'amelie-art-studio' || file.version !== 1 || !file.data || [...STATE, 'words'].some((c) => !Array.isArray(file.data[c]) || file.data[c].some((item) => !item || typeof item.id !== 'string'))) throw new Error('Это не файл прогресса Амели');
   if (MODE === 'server') {
     if (!(await flushSaves())) throw new Error('Сначала дождитесь сохранения текущего прогресса');

@@ -1,5 +1,6 @@
 import { S, esc, profile, saveProfile, save, toast, speak, todayKey, startOfDay, DAY, topicOf, $, MODE, exportProgress, importProgress, isStandalone, isAndroid, installHint, SYNC, flushSaves, browserBackup, importContent, uid } from '../lib.js';
 import { topicStats, seenWords } from '../srs.js';
+import { mountHomework } from './homework.js';
 
 let unlocked = false;
 
@@ -29,6 +30,8 @@ export default function parents(el) {
       <div class="stat"><span>Звёзды / наклейки</span><span>⭐ ${p.stars || 0} · ${(p.stickers || []).length}</span></div>
       <div class="stat" style="border:0"><span>Рисунков в галерее</span><span>${S.gallery.length}</span></div>
     </div>
+
+    <section id="school-homework" aria-label="Задания из учебника"></section>
 
     <div class="h2">Темы</div>
     <div class="card">${S.topics.map((t) => { const st = topicStats(t.id); return `<div class="stat"><span>${t.icon} ${esc(t.ru)}</span><span>${st.learned} выучено · ${st.seen}/${st.total}</span></div>`; }).join('')}</div>
@@ -75,6 +78,8 @@ export default function parents(el) {
       Всё английское озвучивается — просите Амели повторять вслух. Слово становится «выученным» (⭐), когда она узнала его 3 раза в разные дни.<br><br>
       Здесь собраны базовые темы. Сверяйте их с учебником и тем, что ребёнок уже знает; можно начать с приветствий, цветов и коротких фраз. Новые слова добавляйте через форму выше.
     </div>`;
+
+  mountHomework($('#school-homework', el));
 
   const updateSync = () => {
     const el = $('#sync-status'); if (!el) return;
@@ -128,7 +133,7 @@ export default function parents(el) {
     if (S.words.some((w) => w.en === en)) { toast('Такое слово уже есть'); return; }
     const order = S.words.filter((w) => w.topic === d.topic).length;
     await save('words', { id: `${d.topic}-custom-${uid()}`, topic: d.topic, en, ru: d.ru.trim(), pic: d.pic.trim() || '🖍️', ex: d.ex.trim() || `I can say: ${en}.`, exRu: '', order, custom: true });
-    toast(`Добавлено в «${topicOf(d.topic).ru}»`); e.target.reset();
+    toast(`Добавлено в «${topicOf(d.topic).ru}»`); e.target.reset(); mountHomework($('#school-homework', el));
   });
   return () => document.removeEventListener('sync', updateSync);
 }

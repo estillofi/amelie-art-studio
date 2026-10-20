@@ -47,13 +47,40 @@ test('progress import is atomic and round-trips old browser exports', () => {
   try {
     const original = progress();
     store.importProgress(original);
-    assert.deepEqual(store.exportProgress().data, { ...original.data, profile: [{ rate: 0.85, ...profile }] });
+    assert.deepEqual(store.exportProgress().data, { ...original.data, assignments: [], profile: [{ rate: 0.85, ...profile }] });
     const broken = progress(); broken.data.words = [{ ...word, topic: 'missing' }];
     assert.throws(() => store.importProgress(broken));
     assert.equal(store.get('profile', 'amelie').stars, 7);
     assert.equal(store.list('progress').length, 1);
     assert.throws(() => store.importProgress({ app: 'amelie-art-studio', version: 1, data: {} }));
     assert.equal(store.list('progress').length, 1);
+  } finally { store.close(); }
+});
+
+test('textbook assignments retain shared progress and round-trip with custom words', () => {
+  const store = openStore(':memory:');
+  try {
+    store.importProgress(progress());
+    const assignment = { id: 'school-66', book: 'Spotlight 2, часть 1', pages: '66–68', task: 'Повторить слова', wordIds: ['hello-hello'], active: true, createdAt: Date.now(), dueDate: '2026-10-25' };
+    const before = store.get('progress', 'hello-hello');
+    store.put('assignments', assignment);
+    assert.deepEqual(store.get('progress', 'hello-hello'), before);
+    assert.throws(() => store.put('assignments', { ...assignment, wordIds: ['missing'] }));
+    assert.throws(() => store.put('assignments', { ...assignment, wordIds: ['hello-hello', 'hello-hello'] }));
+    assert.throws(() => store.put('assignments', { ...assignment, dueDate: '2026-02-31' }));
+    const backup = store.exportProgress();
+    backup.data.words = [{ id: 'hello-custom-wave', topic: 'hello', en: 'wave', ru: 'помаши рукой', pic: '👋', order: 10, custom: true }];
+    backup.data.assignments[0].wordIds.push('hello-custom-wave');
+    store.importProgress(backup);
+    assert.equal(store.get('assignments', assignment.id).wordIds.length, 2);
+    const roundtrip = store.exportProgress();
+    store.importProgress(roundtrip);
+    assert.deepEqual(store.exportProgress().data, roundtrip.data);
+    assert.deepEqual(store.get('progress', 'hello-hello'), before);
+    const invalid = store.exportProgress();
+    invalid.data.assignments[0].wordIds.push('unknown');
+    assert.throws(() => store.importProgress(invalid));
+    assert.deepEqual(store.get('progress', 'hello-hello'), before);
   } finally { store.close(); }
 });
 

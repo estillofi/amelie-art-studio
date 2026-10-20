@@ -26,11 +26,70 @@ def running(command, env=None):
 
 def parents(page):
     page.evaluate("location.hash='/parents'")
-    expect(page.locator('#ans')).to_be_visible()
-    a, b = map(int, re.search(r'(\d+) × (\d+)', page.locator('#view').inner_text()).groups())
-    page.locator('#ans').fill(str(a*b))
-    page.locator('#go').click()
+    page.wait_for_function("document.querySelector('#ans') || document.querySelector('#npd')")
+    if page.locator('#ans').count():
+        a, b = map(int, re.search(r'(\d+) × (\d+)', page.locator('#view').inner_text()).groups())
+        page.locator('#ans').fill(str(a*b))
+        page.locator('#go').click()
     expect(page.locator('#npd')).to_be_visible()
+
+
+def homework(page, server):
+    def data(expr):
+        return page.evaluate("async () => {const m=await import('./js/lib.js'); return " + expr + ';}')
+    baseline = data('m.exportProgress()')
+    before = data('structuredClone(m.S.progress)')
+    parents(page)
+    page.locator('#npd').select_option('10')
+    page.locator('#hw-pages').fill('66–68')
+    page.locator('#hw-task').fill('Повторить red и blue, послушать слова')
+    for word in ['colours-red', 'colours-blue']:
+        page.locator(f'#homework-form input[value="{word}"]').check()
+    page.locator('#homework-form button[type="submit"]').click()
+    expect(page.locator('#hw-message')).to_contain_text('Задание сохранено')
+    if server:
+        assert data('await m.flushSaves()')
+    assignment = data('m.S.assignments[0]')
+    assert data('m.S.progress') == before
+    queue = page.evaluate("async () => (await import('./js/srs.js')).todayQueue().map(x=>x.w.id)")
+    assert queue[:2] == ['colours-red', 'colours-blue'], queue
+    page.evaluate("location.hash='/'")
+    expect(page.locator('.school-section')).to_contain_text('66–68')
+    page.locator('.school-section a').click()
+    expect(page.locator('.lesson-source')).to_contain_text('66–68')
+    page.locator('#next').click()
+    page.locator('#next').click()
+    expect(page.locator('#view .word-ru')).to_contain_text('Ты повторила 2')
+    assert data('m.S.progress.filter(x=>x.id.startsWith("colours-")).every(x=>x.box===1 && x.due>Date.now())')
+    ids = page.evaluate("async () => (await import('./js/srs.js')).todayQueue().map(x=>x.w.id)")
+    assert 'colours-red' not in ids and 'colours-blue' not in ids
+    original_now = page.evaluate('Date.now()')
+    next_day = data('m.S.progress.find(x=>x.id==="colours-red").due') + 3600000
+    page.clock.set_fixed_time(next_day)
+    assert page.evaluate("async () => (await import('./js/srs.js')).assignmentQueue((await import('./js/lib.js')).S.assignments[0]).length") == 2
+    page.clock.set_fixed_time(original_now)
+    parents(page)
+    page.locator(f'[data-edit="{assignment["id"]}"]').click()
+    page.locator('#hw-pages').fill('70')
+    page.locator('#homework-form button[type="submit"]').click()
+    assert data('m.S.assignments[0].pages') == '70'
+    after = data('structuredClone(m.S.progress)')
+    backup = data('m.exportProgress()')
+    if server:
+        assert data('await m.flushSaves()')
+    page.locator('#imp').set_input_files({'name':'with-homework.json','mimeType':'application/json','buffer':json.dumps(backup).encode()})
+    expect(page.locator('#ans')).to_be_visible()
+    parents(page)
+    assert data('m.S.assignments[0].pages') == '70'
+    assert data('m.S.progress') == after
+    page.locator(f'[data-toggle="{assignment["id"]}"]').click()
+    assert data('m.S.assignments[0].active') is False
+    page.evaluate("location.hash='/'")
+    expect(page.locator('.school-section')).to_have_count(0)
+    assert data('m.S.progress') == after
+    page.evaluate('(backup) => import("./js/lib.js").then(m=>m.importProgress(backup))',baseline)
+    page.reload(wait_until='networkidle')
+    print('PASS:', 'server' if server else 'static', 'textbook assignment creation, priority, next-day scheduling, editing, backup and completion')
 
 
 def exercise(browser, base, server=False):
@@ -119,10 +178,12 @@ def exercise(browser, base, server=False):
     assert len(backup['data']['gallery']) == 1
     # Import the old prototype's export through the adult UI.
     backup['data']['profile'][0]['stars'] = 11
+    backup['data'].pop('assignments', None)  # A real legacy export has no homework collection.
     page.on('dialog', lambda dialog: dialog.accept())
     page.locator('#imp').set_input_files({'name': 'old-progress.json', 'mimeType': 'application/json', 'buffer': json.dumps(backup).encode()})
     expect(page.locator('#ans')).to_be_visible()
     assert data('m.profile().stars') == 11
+    homework(page, server)
     if server:
         parents(page)
         page.locator('#content-import').set_input_files(str(ROOT / 'docs/content-example.json'))

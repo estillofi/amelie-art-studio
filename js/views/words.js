@@ -1,5 +1,5 @@
 import { S, esc, wordPic, speak, sfx, addStars, markStep, celebrate, topicOf, $, $$, ICON } from '../lib.js';
-import { todayQueue, grade, topicStats, seen, learned } from '../srs.js';
+import { todayQueue, grade, topicStats, seen, learned, assignmentQueue } from '../srs.js';
 
 // #/words — topics as sketchbook pages
 export function topics(el) {
@@ -34,8 +34,8 @@ export function topic(el, id) {
 }
 
 // #/learn[/<topic>] — flashcards. New word: see + hear. Known word: picture first, say it, then check.
-export function learn(el, topicId) {
-  let queue = todayQueue(topicId || null);
+export function learn(el, topicId, assignment = null) {
+  let queue = assignment ? assignmentQueue(assignment) : todayQueue(topicId || null);
   const total = queue.length;
   let shown = false; let done = 0; let stars = 0;
 
@@ -44,7 +44,7 @@ export function learn(el, topicId) {
     if (!it) {
       if (!topicId) markStep('words');
       el.innerHTML = `<div class="card flash"><div style="font-size:84px">🎉</div><div class="word" style="font-size:36px">Well done!</div>
-        <div class="word-ru">${done ? `Ты повторила ${done} ${done === 1 ? 'слово' : done < 5 ? 'слова' : 'слов'}` : 'На сегодня всё повторено'}</div>
+        <div class="word-ru">${done ? `Ты повторила ${done} ${done === 1 ? 'слово' : done < 5 ? 'слова' : 'слов'}` : assignment ? 'На сегодня достаточно. Остальные слова появятся в свой день.' : 'На сегодня всё повторено'}</div>
         <a class="btn" href="#/play" style="--c:#7FD1AE">🎲 Поиграть</a><a class="btn white" href="#/">🏠 Домой</a></div>`;
       if (done) celebrate(`Молодец! +${stars} ⭐`, '🎨');
       return;
@@ -52,6 +52,7 @@ export function learn(el, topicId) {
     const { w, isNew } = it;
     const reveal = isNew || shown;
     el.innerHTML = `
+      ${assignment ? `<div class="lesson-source"><b>${esc(assignment.book)} · стр. ${esc(assignment.pages)}</b>${assignment.task ? `<p>${esc(assignment.task)}</p>` : ''}</div>` : ''}
       <div class="progress"><i style="width:${total ? (done / total) * 100 : 0}%"></i></div>
       <div class="card flash">
         <button class="icon-btn say" id="say" aria-label="Послушать">${ICON.sound}</button>
@@ -73,12 +74,21 @@ export function learn(el, topicId) {
 
   function answer(know) {
     const it = queue.shift();
-    grade(it.w.id, know);
+    grade(it.w.id, know, assignment?.id);
     if (know) { sfx.ok(); done++; stars++; addStars(1, 'words'); }
     else { sfx.pop(); queue.splice(Math.min(3, queue.length), 0, { w: it.w, isNew: false }); }
     shown = false; paint();
   }
 
   paint();
+}
+
+export function learnAssignment(el, id) {
+  const assignment = S.assignments.find((a) => a.id === id && a.active);
+  if (!assignment) {
+    el.innerHTML = '<div class="note">Это задание уже завершено или не найдено.</div><a class="btn full" href="#/">Домой</a>';
+    return;
+  }
+  return learn(el, null, assignment);
 }
 

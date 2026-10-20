@@ -4,8 +4,8 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 export const ROOT = fileURLToPath(new URL('../', import.meta.url));
-export const COLLECTIONS = ['topics', 'words', 'progress', 'log', 'profile', 'gallery'];
-export const STATE = ['progress', 'log', 'profile', 'gallery'];
+export const COLLECTIONS = ['topics', 'words', 'progress', 'log', 'profile', 'gallery', 'assignments'];
+export const STATE = ['progress', 'log', 'profile', 'gallery', 'assignments'];
 const ID = /^[a-zA-Z0-9_-]{1,100}$/;
 const validId = (v) => typeof v === 'string' && ID.test(v);
 const COLOR = /^#[\da-f]{6}$/i;
@@ -47,6 +47,11 @@ export function validateItem(col, item) {
     requireThat(['house', 'pets', 'night'].includes(item.pic) && plain(item.fills), 'Некорректный рисунок');
     requireThat(Object.entries(item.fills).every(([key, value]) => /^[a-z]+$/.test(key) && COLOR.test(value)), 'Некорректная раскраска');
     requireThat(integer(item.ts, 0, Number.MAX_SAFE_INTEGER), 'Некорректное время рисунка');
+  } else if (col === 'assignments') {
+    requireThat(text(item.book, 120) && text(item.pages, 60) && optionalText(item.task, 1000), 'Укажите учебник и страницы; задание — до 1000 символов');
+    requireThat(Array.isArray(item.wordIds) && item.wordIds.length >= 1 && item.wordIds.length <= 50 && item.wordIds.every(validId) && new Set(item.wordIds).size === item.wordIds.length, 'Выберите от 1 до 50 разных слов');
+    requireThat(typeof item.active === 'boolean' && integer(item.createdAt, 0, Number.MAX_SAFE_INTEGER), 'Некорректное задание');
+    requireThat(item.dueDate === undefined || item.dueDate === '' || (typeof item.dueDate === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(item.dueDate) && Number.isFinite(Date.parse(item.dueDate)) && new Date(item.dueDate).toISOString().slice(0, 10) === item.dueDate), 'Некорректная дата задания');
   }
   return item;
 }
@@ -74,6 +79,7 @@ export function openStore(path = join(process.env.DATA_DIR || join(ROOT, '.local
       }
       validateItem(col, item);
       if (col === 'words') requireThat(Boolean(store.get('topics', item.topic)), 'Тема слова не найдена');
+      if (col === 'assignments') requireThat(item.wordIds.every((id) => store.get('words', id)), 'Некоторые слова задания не найдены. Сначала добавьте их в словарь.');
       put.run(col, item.id, JSON.stringify(item));
       return item;
     },
@@ -92,17 +98,18 @@ export function openStore(path = join(process.env.DATA_DIR || join(ROOT, '.local
     },
     importProgress(file) {
       requireThat(file?.app === 'amelie-art-studio' && file.version === 1 && plain(file.data), 'Это не файл прогресса Амели');
+      const data = { ...file.data, assignments: file.data.assignments === undefined ? [] : file.data.assignments };
       for (const col of [...STATE, 'words']) {
-        requireThat(Array.isArray(file.data[col]) && file.data[col].length <= 100000, 'Некорректный массив: ' + col);
+        requireThat(Array.isArray(data[col]) && data[col].length <= 100000, 'Некорректный массив: ' + col);
         const ids = new Set();
-        for (const item of file.data[col]) { validateItem(col, item); requireThat(!ids.has(item.id), 'Повторяющийся id'); ids.add(item.id); }
+        for (const item of data[col]) { validateItem(col, item); requireThat(!ids.has(item.id), 'Повторяющийся id'); ids.add(item.id); }
       }
       return transaction(() => {
+        for (const item of data.words) store.put('words', { ...item, custom: true });
         for (const col of STATE) {
           db.prepare('DELETE FROM records WHERE collection=?').run(col);
-          for (const item of file.data[col]) store.put(col, item);
+          for (const item of data[col]) store.put(col, item);
         }
-        for (const item of file.data.words) store.put('words', { ...item, custom: true });
         return { imported: true };
       });
     },

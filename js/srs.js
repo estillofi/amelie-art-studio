@@ -10,28 +10,37 @@ export const boxOf = (wordId) => progOf(wordId)?.box || 0;
 export const seen = (wordId) => Boolean(progOf(wordId));
 export const learned = (wordId) => boxOf(wordId) >= LEARNED_BOX;
 
-export function grade(wordId, know) {
+export function grade(wordId, know, assignmentId = null) {
   const wasNew = !progOf(wordId);
   const p = progOf(wordId) || { id: wordId, box: 0, reps: 0, first: Date.now() };
   const box = know ? Math.min(5, (p.box || 0) + 1) : 1;
   const due = know ? startOfDay() + WAIT_DAYS[box] * DAY : 0;
   save('progress', { ...p, box, due, reps: (p.reps || 0) + 1, last: Date.now() });
-  save('log', { word: wordId, ts: Date.now(), know, wasNew, day: todayKey() });
+  save('log', { word: wordId, ts: Date.now(), know, wasNew, day: todayKey(), ...(assignmentId ? { assignment: assignmentId } : {}) });
 }
 
 const newToday = () => S.log.filter((l) => l.day === todayKey() && l.wasNew).length;
 
-// Today's cards: words due again, then up to N new words — the topic order follows the textbook.
-export function todayQueue(topic = null) {
-  const pool = S.words.filter((w) => !topic || w.topic === topic);
+export const activeAssignments = () => [...S.assignments].filter((a) => a.active).sort((a, b) => (a.dueDate || '9999').localeCompare(b.dueDate || '9999') || b.createdAt - a.createdAt);
+
+// Assignments prioritize a shared schedule; adding one never resets a word's interval.
+export function todayQueue(topic = null, wordIds = null) {
+  const selected = wordIds ? new Set(wordIds) : null;
+  const pool = S.words.filter((w) => (!topic || w.topic === topic) && (!selected || selected.has(w.id)));
+  const priority = new Map();
+  for (const assignment of activeAssignments()) for (const id of assignment.wordIds) if (!priority.has(id)) priority.set(id, priority.size);
+  const rank = (w) => priority.get(w.id) ?? Number.MAX_SAFE_INTEGER;
   const end = startOfDay() + DAY;
-  const due = pool.filter((w) => seen(w.id) && (progOf(w.id).due || 0) < end && boxOf(w.id) < 6);
+  const due = pool.filter((w) => seen(w.id) && (progOf(w.id).due || 0) < end && boxOf(w.id) < 6)
+    .sort((a, b) => rank(a) - rank(b) || (progOf(a.id).due || 0) - (progOf(b.id).due || 0));
   const order = S.topics.map((t) => t.id);
   const fresh = pool.filter((w) => !seen(w.id))
-    .sort((a, b) => order.indexOf(a.topic) - order.indexOf(b.topic) || a.order - b.order)
+    .sort((a, b) => rank(a) - rank(b) || order.indexOf(a.topic) - order.indexOf(b.topic) || a.order - b.order)
     .slice(0, Math.max(0, (topic ? 8 : profile().newPerDay || 4) - (topic ? 0 : newToday())));
   return [...due.map((w) => ({ w, isNew: false })), ...fresh.map((w) => ({ w, isNew: true }))];
 }
+
+export const assignmentQueue = (assignment) => todayQueue(null, assignment.wordIds);
 
 export const seenWords = () => S.words.filter((w) => seen(w.id));
 export const topicStats = (topic) => {

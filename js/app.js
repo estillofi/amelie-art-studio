@@ -1,6 +1,6 @@
 import { loadAll, profile, $, ICON, esc } from './lib.js';
 import home from './views/home.js';
-import { topics, topic, learn } from './views/words.js';
+import { topics, topic, learn, learnAssignment } from './views/words.js';
 import { playHub, listen, spell, sensei } from './views/play.js';
 import { paintHub, paint } from './views/paint.js';
 import abc from './views/abc.js';
@@ -10,9 +10,9 @@ import parents from './views/parents.js';
 const NAV = [
   ['', '🏠', 'Home'], ['words', '📒', 'Words'], ['play', '🎲', 'Play'], ['paint', '🎨', 'Paint'], ['abc', '🔤', 'ABC'],
 ];
-const ROUTES = { '': home, words: topics, topic, learn, play: playHub, listen, spell, sensei, paint: paintHub, colour: paint, abc, gallery, parents };
+const ROUTES = { '': home, words: topics, topic, learn, homework: learnAssignment, play: playHub, listen, spell, sensei, paint: paintHub, colour: paint, abc, gallery, parents };
 // Which bottom tab lights up for nested pages.
-const TAB = { topic: 'words', learn: 'words', listen: 'play', spell: 'play', sensei: 'play', colour: 'paint', gallery: '', parents: '' };
+const TAB = { topic: 'words', learn: 'words', homework: 'words', listen: 'play', spell: 'play', sensei: 'play', colour: 'paint', gallery: '', parents: '' };
 
 function renderTop(route) {
   const p = profile();

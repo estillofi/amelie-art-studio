@@ -12,7 +12,7 @@ export function topics(el) {
         const st = topicStats(t.id);
         return `<a class="tile painted" href="#/topic/${t.id}" style="--c:${t.color}">
           <span class="big">${t.icon}</span><span class="t en">${esc(t.en)}</span><span class="s">${esc(t.ru)} · ${st.learned}/${st.total} ⭐</span>
-          <span class="bar"><i style="width:${(st.seen / st.total) * 100}%;--c:${t.color}"></i></span></a>`;
+          <span class="bar"><i style="width:${st.total ? (st.seen / st.total) * 100 : 0}%;--c:${t.color}"></i></span></a>`;
       }).join('')}
     </div>`;
 }

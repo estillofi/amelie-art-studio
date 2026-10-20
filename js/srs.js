@@ -29,7 +29,7 @@ export function todayQueue(topic = null) {
   const order = S.topics.map((t) => t.id);
   const fresh = pool.filter((w) => !seen(w.id))
     .sort((a, b) => order.indexOf(a.topic) - order.indexOf(b.topic) || a.order - b.order)
-    .slice(0, Math.max(0, (topic ? 8 : profile().newPerDay || 6) - (topic ? 0 : newToday())));
+    .slice(0, Math.max(0, (topic ? 8 : profile().newPerDay || 4) - (topic ? 0 : newToday())));
   return [...due.map((w) => ({ w, isNew: false })), ...fresh.map((w) => ({ w, isNew: true }))];
 }
 

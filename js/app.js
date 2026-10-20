@@ -1,4 +1,4 @@
-import { loadAll, profile, $, ICON } from './lib.js';
+import { loadAll, profile, $, ICON, esc } from './lib.js';
 import home from './views/home.js';
 import { topics, topic, learn } from './views/words.js';
 import { playHub, listen, spell, sensei } from './views/play.js';
@@ -42,6 +42,11 @@ async function router() {
   cleanup = (await view(el, ...args)) || null;
 }
 
-window.addEventListener('hashchange', router);
-await loadAll();
-router();
+try {
+  await loadAll();
+  window.addEventListener('hashchange', router);
+  router();
+} catch (error) {
+  $('#view').innerHTML = `<div class="card start-error" role="alert"><div class="h2">Не получилось открыть альбом</div><p>${esc(error.message)}</p><p>Попробуй снова, когда появится связь.</p><button class="btn" id="retry">Попробовать ещё раз</button></div>`;
+  $('#retry').onclick = () => location.reload();
+}

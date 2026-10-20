@@ -1,0 +1,9 @@
+{
+  "topics": [
+    { "id": "art-tools", "en": "My art box", "ru": "Моя коробка для рисования", "icon": "🖌️", "color": "#3FA796", "order": 12 }
+  ],
+  "words": [
+    { "id": "art-tools-crayon", "topic": "art-tools", "en": "crayon", "ru": "восковой мелок", "pic": "🖍️", "ex": "This is my crayon.", "exRu": "Это мой мелок.", "order": 0 },
+    { "id": "art-tools-scissors", "topic": "art-tools", "en": "scissors", "ru": "ножницы", "pic": "✂️", "ex": "These are my scissors.", "exRu": "Это мои ножницы.", "order": 1 }
+  ]
+}

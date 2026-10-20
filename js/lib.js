@@ -5,12 +5,48 @@ export const STATE = ['progress', 'log', 'profile', 'gallery']; // Amelie's own 
 export const S = Object.fromEntries(COLS.map((c) => [c, []]));
 
 // Two ways to run:
-//   server — `node server.js` (local / VPS): data lives in data/*.json on the server;
+//   server — `node server.js` (local / VPS): data lives in a private SQLite database;
 //   static — GitHub Pages: content comes from data/*.json files, Amelie's progress lives in this browser (localStorage).
 export let MODE = 'static';
 const LS = 'amelie:v1:';
 const lsGet = (col) => { try { return JSON.parse(localStorage.getItem(LS + col) || '[]'); } catch { return []; } };
-const lsSet = (col, items) => { try { localStorage.setItem(LS + col, JSON.stringify(items)); } catch {} };
+const lsSet = (col, items) => { try { localStorage.setItem(LS + col, JSON.stringify(items)); return true; } catch { return false; } };
+let pending = lsGet('pending');
+if (!Array.isArray(pending)) pending = [];
+let sending = null;
+let durableQueue = true;
+export let SYNC = { pending: pending.length, error: '', durable: durableQueue };
+const syncStatus = (error = '') => {
+  SYNC = { pending: pending.length, error, durable: durableQueue };
+  document.dispatchEvent(new CustomEvent('sync', { detail: SYNC }));
+};
+
+async function requestJSON(url, options = {}) {
+  const r = await fetch(url, { cache: 'no-store', signal: AbortSignal.timeout(10000), ...options });
+  const data = await r.json().catch(() => null);
+  if (!r.ok) throw new Error(data?.error || `Не удалось связаться с сервером (${r.status})`);
+  return data;
+}
+
+// Keep writes on this device until the server acknowledges them, including across reloads.
+export function flushSaves() {
+  if (MODE !== 'server') return Promise.resolve(true);
+  if (sending) return sending;
+  if (!pending.length) { syncStatus(); return Promise.resolve(true); }
+  sending = (async () => {
+    try {
+      while (pending.length) {
+        const entry = pending[0];
+        await requestJSON(`api/db/${entry.col}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(entry.item) });
+        pending.shift(); durableQueue = lsSet('pending', pending); syncStatus();
+      }
+      syncStatus(); return true;
+    } catch (error) { syncStatus(error.message); return false; }
+  })().finally(() => { sending = null; });
+  return sending;
+}
+window.addEventListener('online', () => flushSaves());
+setInterval(() => { if (pending.length && MODE === 'server') flushSaves(); }, 10000);
 
 async function getJSON(url) {
   try { const r = await fetch(url, { cache: 'no-store' }); if (!r.ok) return null; const v = await r.json(); return Array.isArray(v) ? v : null; } catch { return null; }
@@ -20,14 +56,26 @@ async function getJSON(url) {
 const mergeById = (base, extra) => { const m = new Map(base.map((x) => [x.id, x])); for (const x of extra) m.set(x.id, { ...(m.get(x.id) || {}), ...x }); return [...m.values()]; };
 
 export async function loadAll() {
-  MODE = (await getJSON('api/db/topics')) ? 'server' : 'static';
+  const probe = await fetch('api/db/topics', { cache: 'no-store', signal: AbortSignal.timeout(10000) });
+  if (probe.status === 404) MODE = 'static';
+  else if (probe.ok) MODE = 'server';
+  else throw new Error('Сервер временно недоступен. Попробуйте открыть приложение ещё раз.');
+  if (MODE === 'server' && lsGet('serverUsed') !== true) {
+    if (STATE.some((c) => lsGet(c).length)) lsSet('beforeServer', { app: 'amelie-art-studio', version: 1, data: { ...Object.fromEntries(STATE.map((c) => [c, lsGet(c)])), words: lsGet('words').filter((w) => w.custom) } });
+    lsSet('serverUsed', true);
+  }
   await Promise.all(COLS.map(async (c) => {
-    if (MODE === 'server') S[c] = (await getJSON(`api/db/${c}`)) || [];
+    if (MODE === 'server') {
+      const data = await requestJSON(`api/db/${c}`);
+      if (!Array.isArray(data)) throw new Error('Сервер вернул некорректные данные');
+      S[c] = mergeById(data, pending.filter((x) => x.col === c).map((x) => x.item));
+    }
     else S[c] = mergeById(STATE.includes(c) ? [] : (await getJSON(`data/${c}.json`)) || [], lsGet(c));
   }));
   S.topics.sort((a, b) => a.order - b.order);
   // Ask the browser not to evict our data (Chrome/Android honour it; on iPhone — add the site to the Home Screen).
   if (MODE === 'static') navigator.storage?.persist?.().catch(() => {});
+  else { for (const c of COLS) lsSet(c, S[c]); flushSaves(); }
 }
 
 export const uid = () => Math.random().toString(16).slice(2, 10) + Date.now().toString(16).slice(-4);
@@ -35,9 +83,12 @@ export const uid = () => Math.random().toString(16).slice(2, 10) + Date.now().to
 export async function save(col, item) {
   if (!item.id) item.id = uid();
   const i = S[col].findIndex((x) => x.id === item.id);
-  if (i >= 0) S[col][i] = { ...S[col][i], ...item }; else S[col].push(item);
+  if (i >= 0) S[col][i] = { ...S[col][i], ...item }; else S[col].push({ ...(col === 'profile' ? profile() : {}), ...item });
   const saved = S[col][i >= 0 ? i : S[col].length - 1];
-  if (MODE === 'server') fetch(`api/db/${col}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(item) });
+  if (MODE === 'server') {
+    pending.push({ col, item: structuredClone(col === 'profile' ? item : saved) });
+    durableQueue = lsSet('pending', pending); lsSet(col, S[col]); syncStatus(); flushSaves();
+  }
   else if (STATE.includes(col)) lsSet(col, S[col]);
   else lsSet(col, mergeById(lsGet(col), [saved])); // content: keep only local additions, not the whole static file
   return saved;
@@ -50,14 +101,29 @@ export function exportProgress() {
 }
 
 export async function importProgress(file) {
-  if (file?.app !== 'amelie-art-studio' || !file.data) throw new Error('Это не файл прогресса Амели');
+  if (file?.app !== 'amelie-art-studio' || file.version !== 1 || !file.data || [...STATE, 'words'].some((c) => !Array.isArray(file.data[c]) || file.data[c].some((item) => !item || typeof item.id !== 'string'))) throw new Error('Это не файл прогресса Амели');
+  if (MODE === 'server') {
+    if (!(await flushSaves())) throw new Error('Сначала дождитесь сохранения текущего прогресса');
+    await requestJSON('api/progress/import', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(file) });
+    lsSet('beforeServer', null);
+    await loadAll();
+    return;
+  }
   for (const c of STATE) {
-    const items = Array.isArray(file.data[c]) ? file.data[c] : [];
+    const items = file.data[c];
     S[c] = items;
-    if (MODE === 'server') await fetch(`api/db/${c}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(items) });
-    else lsSet(c, items);
+    lsSet(c, items);
   }
   for (const w of file.data.words || []) await save('words', w);
+}
+
+export const browserBackup = () => lsGet('beforeServer')?.app === 'amelie-art-studio' ? lsGet('beforeServer') : null;
+
+export async function importContent(pack) {
+  if (MODE !== 'server') throw new Error('Наборы тем можно добавлять в серверной версии');
+  if (!(await flushSaves())) throw new Error('Сначала дождитесь сохранения прогресса');
+  const result = await requestJSON('api/content/import', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(pack) });
+  await loadAll(); return result;
 }
 
 // How to pin the site to the home screen on this phone (progress is safest that way in static mode).
@@ -67,8 +133,8 @@ export const installHint = () => (isAndroid()
   ? 'Chrome → меню ⋮ → «Установить приложение» (или «Добавить на главный экран»).'
   : 'Safari → «Поделиться» → «На экран „Домой“».');
 
-export const profile = () => S.profile.find((p) => p.id === 'amelie') || { id: 'amelie', stars: 0, stickers: [], days: {}, rate: 0.85, newPerDay: 6 };
-export const saveProfile = (patch) => save('profile', { ...profile(), ...patch, id: 'amelie' });
+export const profile = () => S.profile.find((p) => p.id === 'amelie') || { id: 'amelie', stars: 0, stickers: [], days: {}, rate: 0.85, newPerDay: 4 };
+export const saveProfile = (patch) => save('profile', { ...patch, id: 'amelie' });
 
 // ── DOM ──────────────────────────────────────────────────────
 export const $ = (sel, root = document) => root.querySelector(sel);
@@ -87,7 +153,7 @@ export const wordById = (id) => S.words.find((w) => w.id === id);
 export function wordPic(w, size = '') {
   if (w.color) return `<span class="blob ${size}" style="--c:${w.color}"></span>`;
   if (w.num) return `<span class="num ${size}">${w.num}</span>`;
-  return `<span class="emo ${size}">${w.pic || '❓'}</span>`;
+  return `<span class="emo ${size}">${esc(w.pic || '❓')}</span>`;
 }
 
 // ── Speech ───────────────────────────────────────────────────

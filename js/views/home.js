@@ -1,4 +1,4 @@
-import { S, esc, wordPic, speak, profile, todayKey, streak, DAY, $, STAR_STEP, topicOf, MODE, isStandalone } from '../lib.js';
+import { S, esc, wordPic, speak, profile, todayKey, DAY, $, STAR_STEP, topicOf, MODE, isStandalone } from '../lib.js';
 import { todayQueue, seenWords, learned } from '../srs.js';
 
 const GAMES = [['listen', '👂', 'Listen & find', 'Послушай и найди'], ['spell', '🔤', 'Spell it', 'Собери слово'], ['sensei', '🥋', 'Sensei says', 'Сенсей говорит']];
@@ -10,30 +10,27 @@ export default function home(el) {
   const game = GAMES[Math.floor(Date.now() / DAY) % GAMES.length];
   const pool = seenWords().length ? seenWords() : S.words.filter((w) => w.topic === 'colours' || w.topic === 'art');
   const wod = pool[Math.floor(Date.now() / DAY) % pool.length];
-  const st = streak();
   const toNext = STAR_STEP - ((p.stars || 0) % STAR_STEP);
   const learnedN = S.words.filter((w) => learned(w.id)).length;
+  const complete = day.words && day.play && day.art;
+  const next = !day.words ? '#/learn' : !day.play ? `#/${game[0]}` : '#/paint';
 
   const step = (done, href, ico, c, title, sub) => `<a class="step ${done ? 'done' : ''}" href="${href}" style="--c:${c}">
     <span class="ico">${ico}</span><span class="tx"><b>${title}</b><span>${sub}</span></span><span class="ok">${done ? '✓' : ''}</span></a>`;
 
-  // A cut-paper plant in the style of the art studio's mural.
-  const plant = `<svg class="mural" viewBox="0 0 90 140" style="right:-6px;top:-18px;width:64px" aria-hidden="true">
-    <path d="M44 140 C44 100 46 70 52 40" stroke="#3FA796" stroke-width="5" fill="none" stroke-linecap="round"/>
-    <path d="M46 96 C20 92 8 70 10 54 C30 58 44 76 46 96 Z" fill="#3FA796"/>
-    <path d="M48 80 C70 74 84 54 82 38 C62 44 50 60 48 80 Z" fill="#5CC2AE"/>
-    <path d="M52 40 C40 34 38 18 44 8 C48 16 52 22 54 26 C58 18 62 12 68 8 C70 22 64 36 52 40 Z" fill="#F0855B"/>
-    <path d="M54 26 C52 18 52 10 56 4 C60 12 58 20 54 26 Z" fill="#F7A1C4"/></svg>`;
-
   el.innerHTML = `
-    <div style="position:relative">${plant}
-    <div class="hello">Hello, Amelie!</div>
-    <div class="sub" style="margin-right:56px">${st ? `🔥 ${st} ${st === 1 ? 'день' : st < 5 ? 'дня' : 'дней'} подряд · ` : ''}Сегодня рисуем по-английски 🎨</div>
-    </div>
+    <section class="welcome" aria-labelledby="welcome-title">
+      <span class="studio-label">Твой альбом английского</span>
+      <h1 class="hello" id="welcome-title">Hello, Amelie!</h1>
+      <p class="welcome-copy">Немного слов, немного красок.<br>Большие открытия маленькими шагами.</p>
+      <img class="welcome-art" src="assets/studio-cat.webp" width="1536" height="1024" alt="Бумажный котёнок в кимоно рисует солнышко" fetchpriority="high">
+      <a class="btn full welcome-cta" href="${next}">${complete ? 'Порисуем ещё? →' : day.words ? 'Продолжим играть →' : 'Откроем альбом →'}</a>
+      <p class="welcome-footnote">${complete ? 'Ты сегодня столько попробовала. Здорово!' : 'Можно заниматься в своём темпе'}</p>
+    </section>
 
-    <div class="h2">Today · <small>План на сегодня</small></div>
+    <div class="h2">Today · <small>Выбери занятие</small></div>
     <div class="plan">
-      ${step(day.words, '#/learn', '📒', '#FFD23F', 'Words · Слова', q.length ? `${q.length} карточек — посмотри и послушай` : 'Все карточки на сегодня пройдены!')}
+      ${step(day.words, '#/learn', '📒', '#FFD23F', 'Words · Слова', q.length ? `${q.length} карточек — посмотри и послушай` : 'На сегодня всё! Можно поиграть')}
       ${step(day.play, `#/${game[0]}`, game[1], '#7FD1AE', `${game[2]}`, game[3])}
       ${step(day.art, '#/paint', '🖍️', '#FFB3CF', 'Paint · Раскраска', 'Раскрась по-английски')}
     </div>

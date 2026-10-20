@@ -1,4 +1,4 @@
-import { S, esc, profile, saveProfile, save, toast, speak, todayKey, startOfDay, DAY, topicOf, $, MODE, exportProgress, importProgress, isStandalone, isAndroid, installHint } from '../lib.js';
+import { S, esc, profile, saveProfile, save, toast, speak, todayKey, startOfDay, DAY, topicOf, $, MODE, exportProgress, importProgress, isStandalone, isAndroid, installHint, SYNC, flushSaves, browserBackup, importContent, uid } from '../lib.js';
 import { topicStats, seenWords } from '../srs.js';
 
 let unlocked = false;
@@ -18,6 +18,9 @@ export default function parents(el) {
     <div class="hello" style="font-size:34px">Для родителей</div>
     <div class="sub">Как идут дела у Амели</div>
 
+    ${MODE === 'server' ? `<div class="note storage-note" style="margin-top:16px"><p id="sync-status" role="status" aria-live="polite"></p><button class="btn sm white" id="sync-retry">Проверить сохранение</button></div>` : ''}
+    ${MODE === 'server' && browserBackup() ? `<div class="note" style="margin-top:14px">На этом устройстве есть прогресс прежней версии. Скачайте текущую резервную копию, прежде чем заменять его.<p><button class="btn sm" id="migrate">Перенести прежний прогресс</button></p></div>` : ''}
+
     <div class="h2">Эта неделя</div>
     <div class="card">
       <div class="stat"><span>Дней с занятиями</span><span>${active} из 7</span></div>
@@ -32,7 +35,7 @@ export default function parents(el) {
 
     <div class="h2">Настройки</div>
     <div class="card">
-      <div class="field"><label>Новых слов в день</label><select class="select" id="npd">${[3, 4, 5, 6, 8, 10].map((n) => `<option ${n === (p.newPerDay || 6) ? 'selected' : ''}>${n}</option>`).join('')}</select></div>
+      <div class="field"><label>Новых слов в день</label><select class="select" id="npd">${[1, 2, 3, 4, 5, 6, 8, 10].map((n) => `<option ${n === (p.newPerDay || 4) ? 'selected' : ''}>${n}</option>`).join('')}</select></div>
       <div class="field"><label>Скорость голоса</label><select class="select" id="rate">${[['0.7', 'медленно'], ['0.85', 'спокойно'], ['1', 'обычно']].map(([v, t]) => `<option value="${v}" ${Number(v) === (p.rate || 0.85) ? 'selected' : ''}>${t}</option>`).join('')}</select></div>
     </div>
 
@@ -52,6 +55,8 @@ export default function parents(el) {
       <button class="btn full" style="--c:#7FD1AE">Добавить</button>
     </form>
 
+    ${MODE === 'server' ? `<div class="h2">Новые темы</div><div class="card"><p class="sub">Загрузите подготовленный набор тем и слов. Существующие записи с тем же id обновятся; прогресс и рисунки сохранятся.</p><label class="btn sm full" style="--c:#9AD7C9">Добавить набор тем<input type="file" id="content-import" accept="application/json,.json" hidden></label><p id="content-result" role="status" aria-live="polite"></p></div>` : ''}
+
     <div class="h2">Резервная копия</div>
     <div class="card">
       <p class="sub" style="margin-top:0">${MODE === 'static'
@@ -66,10 +71,32 @@ export default function parents(el) {
 
     <div class="h2">Как пользоваться</div>
     <div class="note">
-      10–15 минут в день лучше, чем час раз в неделю. На главной — план из трёх шагов: <b>слова → игра → раскраска</b>. За всё — звёзды, каждые 15 звёзд — наклейка, за все три шага за день — кубок.<br><br>
+      Начните с 5–10 минут и 4 новых слов в день. Можно закончить раньше и вернуться позже. На главной — три занятия на выбор: <b>слова → игра → раскраска</b>. За всё — звёзды, каждые 15 звёзд — наклейка, за все три шага за день — кубок.<br><br>
       Всё английское озвучивается — просите Амели повторять вслух. Слово становится «выученным» (⭐), когда она узнала его 3 раза в разные дни.<br><br>
-      Темы идут в порядке программы 2 класса (Spotlight 2 и похожие учебники). Если у вас другой учебник — добавляйте слова из него через форму выше.
+      Здесь собраны базовые темы. Сверяйте их с учебником и тем, что ребёнок уже знает; можно начать с приветствий, цветов и коротких фраз. Новые слова добавляйте через форму выше.
     </div>`;
+
+  const updateSync = () => {
+    const el = $('#sync-status'); if (!el) return;
+    el.textContent = SYNC.pending && !SYNC.durable ? 'Не удалось сохранить очередь на устройстве. Не закрывайте эту страницу до подтверждения сервера; скачайте резервную копию.' : SYNC.error ? `На устройстве сохранено, но сервер пока не подтвердил ${SYNC.pending} записей. ${SYNC.error}` : SYNC.pending ? `Сохраняем: ${SYNC.pending} записей…` : 'Все результаты сохранены на сервере.';
+  };
+  updateSync();
+  document.addEventListener('sync', updateSync);
+  $('#sync-retry', el)?.addEventListener('click', () => flushSaves());
+  $('#migrate', el)?.addEventListener('click', async () => {
+    if (!confirm('Заменить прогресс на сервере прежним прогрессом с этого устройства?')) return;
+    try { await importProgress(browserBackup()); toast('Прогресс перенесён'); location.reload(); } catch (error) { toast(error.message); }
+  });
+  $('#content-import', el)?.addEventListener('change', async (e) => {
+    const file = e.target.files[0]; if (!file) return;
+    try {
+      const pack = JSON.parse(await file.text());
+      if (!confirm('Добавить темы и слова из этого набора? Записи с тем же id обновятся.')) return;
+      const result = await importContent(pack);
+      $('#content-result', el).textContent = `Готово: тем — ${result.topics}, слов — ${result.words}.`;
+    } catch (error) { $('#content-result', el).textContent = error.message; }
+    finally { e.target.value = ''; }
+  });
 
   $('#exp', el).onclick = () => {
     const blob = new Blob([JSON.stringify(exportProgress(), null, 2)], { type: 'application/json' });
@@ -82,7 +109,7 @@ export default function parents(el) {
     try {
       const data = JSON.parse(await f.text());
       if (!confirm('Заменить текущий прогресс прогрессом из файла?')) return;
-      await importProgress(data); toast('Прогресс загружен'); parents(el);
+      await importProgress(data); toast('Прогресс загружен'); location.reload();
     } catch (err) { toast(err.message || 'Не получилось прочитать файл'); }
   };
   $('#voice', el).onclick = () => {
@@ -100,9 +127,10 @@ export default function parents(el) {
     const en = d.en.trim().toLowerCase();
     if (S.words.some((w) => w.en === en)) { toast('Такое слово уже есть'); return; }
     const order = S.words.filter((w) => w.topic === d.topic).length;
-    await save('words', { id: `${d.topic}-${en.replace(/\s+/g, '-')}`, topic: d.topic, en, ru: d.ru.trim(), pic: d.pic.trim() || '🖍️', ex: d.ex.trim() || `I like the ${en}.`, exRu: '', order, custom: true });
+    await save('words', { id: `${d.topic}-custom-${uid()}`, topic: d.topic, en, ru: d.ru.trim(), pic: d.pic.trim() || '🖍️', ex: d.ex.trim() || `I can say: ${en}.`, exRu: '', order, custom: true });
     toast(`Добавлено в «${topicOf(d.topic).ru}»`); e.target.reset();
   });
+  return () => document.removeEventListener('sync', updateSync);
 }
 
 function gate(el) {

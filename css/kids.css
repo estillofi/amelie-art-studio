@@ -280,9 +280,31 @@ h1, h2, h3 { margin: 0; line-height: 1.15; }
 /* ── Cut-paper leaves from the studio mural (decoration) ─── */
 .mural { position: absolute; z-index: 0; pointer-events: none; opacity: .9; }
 
+/* A page from a real sketchbook: quiet paper, a collage companion, one invitation. */
+.welcome { margin-top: 12px; padding: 24px 20px 14px; position: relative; isolation: isolate;
+  background: #fffaf0; border: 1px solid #e9ddc8; border-radius: 8px 22px 10px 18px;
+  box-shadow: 2px 4px 0 #e4d8c2, 0 12px 25px -18px #765c40; }
+.welcome::before { content: ''; position: absolute; top: -10px; left: 28px; width: 86px; height: 24px;
+  background: repeating-linear-gradient(90deg, #ffffff55 0 2px, transparent 2px 6px), #a4cfc2dd;
+  transform: rotate(-5deg); clip-path: polygon(0 3%, 98% 0, 94% 30%, 100% 70%, 95% 100%, 1% 96%, 5% 60%); }
+.studio-label { display: block; font: 800 11px var(--font); letter-spacing: 1.7px; text-transform: uppercase; color: #6c7563; margin-bottom: 9px; }
+.welcome .hello { font-size: clamp(32px, 8vw, 44px); margin-bottom: 10px; }
+.welcome-copy { margin: 0; color: var(--ink-2); font-size: 14px; line-height: 1.6; }
+.welcome-art { display: block; width: calc(100% + 12px); height: auto; margin: 12px -6px 16px;
+  border-radius: 43% 40% 9% 12% / 12% 16% 10% 8%; }
+.welcome-cta { --c: #3fa796; color: #fffef8; font-size: 23px; min-height: 58px; box-shadow: 0 3px 0 #287766; }
+.welcome-footnote { text-align: center; color: var(--ink-2); font-size: 12px; margin: 12px 0 0; }
+.storage-note p { margin-top: 0; }
+.stat { gap: 12px; }
+.stat > span:last-child { text-align: right; }
+.start-error { margin-top: 28px; }
+:focus-visible { outline: 3px solid var(--cobalt); outline-offset: 5px; }
+.w .en { overflow-wrap: anywhere; text-align: center; }
+.toast { max-width: calc(100vw - 32px); width: max-content; }
+
 @media (min-width: 600px) {
   .wgrid { grid-template-columns: repeat(4, 1fr); }
 }
 @media (prefers-reduced-motion: reduce) {
-  .garland .leaf, .listen-btn.pulse { animation: none; }
+  *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; scroll-behavior: auto !important; }
 }

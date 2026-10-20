@@ -1,4 +1,4 @@
-import { S, esc, wordPic, speak, profile, todayKey, DAY, $, STAR_STEP, topicOf, MODE, isStandalone } from '../lib.js';
+import { S, esc, wordPic, paperArt, speak, profile, todayKey, DAY, $, STAR_STEP, topicOf, MODE, isStandalone } from '../lib.js';
 import { todayQueue, seenWords, learned, activeAssignments, assignmentQueue } from '../srs.js';
 
 const GAMES = [['listen', '👂', 'Listen & find', 'Послушай и найди'], ['spell', '🔤', 'Spell it', 'Собери слово'], ['sensei', '🥋', 'Sensei says', 'Сенсей говорит']];
@@ -28,16 +28,20 @@ export default function home(el) {
       <p class="welcome-footnote">${complete ? 'Ты сегодня столько попробовала. Здорово!' : 'Можно заниматься в своём темпе'}</p>
     </section>
 
-    ${activeAssignments().length ? `<section class="school-section" aria-label="Задания из учебника"><div class="h2">My school · <small>Из учебника</small></div>${activeAssignments().map((a) => {
-      const count = assignmentQueue(a).length;
-      return `<article class="card homework-card"><b>${esc(a.book)} · стр. ${esc(a.pages)}</b>${a.task ? `<p>${esc(a.task)}</p>` : ''}${a.dueDate ? `<p class="ru">К ${esc(a.dueDate.split('-').reverse().join('.'))}</p>` : ''}<a class="btn sm full" href="#/homework/${encodeURIComponent(a.id)}">${count ? `Повторить слова · ${count}` : 'На сегодня достаточно ✓'}</a></article>`;
-    }).join('')}</section>` : ''}
+    <section class="school-section" aria-label="Задания из учебника">
+      <div class="school-heading"><div><span class="studio-label">Школа + маленькие шаги</span><h2>Мой учебник</h2></div>${paperArt('backpack', 'lg')}</div>
+      ${activeAssignments().length ? activeAssignments().map((a) => {
+        const count = assignmentQueue(a).length;
+        return `<article class="card homework-card"><span class="assignment-label">Задание из учебника</span><b>${esc(a.book)} · стр. ${esc(a.pages)}</b>${a.task ? `<p>${esc(a.task)}</p>` : ''}${a.dueDate ? `<p class="ru">К ${esc(a.dueDate.split('-').reverse().join('.'))}</p>` : ''}<a class="btn sm full homework-start" href="#/homework/${encodeURIComponent(a.id)}">${count ? `Повторить слова · ${count}` : 'На сегодня достаточно ✓'}</a></article>`;
+      }).join('') : `<p class="school-empty">Здесь будут страницы и слова, которые вы выберете вместе со взрослым.</p>`}
+      <a class="school-manage" href="#/parents/homework">${activeAssignments().length ? 'Взрослым: изменить или добавить задание' : 'Взрослым: добавить задание из учебника'} <span aria-hidden="true">→</span></a>
+    </section>
 
     <div class="h2">Today · <small>Выбери занятие</small></div>
     <div class="plan">
-      ${step(day.words, '#/learn', '📒', '#FFD23F', 'Words · Слова', q.length ? `${q.length} карточек — посмотри и послушай` : 'На сегодня всё! Можно поиграть')}
-      ${step(day.play, `#/${game[0]}`, game[1], '#7FD1AE', `${game[2]}`, game[3])}
-      ${step(day.art, '#/paint', '🖍️', '#FFB3CF', 'Paint · Раскраска', 'Раскрась по-английски')}
+      ${step(day.words, '#/learn', paperArt('book'), '#FFD23F', 'Words · Слова', q.length ? `${q.length} карточек — посмотри и послушай` : 'На сегодня всё! Можно поиграть')}
+      ${step(day.play, `#/${game[0]}`, paperArt('ball'), '#7FD1AE', `${game[2]}`, game[3])}
+      ${step(day.art, '#/paint', paperArt('butterfly'), '#FFB3CF', 'Paint · Раскраска', 'Раскрась по-английски')}
     </div>
     ${day.words && day.play && day.art ? '<div class="note" style="margin-top:12px">🏆 Все три задания на сегодня сделаны! Можно рисовать сколько хочешь.</div>' : ''}
 
@@ -51,7 +55,7 @@ export default function home(el) {
 
     <div class="grid2" style="margin-top:22px">
       <a class="tile painted" href="#/gallery" style="--c:#FF70A6"><span class="big">⭐</span><span class="t">${p.stars || 0} звёзд</span><span class="s">ещё ${toNext} до наклейки</span></a>
-      <a class="tile painted" href="#/words" style="--c:#3BB273"><span class="big">📒</span><span class="t">${learnedN} слов</span><span class="s">уже знаю</span></a>
+      <a class="tile painted" href="#/words" style="--c:#3BB273"><span class="big">${paperArt('book')}</span><span class="t">${learnedN} слов</span><span class="s">уже знаю</span></a>
     </div>
 
     ${MODE === 'static' && !isStandalone() ? '<div class="note" style="margin-top:20px">📌 Попроси взрослого добавить меня на экран «Домой» — тогда звёзды и рисунки не потеряются.</div>' : ''}

@@ -1,4 +1,4 @@
-import { loadAll, profile, $, ICON, esc } from './lib.js';
+import { loadAll, profile, $, ICON, esc, paperArt } from './lib.js';
 import home from './views/home.js';
 import { topics, topic, learn, learnAssignment } from './views/words.js';
 import { playHub, listen, spell, sensei } from './views/play.js';
@@ -8,7 +8,7 @@ import gallery from './views/gallery.js';
 import parents from './views/parents.js';
 
 const NAV = [
-  ['', '🏠', 'Home'], ['words', '📒', 'Words'], ['play', '🎲', 'Play'], ['paint', '🎨', 'Paint'], ['abc', '🔤', 'ABC'],
+  ['', '🏠', 'Home'], ['words', paperArt('book'), 'Words'], ['play', paperArt('ball'), 'Play'], ['paint', '🎨', 'Paint'], ['abc', '🔤', 'ABC'],
 ];
 const ROUTES = { '': home, words: topics, topic, learn, homework: learnAssignment, play: playHub, listen, spell, sensei, paint: paintHub, colour: paint, abc, gallery, parents };
 // Which bottom tab lights up for nested pages.
@@ -17,8 +17,8 @@ const TAB = { topic: 'words', learn: 'words', homework: 'words', listen: 'play',
 function renderTop(route) {
   const p = profile();
   const back = TAB[route] !== undefined ? `#/${TAB[route]}` : null;
-  $('#top').innerHTML = `${back ? `<a class="icon-btn" href="${back}" aria-label="Назад">${ICON.back}</a>` : '<a class="logo" href="#/"><span class="pal">🎨</span>Amelie</a>'}
-    <span class="sp"></span>
+  $('#top').innerHTML = `${back ? `<a class="icon-btn" href="${back}" aria-label="Назад">${ICON.back}</a>` : `<a class="logo" href="#/"><span class="pal">${paperArt('butterfly')}</span>Amelie</a>`}
+    <span class="sp"></span><a class="adult-link" href="#/parents" aria-label="Открыть раздел для взрослых">Взрослым</a>
     <a class="chip" href="#/gallery" title="Мои звёзды и наклейки">⭐ <span id="stars">${p.stars || 0}</span></a>`;
 }
 

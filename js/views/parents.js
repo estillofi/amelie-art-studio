@@ -1,11 +1,12 @@
 import { S, esc, profile, saveProfile, save, toast, speak, todayKey, startOfDay, DAY, topicOf, $, MODE, exportProgress, importProgress, isStandalone, isAndroid, installHint, SYNC, flushSaves, browserBackup, importContent, uid } from '../lib.js';
 import { topicStats, seenWords } from '../srs.js';
+import { RELEASE } from '../release.js';
 import { mountHomework } from './homework.js';
 
 let unlocked = false;
 
-// #/parents — a simple grown-up gate, then progress, settings and "add a word from the textbook".
-export default function parents(el) {
+// The requested tab survives the grown-up gate; the router owns event cleanup.
+export default function parents(el, section = '') {
   if (!unlocked) return gate(el);
   const p = profile();
   const week = Array.from({ length: 7 }, (_, i) => todayKey(new Date(startOfDay() - (6 - i) * DAY)));
@@ -17,7 +18,22 @@ export default function parents(el) {
 
   el.innerHTML = `
     <div class="hello" style="font-size:34px">Для родителей</div>
-    <div class="sub">Как идут дела у Амели</div>
+    <div class="sub">Занимаемся спокойно, понемногу</div>
+    <nav class="parent-tabs" aria-label="Разделы для взрослых"><a href="#/parents/homework" ${section === 'homework' ? 'aria-current="page"' : ''}>Учебник и задания</a><a href="#/parents" ${section !== 'homework' ? 'aria-current="page"' : ''}>Прогресс и настройки</a></nav>
+    <div id="parent-homework" ${section === 'homework' ? '' : 'hidden'}>
+      <section id="school-homework" aria-label="Задания из учебника"></section>
+
+    <details class="new-word-panel"><summary>Нет нужного слова? Добавить новое</summary><form class="card" id="add">
+      <div class="field"><label>Слово по-английски</label><input class="input" name="en" required placeholder="giraffe"></div>
+      <div class="field"><label>Перевод</label><input class="input" name="ru" required placeholder="жираф"></div>
+      <div class="field"><label>Эмодзи-картинка</label><input class="input" name="pic" placeholder="🦒"></div>
+      <div class="field"><label>Тема</label><select class="select" name="topic">${S.topics.map((t) => `<option value="${t.id}">${t.icon} ${esc(t.ru)}</option>`).join('')}</select></div>
+      <div class="field"><label>Пример (по желанию)</label><input class="input" name="ex" placeholder="I can draw a giraffe."></div>
+      <button class="btn full" style="--c:#7FD1AE">Добавить</button>
+    </form></details>
+      <p class="note">Страницы помогают помнить, что задано в школе. Слова выбирает взрослый: приложение не определяет содержание страницы автоматически. Повторения идут с интервалами 1, 2, 4, 8 и 16 дней; после ошибки начинаем снова с одного дня.</p>
+    </div>
+    <div id="parent-overview" ${section === 'homework' ? 'hidden' : ''}>
 
     ${MODE === 'server' ? `<div class="note storage-note" style="margin-top:16px"><p id="sync-status" role="status" aria-live="polite"></p><button class="btn sm white" id="sync-retry">Проверить сохранение</button></div>` : ''}
     ${MODE === 'server' && browserBackup() ? `<div class="note" style="margin-top:14px">На этом устройстве есть прогресс прежней версии. Скачайте текущую резервную копию, прежде чем заменять его.<p><button class="btn sm" id="migrate">Перенести прежний прогресс</button></p></div>` : ''}
@@ -31,7 +47,6 @@ export default function parents(el) {
       <div class="stat" style="border:0"><span>Рисунков в галерее</span><span>${S.gallery.length}</span></div>
     </div>
 
-    <section id="school-homework" aria-label="Задания из учебника"></section>
 
     <div class="h2">Темы</div>
     <div class="card">${S.topics.map((t) => { const st = topicStats(t.id); return `<div class="stat"><span>${t.icon} ${esc(t.ru)}</span><span>${st.learned} выучено · ${st.seen}/${st.total}</span></div>`; }).join('')}</div>
@@ -48,15 +63,6 @@ export default function parents(el) {
       ${isAndroid() ? `<div class="note" style="margin-top:10px"><b>Не слышно английского или голос с акцентом?</b> На Xiaomi: Настройки → Дополнительные настройки → Язык и ввод → <b>Синтез речи</b> → выберите <b>«Синтез речи Google»</b> → шестерёнка → «Установить голосовые данные» → <b>English (United Kingdom)</b>. Потом перезапустите Chrome.</div>` : ''}
     </div>
 
-    <div class="h2">Добавить слово из учебника</div>
-    <form class="card" id="add">
-      <div class="field"><label>Слово по-английски</label><input class="input" name="en" required placeholder="giraffe"></div>
-      <div class="field"><label>Перевод</label><input class="input" name="ru" required placeholder="жираф"></div>
-      <div class="field"><label>Эмодзи-картинка</label><input class="input" name="pic" placeholder="🦒"></div>
-      <div class="field"><label>Тема</label><select class="select" name="topic">${S.topics.map((t) => `<option value="${t.id}">${t.icon} ${esc(t.ru)}</option>`).join('')}</select></div>
-      <div class="field"><label>Пример (по желанию)</label><input class="input" name="ex" placeholder="I can draw a giraffe."></div>
-      <button class="btn full" style="--c:#7FD1AE">Добавить</button>
-    </form>
 
     ${MODE === 'server' ? `<div class="h2">Новые темы</div><div class="card"><p class="sub">Загрузите подготовленный набор тем и слов. Существующие записи с тем же id обновятся; прогресс и рисунки сохранятся.</p><label class="btn sm full" style="--c:#9AD7C9">Добавить набор тем<input type="file" id="content-import" accept="application/json,.json" hidden></label><p id="content-result" role="status" aria-live="polite"></p></div>` : ''}
 
@@ -76,10 +82,11 @@ export default function parents(el) {
     <div class="note">
       Начните с 5–10 минут и 4 новых слов в день. Можно закончить раньше и вернуться позже. На главной — три занятия на выбор: <b>слова → игра → раскраска</b>. За всё — звёзды, каждые 15 звёзд — наклейка, за все три шага за день — кубок.<br><br>
       Всё английское озвучивается — просите Амели повторять вслух. Слово становится «выученным» (⭐), когда она узнала его 3 раза в разные дни.<br><br>
-      Здесь собраны базовые темы. Сверяйте их с учебником и тем, что ребёнок уже знает; можно начать с приветствий, цветов и коротких фраз. Новые слова добавляйте через форму выше.
-    </div>`;
+      Здесь собраны базовые темы. Сверяйте их с учебником и тем, что ребёнок уже знает; можно начать с приветствий, цветов и коротких фраз. Задания и новые слова — во вкладке «Учебник и задания».
+    </div>
+    </div><p class="release-note">Версия ${RELEASE} · Бумажная мастерская</p>`;
 
-  mountHomework($('#school-homework', el));
+  const homework = mountHomework($('#school-homework', el));
 
   const updateSync = () => {
     const el = $('#sync-status'); if (!el) return;
@@ -132,8 +139,9 @@ export default function parents(el) {
     const en = d.en.trim().toLowerCase();
     if (S.words.some((w) => w.en === en)) { toast('Такое слово уже есть'); return; }
     const order = S.words.filter((w) => w.topic === d.topic).length;
-    await save('words', { id: `${d.topic}-custom-${uid()}`, topic: d.topic, en, ru: d.ru.trim(), pic: d.pic.trim() || '🖍️', ex: d.ex.trim() || `I can say: ${en}.`, exRu: '', order, custom: true });
-    toast(`Добавлено в «${topicOf(d.topic).ru}»`); e.target.reset(); mountHomework($('#school-homework', el));
+    const id = `${d.topic}-custom-${uid()}`;
+    await save('words', { id, topic: d.topic, en, ru: d.ru.trim(), pic: d.pic.trim() || '🖍️', ex: d.ex.trim() || `I can say: ${en}.`, exRu: '', order, custom: true });
+    toast(`Добавлено в «${topicOf(d.topic).ru}»`); e.target.reset(); homework.refreshWithWord(id);
   });
   return () => document.removeEventListener('sync', updateSync);
 }
@@ -145,7 +153,7 @@ function gate(el) {
     <p class="sub">Сколько будет ${a} × ${b}?</p>
     <input class="input" id="ans" inputmode="numeric" style="text-align:center;font-size:24px;max-width:160px">
     <div style="margin-top:14px"><button class="btn" id="go">Войти</button></div></div>`;
-  const go = () => { if (Number($('#ans', el).value) === a * b) { unlocked = true; parents(el); } else toast('Неверно'); };
+  const go = () => { if (Number($('#ans', el).value) === a * b) { unlocked = true; window.dispatchEvent(new HashChangeEvent('hashchange'));  } else toast('Неверно'); };
   $('#go', el).onclick = go;
   $('#ans', el).addEventListener('keydown', (e) => { if (e.key === 'Enter') go(); });
 }

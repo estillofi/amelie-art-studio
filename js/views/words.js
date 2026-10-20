@@ -1,4 +1,4 @@
-import { S, esc, wordPic, speak, sfx, addStars, markStep, celebrate, topicOf, $, $$, ICON } from '../lib.js';
+import { S, esc, wordPic, paperArt, speak, sfx, addStars, markStep, celebrate, topicOf, $, $$, ICON } from '../lib.js';
 import { todayQueue, grade, topicStats, seen, learned, assignmentQueue } from '../srs.js';
 
 // #/words — topics as sketchbook pages
@@ -11,7 +11,7 @@ export function topics(el) {
       ${S.topics.map((t) => {
         const st = topicStats(t.id);
         return `<a class="tile painted" href="#/topic/${t.id}" style="--c:${t.color}">
-          <span class="big">${t.icon}</span><span class="t en">${esc(t.en)}</span><span class="s">${esc(t.ru)} · ${st.learned}/${st.total} ⭐</span>
+          <span class="big">${({animals: paperArt('cat'), toys: paperArt('ball')})[t.id] || t.icon}</span><span class="t en">${esc(t.en)}</span><span class="s">${esc(t.ru)} · ${st.learned}/${st.total} ⭐</span>
           <span class="bar"><i style="width:${st.total ? (st.seen / st.total) * 100 : 0}%;--c:${t.color}"></i></span></a>`;
       }).join('')}
     </div>`;

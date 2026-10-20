@@ -1,4 +1,5 @@
 import http from 'node:http';
+import { RELEASE } from './js/release.js';
 import { createHash, timingSafeEqual } from 'node:crypto';
 import { readFile } from 'node:fs/promises';
 import { join } from 'node:path';
@@ -35,7 +36,7 @@ export function createApp({ store = openStore(), user = process.env.APP_USER, pa
         const origin = req.headers.origin;
         if ((origin && new URL(origin).host !== req.headers.host) || req.headers['sec-fetch-site'] === 'cross-site') return send(res, 403, { error: 'Запрос с другого сайта запрещён' });
       }
-      if (path === '/api/health' && req.method === 'GET') return send(res, 200, { status: 'ok', storage: 'sqlite' });
+      if (path === '/api/health' && req.method === 'GET') return send(res, 200, { status: 'ok', storage: 'sqlite', version: RELEASE });
       if (path === '/api/progress/export' && req.method === 'GET') return send(res, 200, store.exportProgress());
       if (path === '/api/progress/import' && req.method === 'POST') return send(res, 200, store.importProgress(await body(req)));
       if (path === '/api/content/import' && req.method === 'POST') return send(res, 200, store.importContent(await body(req)));

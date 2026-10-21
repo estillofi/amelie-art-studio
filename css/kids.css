@@ -321,7 +321,7 @@ h1, h2, h3 { margin: 0; line-height: 1.15; }
 .toast { max-width: calc(100vw - 32px); width: max-content; }
 
 /* Real paper grain under the paint, with soft shadows between the layers. */
-:root { --paper-grain: url('../assets/watercolor-paper.webp'); --wall: #f2eadd; --shadow: 1px 3px 0 #bba48555, 0 8px 16px -9px #63452c66; }
+:root { --paper-grain: url('../assets/crumpled-paper.webp'); --wall: #f2eadd; --shadow: 1px 3px 0 #bba48555, 0 8px 16px -9px #63452c66; }
 body { background-image: linear-gradient(#eadcc455, #eadcc455), var(--paper-grain); background-size: auto, 768px 512px; }
 .card, .step, .opt, .note, .w, .welcome, .cel-card { background-image: linear-gradient(#fffdf8bb, #fffdf8bb), var(--paper-grain); background-size: auto, 600px 400px; border: 1px solid #caba9d55; }
 .welcome { background-image: linear-gradient(#fff9ef88, #fff9ef88), var(--paper-grain); padding-bottom: 18px; }
@@ -332,7 +332,7 @@ body { background-image: linear-gradient(#eadcc455, #eadcc455), var(--paper-grai
 .tile { border-radius: 7px 3px 9px 4px; box-shadow: 1px 3px 0 #a17e56, 2px 10px 15px -10px #65452b99; }
 .tile.painted::before { opacity: .4; inset: 14px 8px 18px; border-radius: 3px 18px 8px 12px; }
 .hero::after { display: none; }
-.paper-art { display: inline-block; width: 54px; background-image: url('../assets/paper-friends.webp'); background-repeat: no-repeat; vertical-align: middle; flex-shrink: 0; }
+.paper-art { display: inline-block; width: 54px; background-repeat: no-repeat; vertical-align: middle; flex-shrink: 0; }
 .paper-art.lg { width: 80px; }
 .paper-art.xl { width: 160px; margin: 12px auto; }
 .w .paper-art { width: 62px; }
@@ -387,3 +387,81 @@ body { background-image: linear-gradient(#eadcc455, #eadcc455), var(--paper-grai
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; scroll-behavior: auto !important; }
 }
+
+/* Crumpled paper and expressive blue crayon drawings — October reference. */
+:root {
+  --paper-grain: url('../assets/crumpled-paper.webp');
+  --cardboard: url('../assets/kraft-cardboard.webp');
+  --ink: #124f74; --ink-2: #465d68; --wall: #f3eee4;
+  --teal: #26996e; --yellow: #f8d44a; --cobalt: #126c9a;
+}
+body { background: #ddd0b9 url('../assets/torn-collage.webp') center top / 850px auto repeat; }
+.app { isolation: isolate; }
+.app::before { content: ''; position: absolute; z-index: -1; inset: 0; background: linear-gradient(#fffdf2c9, #fffdf2c9), var(--paper-grain); background-size: auto, 650px auto; box-shadow: 0 0 22px #343b3d24; }
+.top { background: linear-gradient(#f5f0e6f5 76%, #f5f0e600); }
+.logo { color: #126c9a; }
+.hello::after { height: 30%; opacity: .7; }
+.garland { height: 54px; }
+.paper-surface { position: relative; isolation: isolate; background: transparent !important; border: 0; box-shadow: none; border-radius: 0; filter: none; }
+.material-layer { position: absolute; z-index: -2; inset: 0; pointer-events: none; background: linear-gradient(#fffdf5c2, #fffdf5c2), var(--paper-grain) center / cover; mask: url('../assets/torn-sheet.svg') center / 100% 100% no-repeat; }
+.tile > .material-shadow > .material-layer { background: var(--cardboard) center / 300px auto; }
+.tile.painted::before { background: linear-gradient(var(--c), var(--c)), var(--paper-grain); background-blend-mode: multiply; opacity: .7; mask: url('../assets/torn-sheet.svg') center / 100% 100% no-repeat; border-radius: 0; inset: 10px 8px 14px; }
+.w > .material-shadow > .material-layer { background: linear-gradient(#fffef9d9, #fffef9d9), var(--paper-grain) center / cover; }
+.opt.right > .material-shadow > .material-layer { background: linear-gradient(#d8f3dad9, #d8f3dad9), var(--paper-grain) center / cover; }
+.opt.right { outline: 4px solid #26996e; outline-offset: -4px; }
+.opt.wrong > .material-shadow > .material-layer { background-color: #f8cac1; background-blend-mode: multiply; }
+.school-section > .material-shadow > .material-layer { background: linear-gradient(#e0ebc8ae, #e0ebc8ae), var(--paper-grain) center / cover; }
+.welcome > .material-shadow > .material-layer { background: linear-gradient(#fffdf4a6, #fffdf4a6), var(--paper-grain) center / cover; }
+.welcome { padding: 24px 20px 20px; }
+.welcome-art { width: 100%; margin: 12px 0 14px; border-radius: 0; mix-blend-mode: normal; }
+.welcome-cta { --c: #c5e3ce; color: #164e68; box-shadow: 1px 3px 0 #32837366; }
+.btn { background: linear-gradient(var(--c, #f8d44a),var(--c, #f8d44a)), var(--paper-grain); background-blend-mode: multiply; background-size: auto, 240px auto; border-radius: 5px 3px 7px 4px; box-shadow: 1px 3px 0 #705c3c55, 0 5px 8px -6px #4c3d2e88; }
+.btn.white { --c: #fffdf5; }
+.chip { background: linear-gradient(#ffe06eae,#ffe06eae), var(--paper-grain) center / cover; box-shadow: 1px 3px 0 #b7a47055; border-radius: 3px 9px 4px 6px; }
+.chip::before { display: none; }
+.nav { background: var(--cardboard) center / 440px auto; clip-path: polygon(0 7px,3% 4px,7% 8px,11% 3px,16% 6px,21% 2px,27% 7px,33% 4px,39% 8px,45% 3px,51% 6px,57% 2px,63% 7px,69% 3px,75% 6px,81% 2px,87% 7px,93% 4px,100% 8px,100% 100%,0 100%); }
+.nav a { color: #164d6c; }
+.nav a.on .e { background: linear-gradient(#fffaf2b8,#fffaf2b8), var(--paper-grain) center / cover; border-radius: 3px 7px 2px 6px; }
+.palette,.wgrid { background: var(--cardboard) center / 360px auto; border-radius: 5px 9px 4px 7px; }
+.palette .crayon { border: 2px solid #126c9a; background: repeating-linear-gradient(135deg,#ffffff35 0 1px,transparent 1px 5px),var(--c); box-shadow: 1px 3px 0 #126c9a55; }
+.palette .crayon span { color: #164d6c; }
+.paper-art.sketch-art { aspect-ratio: 1; height: auto; background-size: 400% 400%; background-repeat: no-repeat; filter: none; }
+.paper-art.symbol-art { width: 1.4em; height: 1.4em; vertical-align: -.28em; margin: 0 .06em; }
+.tile .paper-art.symbol-art { width: 1.5em; height: 1.5em; }
+.nav .paper-art.symbol-art { width: 34px; height: 34px; }
+.stk .paper-art.symbol-art { width: 100%; height: 100%; }
+.cel-emo .paper-art.symbol-art { width: 110px; height: 110px; }
+.listen-btn { background: linear-gradient(#f8dc60b8,#f8dc60b8),var(--paper-grain) center / cover; box-shadow: 1px 4px 0 #bba45566; }
+.listen-btn .paper-art.symbol-art { width: 82px; height: 82px; }
+.drawn-color { width: 54px; height: 50px; display: inline-block; vertical-align: middle; flex-shrink: 0; }
+.drawn-color.lg { width: 80px; height: 74px; }
+.drawn-color.xl { width: 160px; height: 146px; margin: 12px auto; }
+.drawn-color.mini { width: 24px; height: 22px; }
+.abc button small { height: 26px; display: flex; align-items: center; }
+.abc .paper-art.mini { width: 26px; height: 26px; }
+.abc button { color: #126c9a; background: linear-gradient(var(--c),var(--c)),var(--paper-grain); background-blend-mode: multiply; background-size: auto,180px auto; border: 1px solid #126c9a55; border-radius: 3px 8px 4px 6px; }
+.sketch-number { color: #126c9a; background: linear-gradient(#f9d65caa,#f9d65caa),var(--paper-grain) center / cover; border: 2px solid #126c9a; border-radius: 44% 52% 47% 39%; font-family: var(--hand); box-shadow: none; }
+.drawn-numbers { color: #126c9a; background: none !important; font: 400 25px var(--hand); line-height: 54px; }
+.drawn-numbers span { color: #e18269; }
+.canvas svg { background: transparent; }
+.tile svg { background: #fffdf6; }
+.icon-btn { color: #126c9a; background: linear-gradient(#fffdf5b8,#fffdf5b8),var(--paper-grain) center / cover; border: 1px solid #126c9a55; border-radius: 8px 4px 7px 3px; }
+.card::before,.welcome::before,.school-section::before,.tile::after,.canvas::before,.canvas::after { background-image: linear-gradient(#b5d8c888,#b5d8c888),var(--paper-grain); background-size: auto,180px auto; opacity: .88; }
+.stk.got { background: linear-gradient(#fffdf5b0,#fffdf5b0),var(--paper-grain) center / cover; border-radius: 5px 9px 3px 6px; box-shadow: 1px 3px 0 #bba47066; }
+.hero .wash { opacity: .22; }
+.parent-tabs a { background-image: linear-gradient(#fffdf588,#fffdf588),var(--paper-grain); background-size: auto,220px auto; border-radius: 4px 8px 3px 5px; }
+.parent-tabs a[aria-current] { background-image: linear-gradient(#c6e5cfb5,#c6e5cfb5),var(--paper-grain); }
+@media (min-width: 760px) { body { background-size: 1100px auto; } .app::before { inset: 0 -22px; } }
+.garland { display: flex; justify-content: space-around; align-items: center; padding: 2px 16px 0; }
+.garland .paper-art { width: 34px; transform: rotate(-8deg); }
+.garland .paper-art:nth-child(2n) { width: 45px; transform: rotate(7deg); }
+.icon-btn .control-art { width: 34px; height: 34px; }
+.paper-art.sketch-art { position: relative; background-image: none; }
+.sketch-ink { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); display: block; background-repeat: no-repeat; pointer-events: none; }
+.drawn-numbers { display: inline-flex !important; justify-content: center; align-items: center; }
+.welcome-art { mix-blend-mode: multiply; mask: url('../assets/torn-sheet.svg') center / 100% 100% no-repeat; }
+
+.material-shadow { position: absolute; z-index: -2; inset: 0; pointer-events: none; filter: drop-shadow(1px 3px 2px #604e3438); }
+.material-layer { z-index: auto; }
+html { scroll-padding-bottom: calc(110px + var(--safe-b)); }
+.btn,.input,.select { scroll-margin-bottom: calc(110px + var(--safe-b)); }

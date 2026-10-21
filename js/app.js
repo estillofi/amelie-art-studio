@@ -1,3 +1,4 @@
+import { decorate, observeArt } from './art.js';
 import { loadAll, profile, $, ICON, esc, paperArt } from './lib.js';
 import home from './views/home.js';
 import { topics, topic, learn, learnAssignment } from './views/words.js';
@@ -40,9 +41,12 @@ async function router() {
   el.innerHTML = '';
   window.scrollTo(0, 0);
   cleanup = (await view(el, ...args)) || null;
+  decorate(document.body);
 }
 
 try {
+  $('#studio-garland').innerHTML = ['star', 'cloud', 'moon', 'cloud', 'star'].map((name) => paperArt(name)).join('');
+  observeArt();
   await loadAll();
   window.addEventListener('hashchange', router);
   router();

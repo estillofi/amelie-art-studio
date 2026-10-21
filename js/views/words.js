@@ -1,3 +1,4 @@
+import { topicArt } from '../art.js';
 import { S, esc, wordPic, paperArt, speak, sfx, addStars, markStep, celebrate, topicOf, $, $$, ICON } from '../lib.js';
 import { todayQueue, grade, topicStats, seen, learned, assignmentQueue } from '../srs.js';
 
@@ -11,7 +12,7 @@ export function topics(el) {
       ${S.topics.map((t) => {
         const st = topicStats(t.id);
         return `<a class="tile painted" href="#/topic/${t.id}" style="--c:${t.color}">
-          <span class="big">${({animals: paperArt('cat'), toys: paperArt('ball')})[t.id] || t.icon}</span><span class="t en">${esc(t.en)}</span><span class="s">${esc(t.ru)} · ${st.learned}/${st.total} ⭐</span>
+          <span class="big">${topicArt(t)}</span><span class="t en">${esc(t.en)}</span><span class="s">${esc(t.ru)} · ${st.learned}/${st.total} ⭐</span>
           <span class="bar"><i style="width:${st.total ? (st.seen / st.total) * 100 : 0}%;--c:${t.color}"></i></span></a>`;
       }).join('')}
     </div>`;
@@ -23,7 +24,7 @@ export function topic(el, id) {
   if (!t) { location.hash = '#/words'; return; }
   const ws = S.words.filter((w) => w.topic === id).sort((a, b) => a.order - b.order);
   el.innerHTML = `
-    <div class="row" style="margin:4px 0 12px"><span style="font-size:44px">${t.icon}</span><div><div class="hello" style="font-size:34px;margin:0">${esc(t.en)}</div><div class="sub">${esc(t.ru)} · нажми на картинку и послушай</div></div></div>
+    <div class="row" style="margin:4px 0 12px"><span style="font-size:44px">${topicArt(t)}</span><div><div class="hello" style="font-size:34px;margin:0">${esc(t.en)}</div><div class="sub">${esc(t.ru)} · нажми на картинку и послушай</div></div></div>
     <div class="wgrid">${ws.map((w) => `<button class="w ${seen(w.id) ? '' : 'new'}" data-id="${w.id}">
       ${learned(w.id) ? '<span class="st">⭐</span>' : ''}${wordPic(w)}<span class="en">${esc(w.en)}</span><span class="ru">${esc(w.ru)}</span></button>`).join('')}</div>
     <a class="btn full" href="#/learn/${id}" style="margin-top:18px;--c:${t.color}">Учить эту тему</a>`;

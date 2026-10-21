@@ -141,8 +141,34 @@ def exercise(browser, base, server=False):
     page.set_viewport_size({'width': 390, 'height': 844})
     route('/words', '#view .grid2')
     assert page.locator('#view a[href^="#/topic/"]').count() == 12
+    # Audit the entire illustration replacement, including color/number cards and small screens.
+    topics = data('m.S.topics.map(t=>({id:t.id,count:m.S.words.filter(w=>w.topic===t.id).length}))')
+    for topic in topics:
+        route('/topic/'+topic['id'], '#view .wgrid')
+        assert page.locator('.w').count() == topic['count']
+        assert page.locator('.w .emo').count() == 0
+        assert page.locator('.w > [role="img"]').count() == topic['count']
+        for width in [320, 390]:
+            page.set_viewport_size({'width':width,'height':844})
+            assert page.evaluate('document.documentElement.scrollWidth<=innerWidth'), topic['id']
+        assert page.evaluate(r"""() => {
+            const walker=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT);
+            while(walker.nextNode()){
+                const node=walker.currentNode;
+                if(node.parentElement.closest('script,style,textarea,option'))continue;
+                if(/\p{Extended_Pictographic}/u.test(node.textContent))return false;
+            }
+            return true;
+        }"""), topic['id']
+    # Old saved emoji stickers must render as drawings, without changing profile records.
+    unchanged = data('JSON.stringify(m.S.profile)')
+    page.evaluate("async () => {const m=await import('./js/lib.js');m.celebrate('Новая наклейка! ⭐','🦄');}")
+    expect(page.locator('.cel-emo .sketch-ink')).to_be_visible()
+    assert data('JSON.stringify(m.S.profile)') == unchanged
+    page.locator('.celebrate').click()
+    print('PASS: drawings cover all 110 words, legacy reward renders, no platform emoji; all topics fit 320/390px')
     route('/topic/animals', '#view .wgrid')
-    assert page.locator('.w .paper-art').count() == 4
+    assert page.locator('.w .sketch-art').count() == 11
     if server:
         page.screenshot(path='/tmp/amelie-animals-mobile.png', full_page=True)
     route('/learn', '#next')

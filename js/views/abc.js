@@ -23,7 +23,7 @@ export default function abc(el, mode) {
     <div class="sub">Английский алфавит · нажми на букву и послушай</div>
     <div id="card"></div>
     <a class="btn full" href="#/abc/quiz" style="margin:14px 0;--c:#7FD1AE">🔎 Игра «Найди букву»</a>
-    <div class="abc">${LETTERS.map((L, i) => `<button data-l="${L}" style="--c:${COLORS[i % COLORS.length]}">${L}${L.toLowerCase()}<small>${exampleFor(L).pic || ''}</small></button>`).join('')}</div>`;
+    <div class="abc">${LETTERS.map((L, i) => `<button data-l="${L}" style="--c:${COLORS[i % COLORS.length]}">${L}${L.toLowerCase()}<small>${wordPic(exampleFor(L), 'mini')}</small></button>`).join('')}</div>`;
 
   function show(L) {
     const w = exampleFor(L);
@@ -57,7 +57,7 @@ function quiz(el) {
     el.innerHTML = `
       <div class="progress"><i style="width:${(i / rounds.length) * 100}%"></i></div>
       <div class="prompt">Find the letter!<span class="ru" style="display:block;font-size:14px">Найди букву, которую слышишь</span></div>
-      <button class="listen-btn pulse" id="hear">🔊</button>
+      <button class="listen-btn pulse" id="hear" aria-label="Послушать букву">🔊</button>
       <div class="opts">${opts.map((x, n) => `<button class="opt" data-l="${x}" style="background:${COLORS[n]}"><span class="en" style="font-size:56px">${x}${x.toLowerCase()}</span></button>`).join('')}</div>`;
     const say = () => speak(NAMES[L]);
     $('#hear', el).onclick = say; setTimeout(say, 250);

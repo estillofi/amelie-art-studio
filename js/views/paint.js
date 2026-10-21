@@ -7,51 +7,60 @@ export const PICTURES = [
   {
     id: 'house', en: 'My house', ru: 'Мой дом', icon: '🏠',
     svg: `
-      <g class="rg" data-w="grass"><path d="M0 262 Q80 248 160 262 T320 258 V320 H0 Z"/></g>
-      <g ${D}><line x1="60" y1="10" x2="60" y2="22"/><line x1="60" y1="98" x2="60" y2="110"/><line x1="10" y1="60" x2="22" y2="60"/><line x1="98" y1="60" x2="110" y2="60"/><line x1="25" y1="25" x2="33" y2="33"/><line x1="87" y1="87" x2="95" y2="95"/><line x1="25" y1="95" x2="33" y2="87"/><line x1="87" y1="33" x2="95" y2="25"/></g>
-      <g class="rg" data-w="sun"><circle cx="60" cy="60" r="30"/></g>
-      <g class="rg" data-w="cloud"><path d="M192 96 C172 96 172 70 194 70 C196 50 226 46 234 64 C248 52 270 62 266 78 C284 80 282 96 266 96 Z"/></g>
-      <g class="rg" data-w="roof"><path d="M88 152 L170 92 L252 152 Z"/></g>
-      <g class="rg" data-w="house"><rect x="100" y="152" width="140" height="108"/></g>
-      <g class="rg" data-w="door"><rect x="153" y="198" width="34" height="62" rx="4"/></g>
-      <g class="rg" data-w="window"><rect x="112" y="168" width="32" height="28" rx="3"/><rect x="196" y="168" width="32" height="28" rx="3"/></g>
-      <g ${D}><line x1="128" y1="168" x2="128" y2="196"/><line x1="212" y1="168" x2="212" y2="196"/><circle cx="180" cy="230" r="2.5" fill="#2B2140"/></g>
-      <g ${D}><rect x="36" y="196" width="16" height="66" fill="#A0522D"/></g>
-      <g class="rg" data-w="tree"><circle cx="44" cy="178" r="32"/></g>
-      <g ${D}><line x1="288" y1="222" x2="288" y2="262" stroke="#3BB273"/></g>
-      <g class="rg" data-w="flower"><circle cx="288" cy="196" r="10"/><circle cx="302" cy="208" r="10"/><circle cx="296" cy="224" r="10"/><circle cx="280" cy="224" r="10"/><circle cx="274" cy="208" r="10"/></g>
-      <g ${D}><circle cx="288" cy="211" r="7" fill="#FFD23F"/></g>`,
+      <g class="rg" data-w="grass"><path d="M0 273 Q49 258 93 269 T190 267 T320 264 L320 320 0 320Z"/></g>
+      <g class="rg" data-w="sun"><circle cx="58" cy="57" r="27"/></g>
+      <g ${D}><path d="m58 16 2-11 m25 21 9-10 M98 53l12-1 M89 81l9 9 M58 96l1 12 M25 84l-9 9 M16 55l-11 2 M25 27l-8-8" fill="none"/><path d="M47 53q3-7 6 0m9 0q3-7 6 0M48 64q12 13 22-2" fill="none"/></g>
+      <g class="rg" data-w="cloud"><path d="M202 72q-18 4-18-11t19-13q5-25 29-17 12-20 30-3 23-7 27 15 19 1 20 15 0 14-17 14Z"/></g>
+      <g class="rg" data-w="roof"><path d="M86 161 117 137 171 91 227 137 252 164 198 158 139 161Z"/></g>
+      <g class="rg" data-w="house"><path d="m100 160 140-1-2 108-139 1Z"/></g>
+      <g class="rg" data-w="door"><path d="M153 268 154 215q14-22 31 0l2 53Z"/></g>
+      <g class="rg" data-w="window"><path d="m111 177 32-2 2 29-33 1Zm84-2 33 3-2 28-32-2Z"/></g>
+      <g ${D}><path d="m126 176 1 29m-15-15 32 1m67-14-1 28m-15-15 32 2M113 139l14 4 10-12m-1-7 12 5 11-13m10-13 14 21 12-2" fill="none"/><circle cx="178" cy="239" r="2" fill="#126c9a"/><path d="m43 255 2-81 8-1-1 84" fill="#dca34c"/></g>
+      <g class="rg" data-w="tree"><path d="m48 124-22 37 14-4-21 32 16-3-22 34 30-5 33 5-19-32 14 4-20-34 14 5Z"/></g>
+      <g ${D}><path d="m33 165 13-17m-18 39 22-24m-21 43 24-28m234 81 1-48m-1 31-12-10m14 19 11-10" fill="none"/></g>
+      <g class="rg" data-w="flower"><path d="M287 214q-16 12-17-4-17-4-6-15-5-16 11-15 8-18 18-4 18-4 15 12 16 8 3 18-5 16-24 8Z"/></g>
+      <g ${D}><circle cx="287" cy="195" r="7" fill="#f8d44a"/><path d="m4 292 12-12m9 19 11-12m22 14 8-13m31 17 10-14m99 13 10-16m22 16 12-11m35 10 8-12" fill="none"/></g>`,
   },
   {
     id: 'pets', en: 'My pets', ru: 'Мои питомцы', icon: '🐱',
     svg: `
-      <g class="rg" data-w="bird"><circle cx="62" cy="62" r="24"/><path d="M44 62 Q60 84 78 66"/></g>
-      <g ${D}><path d="M86 58 L100 64 L86 70 Z" fill="#FF9F1C"/><circle cx="70" cy="54" r="3" fill="#2B2140"/></g>
-      <g class="rg" data-w="fish"><path d="M196 92 C206 66 262 62 276 92 C262 120 206 118 196 92 Z"/><path d="M196 92 L172 74 L176 92 L172 110 Z"/></g>
-      <g ${D}><circle cx="258" cy="88" r="3.5" fill="#2B2140"/></g>
-      <g class="rg" data-w="cat"><ellipse cx="112" cy="232" rx="62" ry="46"/><path d="M80 128 L84 92 L106 116 Z"/><path d="M144 128 L140 92 L118 116 Z"/><circle cx="112" cy="152" r="40"/><path d="M168 236 C200 230 206 196 190 186" fill="none"/></g>
-      <g ${D}><circle cx="98" cy="146" r="4" fill="#2B2140"/><circle cx="126" cy="146" r="4" fill="#2B2140"/><path d="M106 160 L118 160 L112 167 Z" fill="#FF70A6"/><path d="M112 167 Q104 176 98 170 M112 167 Q120 176 126 170" fill="none"/><path d="M70 160 L92 162 M70 170 L92 168 M154 160 L132 162 M154 170 L132 168" fill="none"/></g>
-      <g class="rg" data-w="heart"><path d="M214 176 C214 162 234 158 238 172 C242 158 262 162 262 176 C262 192 238 204 238 210 C238 204 214 192 214 176 Z"/></g>
-      <g class="rg" data-w="ball"><circle cx="252" cy="250" r="36"/></g>
-      <g ${D}><path d="M218 244 Q252 232 286 244 M226 274 Q252 260 278 272" fill="none"/></g>`,
+      <g class="rg" data-w="bird"><path d="M33 74q-7-33 22-39 28-10 39 17 8 25-18 32-17 9-32-2l-17 9Z"/></g>
+      <g ${D}><path d="m94 52 15 8-16 6M45 60q14-7 31 8-16 9-27-1m1 16-2 13m20-11 3 12" fill="none"/><circle cx="79" cy="52" r="3" fill="#126c9a"/></g>
+      <g class="rg" data-w="fish"><path d="M200 76q30-36 80-3-24 40-77 16l-28 20 4-29-4-20Z"/></g>
+      <g ${D}><circle cx="260" cy="75" r="3" fill="#126c9a"/><path d="M237 60q-13 17 0 34m-28-21 14 7-13 6" fill="none"/></g>
+      <g class="rg" data-w="cat"><path d="M61 241q-4-49 43-57 53-2 66 51l-10 40-30-1-10-17-8 18-38-1Z"/><path d="m75 139 1-41 31 22 19-2 29-27-2 48q21 42-13 60-35 17-66-9-25-21 1-51Z"/><path d="M165 239q48-10 24-45" fill="none"/></g>
+      <g ${D}><path d="m87 144 5 8m39-8-3 8m-25 10 11 1-6 6Zm5 7q-8 13-17 6m17-6q10 13 18 5m-60-21 23 4m-24 9 22-3m62-13-20 5m21 8-22-2m-44 64 5 20m37-20-2 19" fill="none"/></g>
+      <g class="rg" data-w="heart"><path d="M210 158q5-20 23-8 10-19 27-4 19 18-19 44-11-5-27-17Z"/></g>
+      <g class="rg" data-w="ball"><path d="M217 251q-2-29 30-34 32-3 39 28 4 30-28 35-32 4-41-29Z"/></g>
+      <g ${D}><path d="m223 231q26 9 54-3m-57 29q31 8 63-5m-34-34q-13 24 0 60" fill="none"/></g>`,
   },
   {
     id: 'night', en: 'Good night', ru: 'Спокойной ночи', icon: '🌙',
     svg: `
-      <g class="rg" data-w="moon"><path d="M92 38 A52 52 0 1 0 128 130 A40 40 0 1 1 92 38 Z"/></g>
-      <g class="rg" data-w="star"><path d="M226 30 L234 50 L256 51 L239 64 L245 86 L226 73 L207 86 L213 64 L196 51 L218 50 Z"/><path d="M282 104 L287 116 L300 117 L290 125 L293 138 L282 130 L271 138 L274 125 L264 117 L277 116 Z"/><path d="M168 96 L172 106 L183 106 L174 113 L177 124 L168 117 L159 124 L162 113 L153 106 L164 106 Z"/></g>
-      <g class="rg" data-w="cloud"><path d="M30 196 C10 196 10 170 32 170 C34 150 64 146 72 164 C86 152 108 162 104 178 C122 180 120 196 104 196 Z"/></g>
-      <g class="rg" data-w="grass"><path d="M0 276 Q90 262 170 276 T320 270 V320 H0 Z"/></g>
-      <g class="rg" data-w="roof"><path d="M168 196 L230 150 L292 196 Z"/></g>
-      <g class="rg" data-w="house"><rect x="180" y="196" width="100" height="80"/></g>
-      <g class="rg" data-w="window"><rect x="196" y="212" width="28" height="26" rx="3"/><rect x="238" y="212" width="28" height="26" rx="3"/></g>
-      <g class="rg" data-w="heart"><path d="M120 236 C120 226 134 223 137 233 C140 223 154 226 154 236 C154 248 137 256 137 261 C137 256 120 248 120 236 Z"/></g>`,
+      <g class="rg" data-w="moon"><path d="M96 28q-48 12-45 56 1 48 48 53 30 3 47-24-41 12-54-19-14-30 4-66Z"/></g>
+      <g ${D}><path d="m79 79 1 7m-4 12q8 8 17 0m-29-33 6-13m-11 31 7-12m-5 32 7-13m0 25 6-13" fill="none"/></g>
+      <g class="rg" data-w="star"><path d="m224 24 10 22 25 2-19 17 6 25-22-13-22 11 6-24-18-18 25-2Zm57 75 7 16 16 1-12 11 4 16-15-8-14 7 3-16-11-12 16-1Zm-118 0 5 12 14 1-11 9 3 13-11-7-11 6 3-12-10-10 13-1Z"/></g>
+      <g ${D}><path d="m217 58 1 4m15-4-1 4m-14 5q6 6 11-1" fill="none"/></g>
+      <g class="rg" data-w="cloud"><path d="M31 194q-20 4-19-13-1-18 19-17 4-25 28-18 16-15 31 5 23-3 23 16 16 8 5 22Z"/></g>
+      <g class="rg" data-w="grass"><path d="M0 281q55-19 111-7 38 12 83 2 66-16 126-2v46H0Z"/></g>
+      <g class="rg" data-w="roof"><path d="m165 202 65-55 65 57-38-5-54 2Z"/></g>
+      <g class="rg" data-w="house"><path d="m180 201 101 1-2 77-99-1Z"/></g>
+      <g class="rg" data-w="window"><path d="m194 215 29-1 1 27-29-1Zm43 0 29 2-2 26-27-2Z"/></g>
+      <g ${D}><path d="m207 215 1 25m-13-13 28 1m28-11-1 24m-12-13 26 2m-79-33 14-1m12-11 11-1m11 1 12 5m-33 69 1-16q9-9 18 1l1 15" fill="none"/></g>
+      <g class="rg" data-w="heart"><path d="M115 238q1-15 17-10 8-15 21-5 18 17-12 36-24-5-26-21Z"/></g>
+      <g ${D}><path d="m15 296 9-12m13 16 11-12m20 15 9-13m18 14 10-14m39 13 10-13m116 12 10-11m17 11 10-13" fill="none"/></g>`,
   },
 ];
 
-export const svgOf = (pic, fills = {}) => `<svg viewBox="0 0 320 320" xmlns="http://www.w3.org/2000/svg">
-  <style>.rg *{stroke:#2B2140;stroke-width:4;stroke-linejoin:round;stroke-linecap:round}.deco{pointer-events:none}.deco *{stroke:#2B2140;stroke-width:3.5;stroke-linecap:round;stroke-linejoin:round}</style>
-  ${pic.svg.replace(/<g class="rg" data-w="(\w+)">/g, (m, w) => `<g class="rg" data-w="${w}" fill="${fills[w] || '#FFFFFF'}">`)}</svg>`;
+let drawingSerial = 0;
+export function svgOf(pic, fills = {}) {
+  const id = `crayon-hatch-${++drawingSerial}`;
+  const hatching = [...pic.svg.matchAll(/<g class="rg" data-w="\w+">([\s\S]*?)<\/g>/g)].map((match) => `<g class="crayon-grain" fill="url(#${id})">${match[1]}</g>`).join('');
+  return `<svg viewBox="0 0 320 320" xmlns="http://www.w3.org/2000/svg">
+    <defs><pattern id="${id}" width="19" height="23" patternUnits="userSpaceOnUse"><path d="m1 17 9-12m-3 16L18 4m-3 20 5-7" stroke="#126c9a" stroke-width="1.1" opacity=".18" fill="none"/></pattern></defs>
+    <style>.rg *{stroke:#126c9a;stroke-width:3;stroke-linejoin:round;stroke-linecap:round}.deco,.crayon-grain{pointer-events:none}.deco *{stroke:#126c9a;stroke-width:2.1;stroke-linecap:round;stroke-linejoin:round}.crayon-grain *{stroke:none}</style>
+    ${pic.svg.replace(/<g class="rg" data-w="(\w+)">/g, (m, w) => `<g class="rg" data-w="${w}" fill="${fills[w] || '#FFFFFF'}">`)}${hatching}</svg>`;
+}
 
 const colours = () => S.words.filter((w) => w.topic === 'colours');
 const wordFor = (en) => S.words.find((w) => w.en === en);
@@ -95,7 +104,7 @@ export function paint(el, picId, mode) {
     el.innerHTML = `
       ${free ? `<div class="task"><div class="tx"><span class="en">Free painting 🎨</span><span class="ru">Раскрашивай как хочешь!</span></div></div>`
         : k ? `<div class="progress"><i style="width:${(t / tasks.length) * 100}%"></i></div>
-          <div class="task"><button class="icon-btn" id="hear">${ICON.sound}</button>
+          <div class="task"><button class="icon-btn" id="hear" aria-label="Послушать задание">${ICON.sound}</button>
             <div class="tx"><span class="en">Colour the ${esc(k.region)} ${esc(k.colour.en)}.</span>
             <span class="ru" id="hint">${misses >= 2 ? `${rw?.pic || ''} ${esc(rw?.ru || k.region)} → ${esc(k.colour.ru)}` : '💡 нажми сюда для подсказки'}</span></div></div>` : ''}
       <div class="canvas" id="cv">${svgOf(pic, fills)}</div>

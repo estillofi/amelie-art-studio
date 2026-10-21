@@ -26,7 +26,7 @@ export default function parents(el, section = '') {
     <details class="new-word-panel"><summary>Нет нужного слова? Добавить новое</summary><form class="card" id="add">
       <div class="field"><label>Слово по-английски</label><input class="input" name="en" required placeholder="giraffe"></div>
       <div class="field"><label>Перевод</label><input class="input" name="ru" required placeholder="жираф"></div>
-      <div class="field"><label>Эмодзи-картинка</label><input class="input" name="pic" placeholder="🦒"></div>
+      <div class="field"><label>Иллюстрация</label><select class="select" name="pic"><option value="">Подобрать по слову</option><option value="sketch:book">Книга</option><option value="sketch:cat">Кот</option><option value="sketch:dog">Собака</option><option value="sketch:flower">Цветок</option><option value="sketch:star">Звезда</option><option value="sketch:plane">Самолёт</option><option value="sketch:picture">Рисунок</option></select></div>
       <div class="field"><label>Тема</label><select class="select" name="topic">${S.topics.map((t) => `<option value="${t.id}">${t.icon} ${esc(t.ru)}</option>`).join('')}</select></div>
       <div class="field"><label>Пример (по желанию)</label><input class="input" name="ex" placeholder="I can draw a giraffe."></div>
       <button class="btn full" style="--c:#7FD1AE">Добавить</button>
@@ -84,7 +84,7 @@ export default function parents(el, section = '') {
       Всё английское озвучивается — просите Амели повторять вслух. Слово становится «выученным» (⭐), когда она узнала его 3 раза в разные дни.<br><br>
       Здесь собраны базовые темы. Сверяйте их с учебником и тем, что ребёнок уже знает; можно начать с приветствий, цветов и коротких фраз. Задания и новые слова — во вкладке «Учебник и задания».
     </div>
-    </div><p class="release-note">Версия ${RELEASE} · Бумажная мастерская</p>`;
+    </div><p class="release-note">Версия ${RELEASE} · Мастерская с рисунками мелками</p>`;
 
   const homework = mountHomework($('#school-homework', el));
 

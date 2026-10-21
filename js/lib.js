@@ -1,3 +1,4 @@
+import { art, wordArt } from './art.js';
 // Shared helpers: data store, DOM, speech, sounds, rewards.
 
 export const COLS = ['words', 'topics', 'progress', 'log', 'profile', 'gallery', 'assignments'];
@@ -150,26 +151,9 @@ export const startOfDay = (t = Date.now()) => { const d = new Date(t); d.setHour
 export const topicOf = (id) => S.topics.find((t) => t.id === id);
 export const wordById = (id) => S.words.find((w) => w.id === id);
 
-// Each illustration has its own rectangle in the transparent paper collage atlas.
-const PAPER_ART = {
-  cat: [25, 20, 420, 430], book: [443, 85, 400, 365], ball: [870, 60, 365, 370],
-  butterfly: [24, 480, 390, 325], dog: [435, 480, 400, 340], backpack: [865, 440, 375, 385],
-  rabbit: [28, 807, 375, 410], plane: [425, 850, 435, 350], boat: [850, 830, 390, 395],
-};
-export function paperArt(name, size = '', label = '') {
-  const box = PAPER_ART[name];
-  if (!box) return '';
-  const [x, y, w, h] = box;
-  return `<span class="paper-art ${size}" ${label ? `role="img" aria-label="${esc(label)}"` : 'aria-hidden="true"'} style="aspect-ratio:${w}/${h};background-size:${1254 / w * 100}% ${1254 / h * 100}%;background-position:${x / (1254 - w) * 100}% ${y / (1254 - h) * 100}%"></span>`;
-}
-const WORD_ART = { cat: 'cat', dog: 'dog', rabbit: 'rabbit', butterfly: 'butterfly', ball: 'ball', book: 'book', backpack: 'backpack', plane: 'plane', boat: 'boat' };
-// Colours and numbers stay literal; supported nouns use the handmade illustrations.
-export function wordPic(w, size = '') {
-  if (w.color) return `<span class="blob ${size}" style="--c:${w.color}"></span>`;
-  if (w.num) return `<span class="num ${size}">${w.num}</span>`;
-  if (WORD_ART[w.en]) return paperArt(WORD_ART[w.en], size, w.ru);
-  return `<span class="emo ${size}">${esc(w.pic || '❓')}</span>`;
-}
+// All pictures share the reference's blue contour and crayon hatching.
+export const paperArt = art;
+export const wordPic = wordArt;
 
 // ── Speech ───────────────────────────────────────────────────
 let voice = null;
@@ -286,7 +270,7 @@ export function burst(el, text = '+1 ⭐') {
 }
 
 export const ICON = {
-  sound: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H2v6h4l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7M19 5a10 10 0 0 1 0 14"/></svg>',
-  back: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m15 5-7 7 7 7"/></svg>',
-  x: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>',
+  sound: art('speaker', 'control-art'),
+  back: '<svg viewBox="0 0 24 24" fill="none" stroke="#126c9a" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M15.5 4.5 11.8 8.1 7.3 12.2 11.7 15.7 15.2 19.5"/><path d="m7.6 12.1 11.8-.4" stroke-width="1.3"/></svg>',
+  x: '<svg viewBox="0 0 24 24" fill="none" stroke="#126c9a" stroke-width="2.3" stroke-linecap="round"><path d="m18.1 5.8-6.4 6.4-5.8 5.9M6.2 6.1l6.2 5.7 5.5 6.3"/></svg>',
 };

@@ -1,4 +1,5 @@
 import { art, wordArt } from './art.js';
+import { SESSION } from './auth.js';
 // Shared helpers: data store, DOM, speech, sounds, rewards.
 
 export const COLS = ['words', 'topics', 'progress', 'log', 'profile', 'gallery', 'assignments'];
@@ -9,7 +10,9 @@ export const S = Object.fromEntries(COLS.map((c) => [c, []]));
 //   server — `node server.js` (local / VPS): data lives in a private SQLite database;
 //   static — GitHub Pages: content comes from data/*.json files, Amelie's progress lives in this browser (localStorage).
 export let MODE = 'static';
-const LS = 'amelie:v1:';
+let LS = 'amelie:v1:';
+export const storageKey = (col) => LS + col;
+const scopeHeaders = () => SESSION ? { 'X-Amelie-Scope': SESSION.scope } : {};
 const lsGet = (col) => { try { return JSON.parse(localStorage.getItem(LS + col) || '[]'); } catch { return []; } };
 const lsSet = (col, items) => { try { localStorage.setItem(LS + col, JSON.stringify(items)); return true; } catch { return false; } };
 let pending = lsGet('pending');
@@ -23,7 +26,7 @@ const syncStatus = (error = '') => {
 };
 
 async function requestJSON(url, options = {}) {
-  const r = await fetch(url, { cache: 'no-store', signal: AbortSignal.timeout(10000), ...options });
+  const r = await fetch(url, { cache: 'no-store', signal: AbortSignal.timeout(10000), ...options, headers: { ...scopeHeaders(), ...options.headers } });
   const data = await r.json().catch(() => null);
   if (!r.ok) throw new Error(data?.error || `Не удалось связаться с сервером (${r.status})`);
   return data;
@@ -57,7 +60,20 @@ async function getJSON(url) {
 const mergeById = (base, extra) => { const m = new Map(base.map((x) => [x.id, x])); for (const x of extra) m.set(x.id, { ...(m.get(x.id) || {}), ...x }); return [...m.values()]; };
 
 export async function loadAll() {
-  const probe = await fetch('api/db/topics', { cache: 'no-store', signal: AbortSignal.timeout(10000) });
+  const prefix = SESSION ? `amelie:v2:${SESSION.scope}:` : 'amelie:v1:';
+  if (prefix !== LS) {
+    LS = prefix;
+    pending = lsGet('pending'); if (!Array.isArray(pending)) pending = [];
+    durableQueue = true; syncStatus();
+    // Offer only a genuine prototype backup. Never reuse the old server's adult test cache.
+    if (SESSION?.role === 'parent' && SESSION.profile === 'amelie' && lsGet('serverUsed') !== true) {
+      try {
+        const old = (col) => JSON.parse(localStorage.getItem('amelie:v1:' + col) || '[]');
+        if (old('serverUsed') !== true && STATE.some((c) => old(c).length)) lsSet('beforeServer', { app: 'amelie-art-studio', version: 1, data: { ...Object.fromEntries(STATE.map((c) => [c, old(c)])), words: old('words').filter((w) => w.custom) } });
+      } catch { /* Keep malformed old storage untouched. */ }
+    }
+  }
+  const probe = await fetch('api/db/topics', { cache: 'no-store', headers: scopeHeaders(), signal: AbortSignal.timeout(10000) });
   if (probe.status === 404) MODE = 'static';
   else if (probe.ok) MODE = 'server';
   else throw new Error('Сервер временно недоступен. Попробуйте открыть приложение ещё раз.');
@@ -99,6 +115,12 @@ export async function save(col, item) {
 export function exportProgress() {
   return { app: 'amelie-art-studio', version: 1, exportedAt: new Date().toISOString(),
     data: { ...Object.fromEntries(STATE.map((c) => [c, S[c]])), words: S.words.filter((w) => w.custom) } };
+}
+
+export async function previewProgress(file) {
+  if (!SESSION) return null;
+  if (!(await flushSaves())) throw new Error('Сначала дождитесь сохранения текущего прогресса');
+  return requestJSON('api/progress/preview', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(file) });
 }
 
 export async function importProgress(file) {

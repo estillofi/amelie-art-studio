@@ -1,5 +1,6 @@
+import { SESSION, initSession, authRequest } from './auth.js';
 import { decorate, observeArt } from './art.js';
-import { loadAll, profile, $, ICON, esc, paperArt } from './lib.js';
+import { loadAll, profile, $, ICON, esc, paperArt, flushSaves, toast } from './lib.js';
 import home from './views/home.js';
 import { topics, topic, learn, learnAssignment } from './views/words.js';
 import { playHub, listen, spell, sensei } from './views/play.js';
@@ -19,7 +20,7 @@ function renderTop(route) {
   const p = profile();
   const back = TAB[route] !== undefined ? `#/${TAB[route]}` : null;
   $('#top').innerHTML = `${back ? `<a class="icon-btn" href="${back}" aria-label="Назад">${ICON.back}</a>` : `<a class="logo" href="#/"><span class="pal">${paperArt('butterfly')}</span>Amelie</a>`}
-    <span class="sp"></span><a class="adult-link" href="#/parents" aria-label="Открыть раздел для взрослых">Взрослым</a>
+    <span class="sp"></span>${SESSION ? `<button class="adult-link" id="sign-out">Выйти</button>` : ''}<a class="adult-link" href="#/parents" aria-label="Открыть раздел для взрослых">Взрослым</a>
     <a class="chip" href="#/gallery" title="Мои звёзды и наклейки">⭐ <span id="stars">${p.stars || 0}</span></a>`;
 }
 
@@ -36,6 +37,10 @@ async function router() {
   cleanup?.(); cleanup = null;
   if ('speechSynthesis' in window) speechSynthesis.cancel();
   renderTop(route); renderNav(route);
+  $('#sign-out')?.addEventListener('click', async () => {
+    if (!(await flushSaves())) { toast('Сначала дождитесь сохранения результатов. Есть записи на этом устройстве.'); return; }
+    try { await authRequest('logout', {}); location.reload(); } catch (error) { toast(error.message); }
+  });
   const view = ROUTES[route] || home;
   const el = $('#view');
   el.innerHTML = '';
@@ -47,9 +52,11 @@ async function router() {
 try {
   $('#studio-garland').innerHTML = ['star', 'cloud', 'moon', 'cloud', 'star'].map((name) => paperArt(name)).join('');
   observeArt();
-  await loadAll();
-  window.addEventListener('hashchange', router);
-  router();
+  if (await initSession()) {
+    await loadAll();
+    window.addEventListener('hashchange', router);
+    router();
+  }
 } catch (error) {
   $('#view').innerHTML = `<div class="card start-error" role="alert"><div class="h2">Не получилось открыть альбом</div><p>${esc(error.message)}</p><p>Попробуй снова, когда появится связь.</p><button class="btn" id="retry">Попробовать ещё раз</button></div>`;
   $('#retry').onclick = () => location.reload();

@@ -96,7 +96,7 @@ export function openStore(path = join(process.env.DATA_DIR || join(ROOT, '.local
         return { topics: pack.topics.length, words: pack.words.length };
       }, dryRun);
     },
-    importProgress(file) {
+    importProgress(file, { dryRun = false, migrationId } = {}) {
       requireThat(file?.app === 'amelie-art-studio' && file.version === 1 && plain(file.data), 'Это не файл прогресса Амели');
       const data = { ...file.data, assignments: file.data.assignments === undefined ? [] : file.data.assignments };
       for (const col of [...STATE, 'words']) {
@@ -105,13 +105,20 @@ export function openStore(path = join(process.env.DATA_DIR || join(ROOT, '.local
         for (const item of data[col]) { validateItem(col, item); requireThat(!ids.has(item.id), 'Повторяющийся id'); ids.add(item.id); }
       }
       return transaction(() => {
+        if (migrationId) {
+          requireThat(/^[a-f0-9]{64}$/.test(migrationId), 'Некорректный код переноса');
+          const previous = db.prepare("SELECT value FROM meta WHERE key='initial-progress-import'").get();
+          if (previous?.value === migrationId) return { alreadyImported: true };
+          requireThat(!previous && STATE.every((col) => store.list(col).length === 0), 'Первичный перенос разрешён только в пустой альбом');
+        }
         for (const item of data.words) store.put('words', { ...item, custom: true });
         for (const col of STATE) {
           db.prepare('DELETE FROM records WHERE collection=?').run(col);
           for (const item of data[col]) store.put(col, item);
         }
+        if (migrationId) db.prepare("INSERT INTO meta(key,value) VALUES('initial-progress-import',?)").run(migrationId);
         return { imported: true };
-      });
+      }, dryRun);
     },
     exportProgress: () => ({ app: 'amelie-art-studio', version: 1, exportedAt: new Date().toISOString(), data: { ...Object.fromEntries(STATE.map((col) => [col, store.list(col)])), words: store.list('words').filter((w) => w.custom) } }),
     close: () => db.close(),

@@ -6,3 +6,4 @@ node_modules/
 *.sqlite-wal
 backups/
 test-results/
+*.private.json

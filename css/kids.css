@@ -465,3 +465,20 @@ body { background: #ddd0b9 url('../assets/torn-collage.webp') center top / 850px
 .material-layer { z-index: auto; }
 html { scroll-padding-bottom: calc(110px + var(--safe-b)); }
 .btn,.input,.select { scroll-margin-bottom: calc(110px + var(--safe-b)); }
+
+/* Separate family access fits the same paper album. */
+.login-card { margin: 32px auto; max-width: 520px; }
+.login-card .hello { font-size: clamp(28px, 6vw, 42px); }
+.family-panel { margin-top: 18px; }
+.family-panel summary { cursor: pointer; font-weight: 700; }
+.access-row { display: flex; gap: 10px; align-items: center; justify-content: space-between; padding: 14px 0; border-bottom: 1px dashed #9a9a8a; }
+.access-row small { display: block; margin-top: 5px; }
+.access-row button { flex-shrink: 0; }
+.issued-password { font-size: 20px; overflow-wrap: anywhere; user-select: all; }
+.account-name { font-size: 12px; max-width: 72px; overflow: hidden; text-overflow: ellipsis; }
+button.adult-link { background: none; border: 0; font: inherit; font-size: 12px; cursor: pointer; padding: 5px; }
+
+.top:has(#sign-out) { gap: 6px; }
+.top:has(#sign-out) .logo { font-size: 24px; gap: 4px; }
+.top:has(#sign-out) .chip { padding: 5px 8px; gap: 3px; }
+.top:has(#sign-out) .adult-link { font-size: 11px; }

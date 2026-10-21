@@ -2,6 +2,10 @@ import http from 'node:http';
 import { RELEASE } from './js/release.js';
 import { createHash, timingSafeEqual } from 'node:crypto';
 import { readFile } from 'node:fs/promises';
+import { existsSync, chmodSync } from 'node:fs';
+import { backup } from 'node:sqlite';
+import { openFamily } from './server/family.js';
+import { importChildFile } from './scripts/import-child-progress.js';
 import { join } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { openStore, ROOT, COLLECTIONS, ValidationError } from './server/store.js';
@@ -16,7 +20,7 @@ async function body(req) {
   try { return JSON.parse(Buffer.concat(chunks).toString('utf8')); } catch { throw new ValidationError('Некорректный JSON'); }
 }
 
-export function createApp({ store = openStore(), user = process.env.APP_USER, password = process.env.APP_PASSWORD } = {}) {
+export function createApp({ store = openStore(), user = process.env.APP_USER, password = process.env.APP_PASSWORD, family = null } = {}) {
   if (Boolean(user) !== Boolean(password)) throw new Error('Задайте APP_USER и APP_PASSWORD вместе');
   const expected = user ? digest('Basic ' + Buffer.from(`${user}:${password}`).toString('base64')) : null;
   const server = http.createServer(async (req, res) => {
@@ -24,7 +28,7 @@ export function createApp({ store = openStore(), user = process.env.APP_USER, pa
     res.setHeader('X-Content-Type-Options', 'nosniff');
     res.setHeader('Referrer-Policy', 'same-origin');
     res.setHeader('X-Frame-Options', 'DENY');
-    if (expected && !timingSafeEqual(expected, digest(req.headers.authorization || ''))) {
+    if (!family && expected && !timingSafeEqual(expected, digest(req.headers.authorization || ''))) {
       res.setHeader('WWW-Authenticate', 'Basic realm="Amelie family", charset="UTF-8"');
       return send(res, 401, { error: 'Нужен семейный доступ' });
     }
@@ -37,13 +41,44 @@ export function createApp({ store = openStore(), user = process.env.APP_USER, pa
         if ((origin && new URL(origin).host !== req.headers.host) || req.headers['sec-fetch-site'] === 'cross-site') return send(res, 403, { error: 'Запрос с другого сайта запрещён' });
       }
       if (path === '/api/health' && req.method === 'GET') return send(res, 200, { status: 'ok', storage: 'sqlite', version: RELEASE });
-      if (path === '/api/progress/export' && req.method === 'GET') return send(res, 200, store.exportProgress());
-      if (path === '/api/progress/import' && req.method === 'POST') return send(res, 200, store.importProgress(await body(req)));
-      if (path === '/api/content/import' && req.method === 'POST') return send(res, 200, store.importContent(await body(req)));
+      let activeStore = store;
+      if (family && path.startsWith('/api/')) {
+        const cookie = (token, maxAge) => res.setHeader('Set-Cookie', `amelie_session=${token}; Path=/; HttpOnly; SameSite=Strict; Max-Age=${maxAge}${req.socket.encrypted || req.headers['x-forwarded-proto'] === 'https' ? '; Secure' : ''}`);
+        if (path === '/api/auth/login' && req.method === 'POST') {
+          const value = await body(req);
+          const result = family.login(value?.login, value?.password, req.socket.remoteAddress);
+          cookie(result.token, result.maxAge);
+          return send(res, 200, { ok: true });
+        }
+        const session = family.session(req.headers.cookie);
+        if (!session) return send(res, 401, { error: 'Войдите в свой аккаунт' });
+        if (path === '/api/auth/session' && req.method === 'GET') return send(res, 200, family.describe(session));
+        if (path === '/api/auth/logout' && req.method === 'POST') { family.logout(session); cookie('', 0); return send(res, 200, { ok: true }); }
+        if (path === '/api/auth/profile' && req.method === 'POST') { family.select(session, (await body(req))?.profile); return send(res, 200, { ok: true }); }
+        if (path === '/api/auth/access' && req.method === 'GET') return send(res, 200, family.access(session));
+        if (path === '/api/auth/password' && req.method === 'POST') return send(res, 200, family.resetPassword(session, (await body(req))?.account));
+        family.checkScope(session, req.headers['x-amelie-scope']);
+        activeStore = family.store(session);
+        if (path === '/api/progress/preview' && req.method === 'POST') return send(res, 200, await family.importProgress(session, await body(req), { dryRun: true }));
+        if (path === '/api/progress/import' && req.method === 'POST') return send(res, 200, await family.importProgress(session, await body(req)));
+        if (['/api/progress/export', '/api/content/import'].includes(path)) family.requireParent(session);
+        const collection = path.match(/^\/api\/db\/(\w+)$/)?.[1];
+        if (req.method === 'POST' && ['words', 'topics', 'assignments'].includes(collection)) family.requireParent(session);
+        if (req.method === 'POST' && collection === 'profile' && session.account !== 'parent') {
+          const item = await body(req);
+          if (!item || typeof item !== 'object' || Array.isArray(item)) throw new ValidationError('Некорректный профиль');
+          if (Object.keys(item).some((key) => !['id', 'stars', 'stickers', 'days'].includes(key))) return send(res, 403, { error: 'Настройки меняет родитель' });
+          return send(res, 200, activeStore.put('profile', item));
+        }
+      }
+
+      if (path === '/api/progress/export' && req.method === 'GET') return send(res, 200, activeStore.exportProgress());
+      if (path === '/api/progress/import' && req.method === 'POST') return send(res, 200, activeStore.importProgress(await body(req)));
+      if (path === '/api/content/import' && req.method === 'POST') return send(res, 200, activeStore.importContent(await body(req)));
       const match = path.match(/^\/api\/db\/(\w+)$/);
       if (match && COLLECTIONS.includes(match[1])) {
-        if (req.method === 'GET') return send(res, 200, store.list(match[1]));
-        if (req.method === 'POST') return send(res, 200, store.put(match[1], await body(req)));
+        if (req.method === 'GET') return send(res, 200, activeStore.list(match[1]));
+        if (req.method === 'POST') return send(res, 200, activeStore.put(match[1], await body(req)));
         return send(res, 405, { error: 'Метод не поддерживается' });
       }
       if (path.startsWith('/api/') || req.method === 'POST') return send(res, 404, { error: 'Адрес не найден' });
@@ -67,7 +102,20 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
   const host = process.env.HOST || '127.0.0.1';
   if (!['127.0.0.1', 'localhost', '::1'].includes(host) && !(process.env.APP_USER && process.env.APP_PASSWORD)) throw new Error('Для внешнего доступа задайте APP_USER и APP_PASSWORD');
   const store = openStore();
-  const app = createApp({ store });
+  const dir = process.env.DATA_DIR || join(ROOT, '.local');
+  if (process.env.APP_PASSWORD && !existsSync(join(dir, 'accounts.sqlite'))) {
+    // Keep the old shared test profile intact before creating isolated child stores.
+    const destination = join(dir, `before-family-${Date.now()}.sqlite`);
+    await backup(store.db, destination);
+    chmodSync(destination, 0o600);
+  }
+  const family = process.env.APP_PASSWORD ? openFamily({ dir, parentPassword: process.env.APP_PASSWORD }) : null;
+  const initialProgress = process.env.AMELIE_IMPORT_FILE || join(ROOT, 'scripts', 'initial-progress.private.json');
+  if (family && existsSync(initialProgress)) {
+    const result = await importChildFile(family, initialProgress, { apply: true });
+    console.log(`Initial progress migration: ${result.alreadyImported ? 'already applied' : 'applied'}`);
+  }
+  const app = createApp({ store, family });
   app.listen(Number(process.env.PORT || 3000), host, () => console.log(`Amelie listening on ${host}:${app.address().port}`));
-  for (const signal of ['SIGINT', 'SIGTERM']) process.on(signal, () => app.close(() => { store.close(); process.exit(0); }));
+  for (const signal of ['SIGINT', 'SIGTERM']) process.on(signal, () => app.close(() => { family?.close(); store.close(); process.exit(0); }));
 }

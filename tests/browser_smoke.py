@@ -24,6 +24,14 @@ def running(command, env=None):
         proc.wait(timeout=10)
 
 
+def login(page, username='parent', password='local-test-only'):
+    expect(page.locator('#login-form')).to_be_visible()
+    page.locator('#login-name').fill(username)
+    page.locator('#login-password').fill(password)
+    page.locator('#login-form button').click()
+    expect(page.locator('#stars')).to_be_visible()
+
+
 def parents(page):
     page.evaluate("location.hash='/parents'")
     page.wait_for_function("document.querySelector('#ans') || document.querySelector('#npd')")
@@ -83,8 +91,9 @@ def homework(page, server):
     backup = data('m.exportProgress()')
     if server:
         assert data('await m.flushSaves()'), data('m.SYNC')
-    page.locator('#imp').set_input_files({'name':'with-homework.json','mimeType':'application/json','buffer':json.dumps(backup).encode()})
-    expect(page.locator('#ans')).to_be_visible()
+    with page.expect_navigation(wait_until='networkidle'):
+        page.locator('#imp').set_input_files({'name':'with-homework.json','mimeType':'application/json','buffer':json.dumps(backup).encode()})
+    expect(page.locator('#hw-pages' if server else '#ans')).to_be_visible()
     parents(page)
     assert data('m.S.assignments[0].pages') == '70'
     assert data('m.S.progress') == after
@@ -106,6 +115,8 @@ def exercise(browser, base, server=False):
     errors = []
     page.on('pageerror', lambda err: errors.append(str(err)))
     page.goto(base, wait_until='networkidle')
+    if server:
+        login(page)
     expect(page.locator('h1')).to_have_text('Hello, Amelie!')
     assert page.locator('.welcome-art').evaluate('(img) => img.complete && img.naturalWidth>0')
     assert page.evaluate('document.documentElement.scrollWidth<=innerWidth')
@@ -125,10 +136,11 @@ def exercise(browser, base, server=False):
     # The textbook remains discoverable before there are any assignments.
     expect(page.locator('.school-manage')).to_be_visible()
     page.locator('.school-manage').click()
-    expect(page.locator('#ans')).to_be_visible()
-    a, b = map(int, re.search(r'(\d+) × (\d+)', page.locator('#view').inner_text()).groups())
-    page.locator('#ans').fill(str(a*b))
-    page.locator('#go').click()
+    if not server:
+        expect(page.locator('#ans')).to_be_visible()
+        a, b = map(int, re.search(r'(\d+) × (\d+)', page.locator('#view').inner_text()).groups())
+        page.locator('#ans').fill(str(a*b))
+        page.locator('#go').click()
     expect(page.locator('#hw-pages')).to_be_visible()
     expect(page.locator('#parent-overview')).to_be_hidden()
     if server:
@@ -175,19 +187,19 @@ def exercise(browser, base, server=False):
     page.locator('#next').click()
     if server:
         assert data('await m.flushSaves()'), data('m.SYNC')
-        assert len(page.evaluate("async () => (await fetch('api/db/progress')).json()")) == 1
+        assert len(page.evaluate("async () => (await fetch('api/db/progress', {headers:{'X-Amelie-Scope':(await import('./js/auth.js')).SESSION.scope}})).json()")) == 1
         # A failed POST must be retained, overlaid after reload, and eventually sent exactly once.
         page.route('**/api/db/**', lambda r: r.abort() if r.request.method == 'POST' else r.continue_())
         page.locator('#next').click()
-        page.wait_for_function('JSON.parse(localStorage.getItem("amelie:v1:pending") || "[]").length>0')
+        page.wait_for_function('async () => {const m=await import("./js/lib.js");return JSON.parse(localStorage.getItem(m.storageKey("pending")) || "[]").length>0;}')
         assert data('await m.flushSaves()') is False, data('m.SYNC')
         page.reload(wait_until='networkidle')
         assert data('m.S.progress.length') == 2
         page.unroute('**/api/db/**')
         assert data('await m.flushSaves()'), data('m.SYNC')
-        assert len(page.evaluate("async () => (await fetch('api/db/progress')).json()")) == 2
+        assert len(page.evaluate("async () => (await fetch('api/db/progress', {headers:{'X-Amelie-Scope':(await import('./js/auth.js')).SESSION.scope}})).json()")) == 2
         assert len(data('m.S.progress')) == 2
-        assert page.evaluate('JSON.parse(localStorage.getItem("amelie:v1:pending")).length') == 0
+        assert data('JSON.parse(localStorage.getItem(m.storageKey("pending"))).length') == 0
         page.route('**/api/db/**', lambda r: r.abort() if r.request.method == 'POST' else r.continue_())
         page.evaluate('''() => { window.originalStorageSet = Storage.prototype.setItem;
             Storage.prototype.setItem = function(key, value) { if (key.endsWith(':pending')) throw new DOMException('Quota', 'QuotaExceededError'); return window.originalStorageSet.call(this, key, value); }; }''')
@@ -215,7 +227,7 @@ def exercise(browser, base, server=False):
     page.locator('#cv [data-w="sun"] circle').click()
     expect(page.locator('#cv [data-w="sun"]')).to_have_attribute('fill', '#FF4D4F')
     page.locator('#save').click()
-    page.wait_for_function('JSON.parse(localStorage.getItem("amelie:v1:gallery") || "[]").length===1')
+    page.wait_for_function('async () => {const m=await import("./js/lib.js");return JSON.parse(localStorage.getItem(m.storageKey("gallery")) || "[]").length===1;}')
     if server:
         assert data('await m.flushSaves()'), data('m.SYNC')
     route('/gallery', '#view .pics')
@@ -235,8 +247,9 @@ def exercise(browser, base, server=False):
     backup['data']['profile'][0]['stars'] = 11
     backup['data'].pop('assignments', None)  # A real legacy export has no homework collection.
     page.on('dialog', lambda dialog: dialog.accept())
-    page.locator('#imp').set_input_files({'name': 'old-progress.json', 'mimeType': 'application/json', 'buffer': json.dumps(backup).encode()})
-    expect(page.locator('#ans')).to_be_visible()
+    with page.expect_navigation(wait_until='networkidle'):
+        page.locator('#imp').set_input_files({'name': 'old-progress.json', 'mimeType': 'application/json', 'buffer': json.dumps(backup).encode()})
+    expect(page.locator('#npd' if server else '#ans')).to_be_visible()
     assert data('m.profile().stars') == 11
     homework(page, server)
     if server:
@@ -252,7 +265,7 @@ def exercise(browser, base, server=False):
         expect(page.locator('[role="alert"]')).to_contain_text('Не получилось открыть альбом')
         page.unroute('**/api/db/topics')
         page.locator('#retry').click()
-        expect(page.locator('#ans')).to_be_visible()
+        expect(page.locator('#npd')).to_be_visible()
         assert data('m.profile().stars') == 11
         print('PASS: content import, old progress migration, and explicit server failure recovery')
     # Adding a missing textbook word must preserve the already entered assignment.
@@ -280,6 +293,49 @@ def exercise(browser, base, server=False):
     print('PASS:', 'server' if server else 'GitHub Pages', 'navigation, learning, games, ABC, painting, persistence, adult settings and backup round-trip')
     context.close()
 
+def family_access(browser, base):
+    context = browser.new_context(viewport={'width': 320, 'height': 740})
+    context.add_init_script("if(!localStorage.getItem('old-server-test')) {localStorage.setItem('amelie:v1:serverUsed','true'); localStorage.setItem('amelie:v1:profile',JSON.stringify([{id:'amelie',stars:999}])); localStorage.setItem('amelie:v1:pending',JSON.stringify([{col:'profile',item:{id:'amelie',stars:999}}])); localStorage.setItem('old-server-test','true');}")
+    page = context.new_page()
+    page.goto(base, wait_until='networkidle')
+    login(page)
+    expect(page.locator('#stars')).to_have_text('3')
+    assert page.evaluate('document.documentElement.scrollWidth<=innerWidth')
+    parents(page)
+    with page.expect_navigation(wait_until='networkidle'):
+        page.locator('#family-profile').select_option('demo')
+    expect(page.locator('#family-profile')).to_have_value('demo')
+    expect(page.locator('#stars')).to_have_text('0')
+    page.locator('.family-panel summary').click()
+    with page.expect_response('**/api/auth/password') as response:
+        page.locator('[data-password="demo"]').click()
+    access = response.value.json()
+    expect(page.locator('#access-message')).to_contain_text('Пароль показан только сейчас')
+    with page.expect_navigation(wait_until='networkidle'):
+        page.locator('#sign-out').click()
+    login(page, access['login'], access['password'])
+    expect(page.locator('#stars')).to_have_text('0')
+    page.evaluate("location.hash='/'")
+    expect(page.locator('h1')).to_have_text('Демо')
+    assert page.evaluate('document.documentElement.scrollWidth<=innerWidth')
+    page.evaluate("location.hash='/learn'")
+    page.locator('#next').click()
+    assert page.evaluate("async () => (await import('./js/lib.js')).flushSaves()")
+    page.evaluate("location.hash='/parents'")
+    expect(page.locator('#parent-login')).to_be_visible()
+    assert page.locator('#family-profile').count() == 0
+    assert page.locator('#imp').count() == 0
+    assert page.evaluate("async () => (await import('./js/lib.js')).storageKey('pending')") == 'amelie:v2:demo:demo:pending'
+    with page.expect_navigation(wait_until='networkidle'):
+        page.locator('#parent-login').click()
+    login(page)
+    expect(page.locator('#stars')).to_have_text('3')
+    parents(page)
+    expect(page.locator('#family-profile')).to_have_value('amelie')
+    print('PASS: parent/child login UI, password handoff, separate empty demo, cache isolation and child permissions at 320px')
+    context.close()
+
+
 with tempfile.TemporaryDirectory(prefix='amelie-browser-') as directory, sync_playwright() as p:
     browser = p.chromium.launch(executable_path=os.environ.get('CHROMIUM_PATH', '/usr/bin/chromium'), headless=True, args=['--no-sandbox'])
     env = {**os.environ, 'PORT': '0', 'HOST': '127.0.0.1', 'DATA_DIR': directory, 'APP_USER': 'test-family', 'APP_PASSWORD': 'local-test-only'}
@@ -290,15 +346,18 @@ with tempfile.TemporaryDirectory(prefix='amelie-browser-') as directory, sync_pl
         context.add_init_script("if(!localStorage.getItem('migration-fixture')) {localStorage.setItem('amelie:v1:profile'," + json.dumps(json.dumps([old])) + ");localStorage.setItem('migration-fixture','1');}")
         page = context.new_page()
         page.goto(base, wait_until='networkidle')
+        login(page)
         assert page.evaluate("async () => (await import('./js/lib.js')).profile().stars") == 11
         parents(page)
         expect(page.locator('#migrate')).to_be_visible()
         page.on('dialog', lambda dialog: dialog.accept())
-        page.locator('#migrate').click()
-        expect(page.locator('#ans')).to_be_visible()
+        with page.expect_navigation(wait_until='networkidle'):
+            page.locator('#migrate').click()
+        expect(page.locator('#npd')).to_be_visible()
         assert page.evaluate("async () => (await import('./js/lib.js')).profile().stars") == 3
         context.close()
         print('PASS: same-origin prototype progress is preserved until explicit adult migration')
+        family_access(browser, base)
     with running(['python3', '-u', '-m', 'http.server', '0', '--bind', '127.0.0.1']) as base:
         exercise(browser, base)
     browser.close()

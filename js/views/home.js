@@ -1,3 +1,4 @@
+import { SESSION } from '../auth.js';
 import { S, esc, wordPic, paperArt, speak, profile, todayKey, DAY, $, STAR_STEP, topicOf, MODE, isStandalone } from '../lib.js';
 import { todayQueue, seenWords, learned, activeAssignments, assignmentQueue } from '../srs.js';
 
@@ -21,7 +22,7 @@ export default function home(el) {
   el.innerHTML = `
     <section class="welcome" aria-labelledby="welcome-title">
       <span class="studio-label">Твой альбом английского</span>
-      <h1 class="hello" id="welcome-title">Hello, Amelie!</h1>
+      <h1 class="hello" id="welcome-title">${!SESSION || SESSION.profile === 'amelie' ? 'Hello, Amelie!' : esc(SESSION.name)}</h1>
       <p class="welcome-copy">Немного слов, немного красок.<br>Большие открытия маленькими шагами.</p>
       <img class="welcome-art" src="assets/doodles/welcome.webp" width="1536" height="1024" alt="Котёнок в кимоно и дружелюбный динозавр рисуют солнце" fetchpriority="high">
       <a class="btn full welcome-cta" href="${next}">${complete ? 'Порисуем ещё? →' : day.words ? 'Продолжим играть →' : 'Откроем альбом →'}</a>

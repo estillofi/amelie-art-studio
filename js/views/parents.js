@@ -1,4 +1,5 @@
-import { S, esc, profile, saveProfile, save, toast, speak, todayKey, startOfDay, DAY, topicOf, $, MODE, exportProgress, importProgress, isStandalone, isAndroid, installHint, SYNC, flushSaves, browserBackup, importContent, uid } from '../lib.js';
+import { SESSION, authRequest, parentRequired } from '../auth.js';
+import { S, esc, profile, saveProfile, save, toast, speak, todayKey, startOfDay, DAY, topicOf, $, MODE, exportProgress, importProgress, isStandalone, isAndroid, installHint, SYNC, flushSaves, browserBackup, importContent, uid, previewProgress } from '../lib.js';
 import { topicStats, seenWords } from '../srs.js';
 import { RELEASE } from '../release.js';
 import { mountHomework } from './homework.js';
@@ -7,7 +8,8 @@ let unlocked = false;
 
 // The requested tab survives the grown-up gate; the router owns event cleanup.
 export default function parents(el, section = '') {
-  if (!unlocked) return gate(el);
+  if (SESSION?.role === 'child') return parentRequired(el);
+  if (!SESSION && !unlocked) return gate(el);
   const p = profile();
   const week = Array.from({ length: 7 }, (_, i) => todayKey(new Date(startOfDay() - (6 - i) * DAY)));
   const days = p.days || {};
@@ -18,7 +20,8 @@ export default function parents(el, section = '') {
 
   el.innerHTML = `
     <div class="hello" style="font-size:34px">Для родителей</div>
-    <div class="sub">Занимаемся спокойно, понемногу</div>
+    <div class="sub">Занимаемся спокойно, понемногу${SESSION ? ` · Альбом: ${esc(SESSION.name)}` : ''}</div>
+    ${SESSION ? `<section class="card family-panel"><div class="field"><label for="family-profile">Чей альбом открыть</label><select class="select" id="family-profile">${SESSION.profiles.map((p) => `<option value="${p.id}" ${p.id === SESSION.profile ? 'selected' : ''}>${esc(p.name)}</option>`).join('')}</select></div><details><summary>Входы и пароли для детей</summary><p class="note">Выдайте каждому отдельный пароль. При замене пароля прежний перестаёт работать. Звёзды и рисунки сохраняются.</p><div id="family-access"></div><p id="access-message" role="status"></p></details></section>` : ''}
     <nav class="parent-tabs" aria-label="Разделы для взрослых"><a href="#/parents/homework" ${section === 'homework' ? 'aria-current="page"' : ''}>Учебник и задания</a><a href="#/parents" ${section !== 'homework' ? 'aria-current="page"' : ''}>Прогресс и настройки</a></nav>
     <div id="parent-homework" ${section === 'homework' ? '' : 'hidden'}>
       <section id="school-homework" aria-label="Задания из учебника"></section>
@@ -86,6 +89,28 @@ export default function parents(el, section = '') {
     </div>
     </div><p class="release-note">Версия ${RELEASE} · Мастерская с рисунками мелками</p>`;
 
+  if (SESSION) {
+    $('#family-profile', el).onchange = async (event) => {
+      const target = event.target;
+      if (!(await flushSaves())) { target.value = SESSION.profile; toast('Сначала дождитесь сохранения результатов'); return; }
+      try { await authRequest('profile', { profile: target.value }); location.reload(); }
+      catch (error) { target.value = SESSION.profile; toast(error.message); }
+    };
+    authRequest('access').then((accounts) => {
+      if (!$('#family-access', el)) return;
+      $('#family-access', el).innerHTML = accounts.map((a) => `<div class="access-row"><span><b>${esc(a.name)}</b> · логин <code>${esc(a.login)}</code><small>${a.ready ? 'Пароль выдан' : 'Нужен первый пароль'}</small></span><button class="btn sm white" data-password="${a.id}">${a.ready ? 'Новый пароль' : 'Выдать пароль'}</button></div>`).join('');
+      for (const button of el.querySelectorAll('[data-password]')) button.onclick = async () => {
+        if (button.textContent === 'Новый пароль' && !confirm('Выдать новый пароль? Прежний перестанет работать.')) return;
+        button.disabled = true;
+        try {
+          const result = await authRequest('password', { account: button.dataset.password });
+          $('#access-message', el).innerHTML = `Сохраните для входа: логин <b>${esc(result.login)}</b>, пароль <code class="issued-password">${esc(result.password)}</code>. Пароль показан только сейчас.`;
+          button.textContent = 'Новый пароль';
+        } catch (error) { $('#access-message', el).textContent = error.message; }
+        finally { button.disabled = false; }
+      };
+    }).catch((error) => { if ($('#access-message', el)) $('#access-message', el).textContent = error.message; });
+  }
   const homework = mountHomework($('#school-homework', el));
 
   const updateSync = () => {
@@ -113,14 +138,16 @@ export default function parents(el, section = '') {
   $('#exp', el).onclick = () => {
     const blob = new Blob([JSON.stringify(exportProgress(), null, 2)], { type: 'application/json' });
     const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob); a.download = `amelie-progress-${todayKey()}.json`; a.click();
+    a.href = URL.createObjectURL(blob); a.download = `${SESSION?.profile || 'amelie'}-progress-${todayKey()}.json`; a.click();
     setTimeout(() => URL.revokeObjectURL(a.href), 2000);
   };
   $('#imp', el).onchange = async (e) => {
     const f = e.target.files[0]; if (!f) return;
     try {
       const data = JSON.parse(await f.text());
-      if (!confirm('Заменить текущий прогресс прогрессом из файла?')) return;
+      const preview = await previewProgress(data);
+      const message = preview ? `Альбом «${SESSION.name}»: заменить прогресс данными из файла? Звёзд: ${preview.summary.stars}, наклеек: ${preview.summary.stickers}, рисунков: ${preview.summary.drawings}, карточек: ${preview.summary.cards}. Перед переносом сервер сохранит резервную копию.` : 'Заменить текущий прогресс прогрессом из файла?';
+      if (!confirm(message)) return;
       await importProgress(data); toast('Прогресс загружен'); location.reload();
     } catch (err) { toast(err.message || 'Не получилось прочитать файл'); }
   };

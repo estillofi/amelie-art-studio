@@ -89,6 +89,7 @@ export function openFamily({ dir, parentPassword }) {
       const store = family.store(session);
       store.importProgress(data, { dryRun: true });
       for (const drawing of data.data.gallery) family.checkPicture(session, drawing.pic);
+      for (const assignment of data.data.assignments || []) if (assignment.picture) family.checkPicture(session, assignment.picture);
       const normalized = { ...data.data, assignments: data.data.assignments || [] };
       const summary = { stars: normalized.profile[0]?.stars || 0, stickers: normalized.profile[0]?.stickers?.length || 0, drawings: normalized.gallery.length, cards: normalized.progress.length };
       if (dryRun) return { dryRun: true, profile: session.profile, summary };
@@ -102,6 +103,7 @@ export function openFamily({ dir, parentPassword }) {
       const store = family.store(session);
       const check = store.importProgress(data, { dryRun: true, migrationId });
       for (const drawing of data.data.gallery) family.checkPicture(session, drawing.pic);
+      for (const assignment of data.data.assignments || []) if (assignment.picture) family.checkPicture(session, assignment.picture);
       if (check.alreadyImported) return check;
       if (dryRun) return { dryRun: true, profile };
       const backupName = await family.backup(session, 'before-migration');

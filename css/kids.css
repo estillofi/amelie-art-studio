@@ -511,8 +511,25 @@ button.adult-link { background: none; border: 0; font: inherit; font-size: 12px;
 
 /* Detailed ink illustrations and the gallery keep their own original linework. */
 .illustrated-colouring { overflow: hidden; isolation: isolate; mix-blend-mode: multiply; }
-.save-note,.gallery-note { color: #48616b; font-size: 14px; line-height: 1.5; }
+.save-note,.gallery-note,.reward-note { color: #48616b; font-size: 14px; line-height: 1.5; }
 .btn:disabled { opacity: .65; cursor: default; transform: none; }
 .saved-copies { margin-top: 8px; font-size: 12px; color: #48616b; }
 .saved-copies summary { cursor: pointer; }
 .saved-copies span { display: block; margin-top: 5px; }
+
+.album-heading { display:flex; flex-wrap:wrap; gap:8px 20px; justify-content:space-between; margin-bottom:16px; }
+.album-heading span { font-size:12px; color:#48616b; }
+.album-pages { display:flex; justify-content:space-between; gap:12px; margin-top:18px; }
+.stk .paper-art { width:100%; height:100%; }
+.school-assignment { margin:18px 0; }
+.school-assignment h2 { font-size:22px; line-height:1.3; }
+.school-assignment details { margin-top:18px; }
+.school-word-list { display:grid; gap:10px; margin-top:12px; }
+.school-word { display:flex; align-items:center; gap:12px; padding:10px; text-align:left; background:#fffdf7; border:1px dashed #126c9a44; border-radius:8px; }
+.school-word small { display:block; color:#48616b; font-size:13px; }
+.school-rest { background:#bce1d15c; padding:12px; border-radius:8px; }
+.school-archive { margin:20px 0; }
+.lesson-preparations { margin:20px 0; background:#fffdf777; padding:14px; border:1px dashed #126c9a66; }
+.lesson-drafts { display:grid; gap:10px; }
+
+.sync-notice { margin:8px 0 16px; padding:10px 14px; background:#ffe39f; color:#4c5146; border-radius:8px; font-size:14px; line-height:1.4; }

@@ -1,6 +1,6 @@
 import { topicArt } from '../art.js';
 import { S, esc, wordPic, paperArt, speak, sfx, addStars, markStep, celebrate, topicOf, $, $$, ICON } from '../lib.js';
-import { todayQueue, grade, topicStats, seen, learned, assignmentQueue } from '../srs.js';
+import { todayQueue, grade, topicStats, seen, learned, assignmentQueue, LESSON_LIMIT } from '../srs.js';
 
 // #/words — topics as sketchbook pages
 export function topics(el) {
@@ -8,6 +8,7 @@ export function topics(el) {
     <div class="hello" style="font-size:34px">My words</div>
     <div class="sub">Мои слова · выбери страницу альбома</div>
     <a class="btn full" href="#/learn" style="margin:16px 0 4px;--c:#FFD23F">📒 Учить слова на сегодня</a>
+    <a class="btn white full" href="#/abc" style="margin-top:10px">ABC · Буквы и звуки</a>
     <div class="grid2" style="margin-top:14px">
       ${S.topics.map((t) => {
         const st = topicStats(t.id);
@@ -36,16 +37,18 @@ export function topic(el, id) {
 
 // #/learn[/<topic>] — flashcards. New word: see + hear. Known word: picture first, say it, then check.
 export function learn(el, topicId, assignment = null) {
-  let queue = assignment ? assignmentQueue(assignment) : todayQueue(topicId || null);
+  const available = assignment ? assignmentQueue(assignment) : todayQueue(topicId || null);
+  let queue = available.slice(0, LESSON_LIMIT);
   const total = queue.length;
   let shown = false; let done = 0; let stars = 0;
 
   function paint() {
     const it = queue[0];
     if (!it) {
-      if (!topicId) markStep('words');
+      if (!topicId && done) markStep('words');
       el.innerHTML = `<div class="card flash"><div style="font-size:84px">🎉</div><div class="word" style="font-size:36px">Well done!</div>
         <div class="word-ru">${done ? `Ты повторила ${done} ${done === 1 ? 'слово' : done < 5 ? 'слова' : 'слов'}` : assignment ? 'На сегодня достаточно. Остальные слова появятся в свой день.' : 'На сегодня всё повторено'}</div>
+        ${available.length > total ? '<p class="ru">Хорошее маленькое занятие. Остальные карточки сохранятся, к ним можно вернуться позже.</p>' : ''}
         <a class="btn" href="#/play" style="--c:#7FD1AE">🎲 Поиграть</a><a class="btn white" href="#/">🏠 Домой</a></div>`;
       if (done) celebrate(`Молодец! +${stars} ⭐`, '🎨');
       return;
@@ -54,6 +57,7 @@ export function learn(el, topicId, assignment = null) {
     const reveal = isNew || shown;
     el.innerHTML = `
       ${assignment ? `<div class="lesson-source"><b>${esc(assignment.book)} · стр. ${esc(assignment.pages)}</b>${assignment.task ? `<p>${esc(assignment.task)}</p>` : ''}</div>` : ''}
+      <p class="lesson-size">Короткое занятие · ${total} карточек</p>
       <div class="progress"><i style="width:${total ? (done / total) * 100 : 0}%"></i></div>
       <div class="card flash">
         <button class="icon-btn say" id="say" aria-label="Послушать">${ICON.sound}</button>
@@ -64,19 +68,22 @@ export function learn(el, topicId, assignment = null) {
       </div>
       ${isNew ? '<div class="duo" style="grid-template-columns:1fr"><button class="btn full" id="next" style="--c:#7FD1AE">Дальше →</button></div>'
         : reveal ? '<div class="duo"><button class="btn" id="again" style="--c:#FFB3CF">🔁 Ещё повторю</button><button class="btn" id="know" style="--c:#7FD1AE">😊 Знаю!</button></div>'
-          : '<div class="duo" style="grid-template-columns:1fr"><button class="btn full" id="show">👀 Проверить</button></div>'}`;
+          : '<div class="duo" style="grid-template-columns:1fr"><button class="btn full" id="show">👀 Проверить</button></div>'}
+      <button class="btn white full" id="lesson-break" style="margin-top:18px">На сегодня хватит</button>`;
     $('#say', el).onclick = () => speak(w.en);
     $('#show', el)?.addEventListener('click', () => { shown = true; paint(); speak(w.en); });
     $('#next', el)?.addEventListener('click', () => answer(true));
     $('#know', el)?.addEventListener('click', () => answer(true));
     $('#again', el)?.addEventListener('click', () => answer(false));
+    $('#lesson-break', el).onclick = () => { if (done && !topicId) markStep('words'); location.hash = '#/'; };
     if (reveal) speak(w.en);
   }
 
   function answer(know) {
+    if (!queue.length) return;
     const it = queue.shift();
     grade(it.w.id, know, assignment?.id);
-    if (know) { sfx.ok(); done++; stars++; addStars(1, 'words'); }
+    if (know) { sfx.ok(); done++; stars++; }
     else { sfx.pop(); queue.splice(Math.min(3, queue.length), 0, { w: it.w, isNew: false }); }
     shown = false; paint();
   }

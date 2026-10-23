@@ -1,6 +1,6 @@
 import { SESSION, initSession, authRequest } from './auth.js';
 import { decorate, observeArt } from './art.js';
-import { loadAll, profile, $, ICON, esc, paperArt, flushSaves, toast } from './lib.js';
+import { loadAll, profile, $, ICON, esc, paperArt, flushSaves, toast, SYNC } from './lib.js';
 import home from './views/home.js';
 import { topics, topic, learn, learnAssignment } from './views/words.js';
 import { playHub, listen, spell, sensei } from './views/play.js';
@@ -8,13 +8,14 @@ import { paintHub, paint } from './views/paint.js';
 import abc from './views/abc.js';
 import gallery from './views/gallery.js';
 import parents from './views/parents.js';
+import school from './views/school.js';
 
 const NAV = [
-  ['', '🏠', 'Home'], ['words', paperArt('book'), 'Words'], ['play', paperArt('ball'), 'Play'], ['paint', '🎨', 'Paint'], ['abc', '🔤', 'ABC'],
+  ['', '🏠', 'Home'], ['words', paperArt('book'), 'Words'], ['play', paperArt('ball'), 'Play'], ['paint', '🎨', 'Paint'], ['school', paperArt('backpack'), 'Учебник'],
 ];
-const ROUTES = { '': home, words: topics, topic, learn, homework: learnAssignment, play: playHub, listen, spell, sensei, paint: paintHub, colour: paint, abc, gallery, parents };
+const ROUTES = { '': home, words: topics, topic, learn, homework: learnAssignment, school, play: playHub, listen, spell, sensei, paint: paintHub, colour: paint, abc, gallery, parents };
 // Which bottom tab lights up for nested pages.
-const TAB = { topic: 'words', learn: 'words', homework: 'words', listen: 'play', spell: 'play', sensei: 'play', colour: 'paint', gallery: '', parents: '' };
+const TAB = { topic: 'words', learn: 'words', homework: 'school', listen: 'play', spell: 'play', sensei: 'play', colour: 'paint', abc: 'words', gallery: '', parents: '' };
 
 function renderTop(route) {
   const p = profile();
@@ -30,6 +31,12 @@ function renderNav(route) {
 }
 
 document.addEventListener('stars', (e) => { const s = $('#stars'); if (s) s.textContent = e.detail.stars; });
+function syncNotice() {
+  const notice = $('#sync-notice'); if (!notice) return;
+  notice.hidden = !SYNC.pending;
+  notice.textContent = !SYNC.durable ? 'Пока не закрывай страницу: ждём сохранения на сервере.' : SYNC.error ? 'Результаты сохранены на этом устройстве. Ждём связь с сервером — пока не выходи из аккаунта.' : 'Сохраняем твои результаты…';
+}
+document.addEventListener('sync', syncNotice);
 
 let cleanup = null;
 async function router() {
@@ -54,6 +61,7 @@ try {
   observeArt();
   if (await initSession()) {
     await loadAll();
+    syncNotice();
     window.addEventListener('hashchange', router);
     router();
   }

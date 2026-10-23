@@ -1,4 +1,4 @@
-import { S, esc, wordPic, speak, sfx, addStars, markStep, celebrate, burst, shuffle, $, $$, ICON } from '../lib.js';
+import { S, esc, wordPic, speak, sfx, addStars, markStep, celebrate, burst, shuffle, $, $$, ICON, viewTimers } from '../lib.js';
 import { seenWords } from '../srs.js';
 
 const ROUNDS = 8;
@@ -31,10 +31,12 @@ export function playHub(el) {
 
 // Shared engine: hear a phrase → tap the right picture out of four.
 function choiceGame(el, { title, sub, pool, phrase, step = 'play' }) {
+  const timers = viewTimers(); const after = timers.after;
   const words = shuffle(pool).slice(0, Math.min(ROUNDS, pool.length));
-  let i = 0; let right = 0; let missed = false;
+  let i = 0; let right = 0; let missed = false; let locked = false;
 
   function round() {
+    timers.clear(); locked = false;
     if (i >= words.length) return finish();
     const w = words[i]; missed = false;
     const others = shuffle(pool.filter((x) => x.id !== w.id && x.en !== w.en)).slice(0, 3);
@@ -46,16 +48,17 @@ function choiceGame(el, { title, sub, pool, phrase, step = 'play' }) {
       <div class="opts">${opts.map((o) => `<button class="opt" data-id="${o.id}">${wordPic(o, 'lg')}</button>`).join('')}</div>`;
     const say = () => speak(phrase(w));
     $('#hear', el).onclick = say;
-    setTimeout(say, 250);
+    after(say, 250);
     $$('.opt', el).forEach((b) => b.addEventListener('click', () => {
+      if (locked) return;
       if (b.dataset.id === w.id) {
-        b.classList.add('right'); b.insertAdjacentHTML('beforeend', `<span class="lab">${esc(w.en)}</span>`);
+        locked = true; b.classList.add('right'); b.insertAdjacentHTML('beforeend', `<span class="lab">${esc(w.en)}</span>`);
         sfx.ok(); burst(b); if (!missed) right++; addStars(1, step);
         $$('.opt', el).forEach((x) => { x.disabled = true; });
-        setTimeout(() => { i++; round(); }, 1100);
+        after(() => { i++; round(); }, 1100);
       } else {
         b.classList.remove('wrong'); void b.offsetWidth; b.classList.add('wrong');
-        sfx.bad(); missed = true; setTimeout(say, 400);
+        sfx.bad(); missed = true; after(say, 400);
       }
     }));
   }
@@ -70,16 +73,17 @@ function choiceGame(el, { title, sub, pool, phrase, step = 'play' }) {
     addStars(3, step); celebrate(`${right} из ${words.length}! +3 ⭐`, '🎉');
   }
   round();
+  return () => timers.stop();
 }
 
 export function listen(el) {
-  choiceGame(el, { title: 'Listen and find!', sub: 'Послушай и найди картинку', pool: playPool(), phrase: (w) => w.en });
+  return choiceGame(el, { title: 'Listen and find!', sub: 'Послушай и найди картинку', pool: playPool(), phrase: (w) => w.en });
 }
 
 export function sensei(el) {
   // Aikido-style commands; body words become "Show me your …".
   const pool = playPool(['aikido', 'body', 'ican']);
-  choiceGame(el, {
+  return choiceGame(el, {
     title: '🥋 Sensei says…', sub: 'Сенсей говорит — найди, что он просит', pool,
     phrase: (w) => (w.topic === 'body' ? `Show me your ${w.en}!` : w.topic === 'ican' ? `Can you ${w.en}?` : `Sensei says: ${w.en}!`),
   });
@@ -87,12 +91,14 @@ export function sensei(el) {
 
 // Spell it: picture + sound → tap the letters in order.
 export function spell(el) {
+  const timers = viewTimers(); const after = timers.after;
   const pool = playPool().filter((w) => /^[a-z ]{2,8}$/.test(w.en));
   const words = shuffle(pool).slice(0, 6);
   let i = 0; let right = 0;
   const colors = ['#FFD23F', '#7FD1AE', '#FFB3CF', '#B9A3FF', '#9CC9FF', '#FFC48A'];
 
   function round() {
+    timers.clear();
     if (i >= words.length) {
       markStep('play'); addStars(3, 'play');
       el.innerHTML = `<div class="card flash"><div style="font-size:84px">🔤</div><div class="word" style="font-size:36px">Super speller!</div>
@@ -116,18 +122,19 @@ export function spell(el) {
       <p style="text-align:center;margin-top:16px"><button class="ru" id="hint" style="text-decoration:underline">💡 Подсказка</button></p>`;
     const slots = $$('.slot', el);
     const say = () => speak(w.en);
-    $('#hear', el).onclick = say; setTimeout(say, 250);
+    $('#hear', el).onclick = say; after(say, 250);
     $('#hint', el).onclick = () => { missed = true; const s = target.replace(/ /g, ''); const next = $$('.letter:not(.used)', el).find((b) => b.dataset.ch === s[pos]); next?.animate([{ transform: 'scale(1)' }, { transform: 'scale(1.25)' }, { transform: 'scale(1)' }], 500); };
     $$('.letter', el).forEach((b) => b.addEventListener('click', () => {
       const plain = target.replace(/ /g, '');
+      if (b.disabled || b.classList.contains('used') || pos >= plain.length) return;
       if (b.dataset.ch === plain[pos]) {
         // fill the next non-space slot
         const free = slots.filter((s) => !s.classList.contains('gap') && !s.classList.contains('f'))[0];
-        free.textContent = b.dataset.ch; free.classList.add('f'); b.classList.add('used'); sfx.pop(); pos++;
-        if (pos === plain.length) { sfx.ok(); if (!missed) right++; addStars(1, 'play'); say(); setTimeout(() => { i++; round(); }, 1200); }
+        free.textContent = b.dataset.ch; free.classList.add('f'); b.classList.add('used'); b.disabled = true; sfx.pop(); pos++;
+        if (pos === plain.length) { sfx.ok(); if (!missed) right++; addStars(1, 'play'); say(); after(() => { i++; round(); }, 1200); }
       } else { b.classList.remove('wrong'); void b.offsetWidth; b.classList.add('wrong'); sfx.bad(); missed = true; }
     }));
   }
   round();
+  return () => timers.stop();
 }
-

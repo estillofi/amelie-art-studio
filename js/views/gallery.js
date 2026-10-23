@@ -1,12 +1,15 @@
-import { S, esc, profile, STAR_STEP } from '../lib.js';
+import { S, esc, profile, paperArt } from '../lib.js';
+import { nextReward } from '../rewards.js';
 import { PICTURES, svgOf } from './paint.js';
 import { groupDrawings } from '../colouring/gallery.js';
 
-export default function gallery(el) {
+export default function gallery(el, sheet) {
   const p = profile();
   const got = p.stickers || [];
-  const slots = Math.max(20, Math.ceil((got.length + 1) / 5) * 5);
-  const toNext = STAR_STEP - ((p.stars || 0) % STAR_STEP);
+  const perSheet = 20;
+  const sheets = Math.floor(got.length / perSheet) + 1;
+  const current = Math.min(sheets - 1, Math.max(0, /^\d+$/.test(sheet || '') ? Number(sheet) : Math.floor(Math.max(0, got.length - 1) / perSheet)));
+  const toNext = nextReward(p).remaining;
   const art = groupDrawings(S.gallery);
 
   el.innerHTML = `
@@ -14,11 +17,12 @@ export default function gallery(el) {
     <div class="sub">Моя галерея · ⭐ ${p.stars || 0} звёзд · до новой наклейки ещё ${toNext}</div>
 
     <div class="h2">Stickers · <small>Наклейки ${got.length}</small></div>
-    <div class="card"><div class="stickers">
-      ${Array.from({ length: slots }, (_, i) => got[i]
-        ? `<span class="stk got" style="--rot:${((i * 37) % 21) - 10}deg" title="${new Date(got[i].ts).toLocaleDateString('ru-RU')}">${got[i].s}</span>`
-        : `<span class="stk">${i === got.length ? '❔' : ''}</span>`).join('')}
-    </div></div>
+    <p class="reward-note">Ещё ${toNext} звёзд до новой наклейки. Кубок за три занятия — отдельная награда, один раз за день. Пропуски ничего не отнимают.</p>
+    <div class="card sticker-album"><div class="album-heading"><b>Лист ${current + 1} из ${sheets}</b><span>По 20 наклеек · новые листы появляются сами</span></div><div class="stickers">
+      ${Array.from({ length: perSheet }, (_, slot) => { const i = current * perSheet + slot; return got[i]
+        ? `<span class="stk got" style="--rot:${((i * 37) % 21) - 10}deg" title="${new Date(got[i].ts).toLocaleDateString('ru-RU')}">${got[i].s.startsWith('sketch:') ? paperArt(got[i].s.slice(7)) : esc(got[i].s)}</span>`
+        : `<span class="stk" aria-label="Место для новой наклейки">${i === got.length ? '❔' : ''}</span>`; }).join('')}
+    </div><nav class="album-pages" aria-label="Листы наклеек">${current ? `<a class="btn sm white" href="#/gallery/${current - 1}">← Предыдущий</a>` : '<span></span>'}${current < sheets - 1 ? `<a class="btn sm white" href="#/gallery/${current + 1}">Следующий →</a>` : '<span></span>'}</nav></div>
 
     <div class="h2">My pictures · <small>Мои рисунки ${art.length}</small></div>
     ${S.gallery.length > art.length ? `<p class="gallery-note">${S.gallery.length} сохранений · ${art.length} разных рисунков. Одинаковые работы собраны вместе, все сохранения на месте.</p>` : ''}

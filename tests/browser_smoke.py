@@ -189,24 +189,24 @@ def exercise(browser, base, server=False):
         assert data('await m.flushSaves()'), data('m.SYNC')
         assert len(page.evaluate("async () => (await fetch('api/db/progress', {headers:{'X-Amelie-Scope':(await import('./js/auth.js')).SESSION.scope}})).json()")) == 1
         # A failed POST must be retained, overlaid after reload, and eventually sent exactly once.
-        page.route('**/api/db/**', lambda r: r.abort() if r.request.method == 'POST' else r.continue_())
+        page.route('**/api/{db/**,activity}', lambda r: r.abort() if r.request.method == 'POST' else r.continue_())
         page.locator('#next').click()
         page.wait_for_function('async () => {const m=await import("./js/lib.js");return JSON.parse(localStorage.getItem(m.storageKey("pending")) || "[]").length>0;}')
         assert data('await m.flushSaves()') is False, data('m.SYNC')
         page.reload(wait_until='networkidle')
         assert data('m.S.progress.length') == 2
-        page.unroute('**/api/db/**')
+        page.unroute('**/api/{db/**,activity}')
         assert data('await m.flushSaves()'), data('m.SYNC')
         assert len(page.evaluate("async () => (await fetch('api/db/progress', {headers:{'X-Amelie-Scope':(await import('./js/auth.js')).SESSION.scope}})).json()")) == 2
         assert len(data('m.S.progress')) == 2
         assert data('JSON.parse(localStorage.getItem(m.storageKey("pending"))).length') == 0
-        page.route('**/api/db/**', lambda r: r.abort() if r.request.method == 'POST' else r.continue_())
+        page.route('**/api/{db/**,activity}', lambda r: r.abort() if r.request.method == 'POST' else r.continue_())
         page.evaluate('''() => { window.originalStorageSet = Storage.prototype.setItem;
             Storage.prototype.setItem = function(key, value) { if (key.endsWith(':pending')) throw new DOMException('Quota', 'QuotaExceededError'); return window.originalStorageSet.call(this, key, value); }; }''')
         data('await m.saveProfile({rate: 0.7})')
         assert data('m.SYNC.durable') is False
         page.evaluate('() => { Storage.prototype.setItem = window.originalStorageSet; }')
-        page.unroute('**/api/db/**')
+        page.unroute('**/api/{db/**,activity}')
         # Wait for the failed in-flight request before explicitly retrying.
         data('await m.flushSaves()')
         assert data('await m.flushSaves()'), data('m.SYNC')

@@ -1,4 +1,4 @@
-import { S, esc, speak, sfx, addStars, markStep, celebrate, burst, shuffle, save, uid, $, $$, ICON } from '../lib.js';
+import { S, esc, speak, sfx, addStars, markStep, celebrate, burst, shuffle, save, uid, $, $$, ICON, viewTimers } from '../lib.js';
 
 // Colouring pictures. Every region (<g class="rg" data-w="…">) is named by its English noun.
 // Decorations (eyes, rays, stems) are pointer-events:none so taps go to the region underneath.
@@ -39,6 +39,7 @@ export function paint(el, picId, mode) {
     el.innerHTML = `<div class="card"><div class="h2">Выберем другой рисунок?</div><p>Эта история сейчас недоступна в твоём альбоме.</p><a class="btn" href="#/paint">К раскраскам</a></div>`;
     return;
   }
+  const timers = viewTimers(); const after = timers.after;
   const regions = [...new Set([...pic.svg.matchAll(/data-w="(\w+)"/g)].map((m) => m[1]))];
   const fills = {};
   let free = mode === 'free';
@@ -131,7 +132,7 @@ export function paint(el, picId, mode) {
         sfx.ok(); burst(g); addStars(1, 'art'); if (!misses) firstTry++;
         t++; misses = 0;
         if (t >= tasks.length) return done();
-        setTimeout(() => { render(); sayTask(); }, 700);
+        after(() => { render(); sayTask(); }, 700);
       } else {
         sfx.bad(); misses++;
         if (g.dataset.w === k.region) speak(`Good! Now choose ${k.colour.en}.`);
@@ -144,6 +145,7 @@ export function paint(el, picId, mode) {
       saving = true; saveState();
       try {
         await save('gallery', { id: uid(), ...drawing(), ts: Date.now() });
+        markStep('art');
         addStars(2, 'art'); celebrate('Рисунок в галерее! +2 ⭐', '🖼️');
       } finally { saving = false; saveState(); }
     });
@@ -163,5 +165,6 @@ export function paint(el, picId, mode) {
   }
 
   makeTasks(); render();
-  if (!free) setTimeout(sayTask, 400);
+  if (!free) after(sayTask, 400);
+  return () => timers.stop();
 }

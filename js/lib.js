@@ -1,5 +1,8 @@
 import { art, wordArt } from './art.js';
 import { SESSION } from './auth.js';
+import { applyActivity } from './activity.js';
+import { validateItem } from './data-model.js';
+export { STICKERS } from './rewards.js';
 // Shared helpers: data store, DOM, speech, sounds, rewards.
 
 export const COLS = ['words', 'topics', 'progress', 'log', 'profile', 'gallery', 'assignments'];
@@ -41,8 +44,20 @@ export function flushSaves() {
     try {
       while (pending.length) {
         const entry = pending[0];
-        await requestJSON(`api/db/${entry.col}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(entry.item) });
-        pending.shift(); durableQueue = lsSet('pending', pending); syncStatus();
+        const result = await requestJSON(entry.col === 'activity' ? 'api/activity' : `api/db/${entry.col}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(entry.item) });
+        pending.shift();
+        if (entry.col === 'activity') {
+          if (result.profile && !pending.some((x) => x.col === 'activity')) {
+            const patches = pending.filter((x) => x.col === 'profile').map((x) => x.item);
+            S.profile = [Object.assign({}, result.profile, ...patches)]; lsSet('profile', S.profile);
+            document.dispatchEvent(new CustomEvent('stars', { detail: { stars: profile().stars, synced: true } }));
+          }
+          if (entry.item.kind === 'review' && !pending.some((x) => x.col === 'activity' && x.item.word === entry.item.word)) {
+            S.progress = result.progress ? mergeById(S.progress, [result.progress]) : S.progress.filter((p) => p.id !== entry.item.word); lsSet('progress', S.progress);
+          }
+          if (entry.item.kind === 'review') { S.log = result.log ? mergeById(S.log, [result.log]) : S.log.filter((l) => l.id !== entry.item.id); lsSet('log', S.log); }
+        }
+        durableQueue = lsSet('pending', pending); syncStatus();
       }
       syncStatus(); return true;
     } catch (error) { syncStatus(error.message); return false; }
@@ -90,15 +105,21 @@ export async function loadAll() {
     else S[c] = mergeById(STATE.includes(c) ? [] : (await getJSON(`data/${c}.json`)) || [], lsGet(c));
   }));
   S.topics.sort((a, b) => a.order - b.order);
+  // Rebuild the optimistic preview from still-unacknowledged activities after a reload.
+  // A response may have been lost after commit; idempotent server replies reconcile the preview.
+  if (MODE === 'server') for (const entry of pending.filter((x) => x.col === 'activity')) applyLocalActivity(entry.item);
   // Ask the browser not to evict our data (Chrome/Android honour it; on iPhone — add the site to the Home Screen).
   if (MODE === 'static') navigator.storage?.persist?.().catch(() => {});
   else { for (const c of COLS) lsSet(c, S[c]); flushSaves(); }
 }
 
-export const uid = () => Math.random().toString(16).slice(2, 10) + Date.now().toString(16).slice(-4);
+export const uid = () => globalThis.crypto?.randomUUID?.() || Math.random().toString(16).slice(2, 10) + Date.now().toString(16).slice(-4);
 
 export async function save(col, item) {
   if (!item.id) item.id = uid();
+  validateItem(col, col === 'profile' ? { ...profile(), ...item } : item);
+  if (col === 'words' && !S.topics.some((topic) => topic.id === item.topic)) throw new Error('Сначала добавьте тему слова.');
+  if (col === 'assignments' && !item.wordIds.every((id) => S.words.some((word) => word.id === id))) throw new Error('Сначала добавьте все слова задания.');
   const i = S[col].findIndex((x) => x.id === item.id);
   if (i >= 0) S[col][i] = { ...S[col][i], ...item }; else S[col].push({ ...(col === 'profile' ? profile() : {}), ...item });
   const saved = S[col][i >= 0 ? i : S[col].length - 1];
@@ -111,10 +132,15 @@ export async function save(col, item) {
   return saved;
 }
 
-// Backup: one JSON file with Amelie's progress + words her parents added.
+// Device snapshot; downloadProgress obtains the authoritative full server export with receipts.
 export function exportProgress() {
-  return { app: 'amelie-art-studio', version: 1, exportedAt: new Date().toISOString(),
-    data: { ...Object.fromEntries(STATE.map((c) => [c, S[c]])), words: S.words.filter((w) => w.custom) } };
+  return { app: 'amelie-art-studio', version: 1, contentSnapshot: true, exportedAt: new Date().toISOString(),
+    data: { ...Object.fromEntries(STATE.map((c) => [c, S[c]])), topics: S.topics, words: S.words } };
+}
+export async function downloadProgress() {
+  if (MODE !== 'server') return exportProgress();
+  if (!(await flushSaves())) throw new Error('Сначала дождитесь подтверждения сервера. Очередь результатов остаётся на этом устройстве.');
+  return requestJSON('api/progress/export');
 }
 
 export async function previewProgress(file) {
@@ -138,6 +164,7 @@ export async function importProgress(file) {
     S[c] = items;
     lsSet(c, items);
   }
+  for (const t of file.data.topics || []) await save('topics', t);
   for (const w of file.data.words || []) await save('words', w);
 }
 
@@ -163,6 +190,13 @@ export const saveProfile = (patch) => save('profile', { ...patch, id: 'amelie' }
 // ── DOM ──────────────────────────────────────────────────────
 export const $ = (sel, root = document) => root.querySelector(sel);
 export const $$ = (sel, root = document) => [...root.querySelectorAll(sel)];
+export function viewTimers() {
+  const timers = new Set(); let stopped = false;
+  const clear = () => { for (const id of timers) clearTimeout(id); timers.clear(); };
+  return { clear, stop: () => { stopped = true; clear(); }, after: (fn, delay) => {
+    const id = setTimeout(() => { timers.delete(id); if (!stopped) fn(); }, delay); timers.add(id); return id;
+  } };
+}
 export const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 export const shuffle = (a) => { const x = [...a]; for (let i = x.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [x[i], x[j]] = [x[j], x[i]]; } return x; };
 export const pick = (a) => a[Math.floor(Math.random() * a.length)];
@@ -218,39 +252,30 @@ export const sfx = {
   win: () => tone([523, 659, 784, 1047, 1319], 0.2, 'sine', 0.1),
 };
 
-// ── Rewards: stars → a sticker every STAR_STEP stars; daily plan of 3 steps ─────────
-export const STICKERS = ['🦄', '🐱', '🌸', '🦋', '🐼', '🍓', '🌈', '🎀', '🐬', '🌻', '🦊', '🍭', '🐞', '⭐', '🐙', '🎨', '🦉', '🧁', '🐢', '🌙'];
-export const STAR_STEP = 15;
-
-export async function addStars(n, where) {
-  const p = profile();
-  const stars = (p.stars || 0) + n;
-  const stickers = [...(p.stickers || [])];
-  let gotSticker = null;
-  while (Math.floor(stars / STAR_STEP) > stickers.length) {
-    gotSticker = STICKERS[stickers.length % STICKERS.length];
-    stickers.push({ s: gotSticker, ts: Date.now() });
-  }
-  await saveProfile({ stars, stickers });
-  document.dispatchEvent(new CustomEvent('stars', { detail: { stars, gotSticker, where } }));
-  if (gotSticker) celebrate(`Новая наклейка! ${gotSticker}`, gotSticker);
-  return stars;
+function applyLocalActivity(event) {
+  const result = applyActivity(profile(), S.progress.find((p) => p.id === event.word), event);
+  S.profile = [result.profile];
+  if (result.progress) S.progress = mergeById(S.progress, [result.progress]);
+  if (result.log) S.log = mergeById(S.log, [result.log]);
+  return result;
 }
 
-// Daily plan: words → game → paint/ABC. Completing all three earns a bonus sticker once a day.
-export async function markStep(step) {
-  const p = profile(); const k = todayKey();
-  const days = { ...(p.days || {}) };
-  const day = { ...(days[k] || {}) };
-  if (day[step]) return;
-  day[step] = Date.now(); days[k] = day;
-  await saveProfile({ days });
-  if (day.words && day.play && day.art && !day.bonus) {
-    day.bonus = true; days[k] = day;
-    const stickers = [...(profile().stickers || []), { s: '🏆', ts: Date.now(), bonus: true }];
-    await saveProfile({ days, stickers });
-    celebrate('Все три задания сделаны! Наклейка-кубок 🏆', '🏆');
+export function recordActivity(fields) {
+  const event = { id: uid(), ts: Date.now(), ...fields };
+  const result = applyLocalActivity(event);
+  for (const col of ['profile', 'progress', 'log']) lsSet(col, S[col]);
+  if (MODE === 'server') {
+    pending.push({ col: 'activity', item: event });
+    durableQueue = lsSet('pending', pending); syncStatus(); flushSaves();
   }
+  document.dispatchEvent(new CustomEvent('stars', { detail: { stars: result.profile.stars, gotSticker: result.awarded[0]?.s, where: fields.where } }));
+  for (const sticker of result.awarded) celebrate(sticker.bonus ? 'Все три занятия сделаны! Кубок дня' : 'Новая наклейка!', sticker.s.startsWith('sketch:') ? art(sticker.s.slice(7)) : sticker.s);
+  return result;
+}
+export const addStars = async (amount, where) => recordActivity({ kind: 'stars', amount, where }).profile.stars;
+export async function markStep(step) {
+  if (profile().days?.[todayKey()]?.[step]) return;
+  recordActivity({ kind: 'step', step, day: todayKey() });
 }
 
 export function streak() {

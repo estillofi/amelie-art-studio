@@ -1,9 +1,9 @@
 // Kid-sized spaced repetition: Leitner boxes 0–5 and two buttons ("I know" / "Again").
 // box 0 = new; each "I know" moves a word one box up and further into the future.
-import { S, save, profile, todayKey, startOfDay, DAY } from './lib.js';
+import { S, recordActivity, profile, todayKey, startOfDay, DAY } from './lib.js';
 
-const WAIT_DAYS = [0, 1, 2, 4, 8, 16]; // box → days until the next look
 export const LEARNED_BOX = 3;           // box ≥ 3 counts as "learned" (a star on the word)
+export const LESSON_LIMIT = 6;          // Backlog stays due; a child never has to finish it in one sitting.
 
 export const progOf = (wordId) => S.progress.find((p) => p.id === wordId);
 export const boxOf = (wordId) => progOf(wordId)?.box || 0;
@@ -11,13 +11,7 @@ export const seen = (wordId) => Boolean(progOf(wordId));
 export const learned = (wordId) => boxOf(wordId) >= LEARNED_BOX;
 
 export function grade(wordId, know, assignmentId = null) {
-  const wasNew = !progOf(wordId);
-  const p = progOf(wordId) || { id: wordId, box: 0, reps: 0, first: Date.now() };
-  // A missed card must return to a one-day interval after the in-session retry.
-  const box = know ? Math.min(5, (p.box || 0) + 1) : 0;
-  const due = know ? startOfDay() + WAIT_DAYS[box] * DAY : 0;
-  save('progress', { ...p, box, due, reps: (p.reps || 0) + 1, last: Date.now() });
-  save('log', { word: wordId, ts: Date.now(), know, wasNew, day: todayKey(), ...(assignmentId ? { assignment: assignmentId } : {}) });
+  recordActivity({ kind: 'review', word: wordId, know, day: todayKey(), dayStart: startOfDay(), ...(assignmentId ? { assignment: assignmentId } : {}) });
 }
 
 const newToday = () => S.log.filter((l) => l.day === todayKey() && l.wasNew).length;

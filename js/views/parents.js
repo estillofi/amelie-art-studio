@@ -1,8 +1,10 @@
 import { SESSION, authRequest, parentRequired } from '../auth.js';
-import { S, esc, profile, saveProfile, save, toast, speak, todayKey, startOfDay, DAY, topicOf, $, MODE, exportProgress, importProgress, isStandalone, isAndroid, installHint, SYNC, flushSaves, browserBackup, importContent, uid, previewProgress } from '../lib.js';
+import { S, esc, profile, saveProfile, save, toast, speak, todayKey, startOfDay, DAY, topicOf, $, MODE, downloadProgress, importProgress, isStandalone, isAndroid, installHint, SYNC, flushSaves, browserBackup, importContent, uid, previewProgress } from '../lib.js';
 import { topicStats, seenWords } from '../srs.js';
 import { RELEASE } from '../release.js';
 import { mountHomework } from './homework.js';
+import { nextReward } from '../rewards.js';
+import { groupDrawings } from '../colouring/gallery.js';
 
 let unlocked = false;
 
@@ -47,7 +49,7 @@ export default function parents(el, section = '') {
       <div class="stat"><span>Повторено карточек</span><span>${reps}${reps ? ` · «знаю» ${Math.round((known / reps) * 100)}%` : ''}</span></div>
       <div class="stat"><span>Слов уже встречала</span><span>${seenWords().length} из ${S.words.length}</span></div>
       <div class="stat"><span>Звёзды / наклейки</span><span>⭐ ${p.stars || 0} · ${(p.stickers || []).length}</span></div>
-      <div class="stat" style="border:0"><span>Рисунков в галерее</span><span>${S.gallery.length}</span></div>
+      <div class="stat" style="border:0"><span>Разных рисунков / сохранений</span><span>${groupDrawings(S.gallery).length} / ${S.gallery.length}</span></div>
     </div>
 
 
@@ -73,7 +75,8 @@ export default function parents(el, section = '') {
     <div class="card">
       <p class="sub" style="margin-top:0">${MODE === 'static'
         ? 'Звёзды, карточки и рисунки хранятся <b>только в этом браузере</b>. Раз в неделю сохраняйте файл прогресса — с ним можно восстановить всё или перенести на другое устройство.'
-        : 'Прогресс хранится на сервере. Файл пригодится для переноса или на всякий случай.'}</p>
+        : 'Прогресс хранится на сервере. Файл содержит результаты, весь словарь, темы, рисунки и задания. Импорт заменяет результаты выбранного альбома — перед ним автоматически сохраняется прежняя база.'}</p>
+      ${MODE === 'server' ? '<p id="backup-status" class="ru" role="status">Проверяем автоматическую резервную копию…</p>' : ''}
       <div class="row"><button class="btn sm grow" id="exp" style="--c:#9AD7C9">⬇️ Скачать прогресс</button>
         <label class="btn sm white grow">⬆️ Загрузить<input type="file" id="imp" accept="application/json,.json" hidden></label></div>
     </div>
@@ -83,7 +86,7 @@ export default function parents(el, section = '') {
 
     <div class="h2">Как пользоваться</div>
     <div class="note">
-      Начните с 5–10 минут и 4 новых слов в день. Можно закончить раньше и вернуться позже. На главной — три занятия на выбор: <b>слова → игра → раскраска</b>. За всё — звёзды, каждые 15 звёзд — наклейка, за все три шага за день — кубок.<br><br>
+      Начните с 5–10 минут и 1–2 новых слов в день; лимит можно изменить выше. Можно закончить раньше и вернуться позже. На главной — три занятия на выбор: <b>слова → игра → раскраска</b>. За участие — звёзды. Первые наклейки требуют 15, затем 18, 22, 27 и далее до 60 звёзд между наградами. Увеличение порога ограничено, пропуски ничего не отнимают. У Амели все прежние наклейки остаются; до следующей сейчас ${nextReward(p).remaining} звёзд. За три занятия за день — отдельный кубок. В альбоме по 20 наклеек на лист, новые листы появляются автоматически.<br><br>
       Всё английское озвучивается — просите Амели повторять вслух. Слово становится «выученным» (⭐), когда она узнала его 3 раза в разные дни.<br><br>
       Здесь собраны базовые темы. Сверяйте их с учебником и тем, что ребёнок уже знает; можно начать с приветствий, цветов и коротких фраз. Задания и новые слова — во вкладке «Учебник и задания».
     </div>
@@ -112,6 +115,10 @@ export default function parents(el, section = '') {
     }).catch((error) => { if ($('#access-message', el)) $('#access-message', el).textContent = error.message; });
   }
   const homework = mountHomework($('#school-homework', el));
+  if (MODE === 'server') fetch('api/backup/status', { headers: SESSION ? { 'X-Amelie-Scope': SESSION.scope } : {}, cache: 'no-store' }).then((r) => r.ok ? r.json() : null).then((status) => {
+    const target = $('#backup-status', el); if (!target) return;
+    target.textContent = status?.lastSuccess ? `Автокопия: ${new Date(status.lastSuccess).toLocaleString('ru-RU')}. Храним ${status.keep} дневных копий на серверном диске.${status.error ? ' Последняя попытка не удалась: '+status.error : ''}` : 'Автокопия пока не подтверждена. Скачайте файл прогресса.';
+  }).catch(() => { const target = $('#backup-status', el); if (target) target.textContent = 'Не удалось проверить автокопию. Файл прогресса можно скачать ниже.'; });
 
   const updateSync = () => {
     const el = $('#sync-status'); if (!el) return;
@@ -135,8 +142,10 @@ export default function parents(el, section = '') {
     finally { e.target.value = ''; }
   });
 
-  $('#exp', el).onclick = () => {
-    const blob = new Blob([JSON.stringify(exportProgress(), null, 2)], { type: 'application/json' });
+  $('#exp', el).onclick = async () => {
+    let snapshot;
+    try { snapshot = await downloadProgress(); } catch (error) { toast(error.message); return; }
+    const blob = new Blob([JSON.stringify(snapshot, null, 2)], { type: 'application/json' });
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob); a.download = `${SESSION?.profile || 'amelie'}-progress-${todayKey()}.json`; a.click();
     setTimeout(() => URL.revokeObjectURL(a.href), 2000);
@@ -167,8 +176,10 @@ export default function parents(el, section = '') {
     if (S.words.some((w) => w.en === en)) { toast('Такое слово уже есть'); return; }
     const order = S.words.filter((w) => w.topic === d.topic).length;
     const id = `${d.topic}-custom-${uid()}`;
-    await save('words', { id, topic: d.topic, en, ru: d.ru.trim(), pic: d.pic.trim() || '🖍️', ex: d.ex.trim() || `I can say: ${en}.`, exRu: '', order, custom: true });
-    toast(`Добавлено в «${topicOf(d.topic).ru}»`); e.target.reset(); homework.refreshWithWord(id);
+    try {
+      await save('words', { id, topic: d.topic, en, ru: d.ru.trim(), pic: d.pic.trim() || '🖍️', ex: d.ex.trim() || `I can say: ${en}.`, exRu: '', order, custom: true });
+      toast(`Добавлено в «${topicOf(d.topic).ru}»`); e.target.reset(); homework.refreshWithWord(id);
+    } catch (error) { toast(error.message); }
   });
   return () => document.removeEventListener('sync', updateSync);
 }

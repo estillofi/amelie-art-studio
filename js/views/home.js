@@ -1,17 +1,19 @@
 import { SESSION } from '../auth.js';
-import { S, esc, wordPic, paperArt, speak, profile, todayKey, DAY, $, STAR_STEP, topicOf, MODE, isStandalone } from '../lib.js';
-import { todayQueue, seenWords, learned, activeAssignments, assignmentQueue } from '../srs.js';
+import { S, esc, wordPic, paperArt, speak, profile, todayKey, DAY, $, topicOf, MODE, isStandalone, viewTimers } from '../lib.js';
+import { nextReward } from '../rewards.js';
+import { todayQueue, seenWords, learned, activeAssignments, assignmentQueue, LESSON_LIMIT } from '../srs.js';
 
 const GAMES = [['listen', '👂', 'Listen & find', 'Послушай и найди'], ['spell', '🔤', 'Spell it', 'Собери слово'], ['sensei', '🥋', 'Sensei says', 'Сенсей говорит']];
 
 export default function home(el) {
+  const timers = viewTimers();
   const p = profile();
   const day = (p.days || {})[todayKey()] || {};
   const q = todayQueue();
   const game = GAMES[Math.floor(Date.now() / DAY) % GAMES.length];
   const pool = seenWords().length ? seenWords() : S.words.filter((w) => w.topic === 'colours' || w.topic === 'art');
   const wod = pool[Math.floor(Date.now() / DAY) % pool.length];
-  const toNext = STAR_STEP - ((p.stars || 0) % STAR_STEP);
+  const toNext = nextReward(p).remaining;
   const learnedN = S.words.filter((w) => learned(w.id)).length;
   const complete = day.words && day.play && day.art;
   const next = !day.words ? '#/learn' : !day.play ? `#/${game[0]}` : '#/paint';
@@ -31,16 +33,17 @@ export default function home(el) {
 
     <section class="school-section" aria-label="Задания из учебника">
       <div class="school-heading"><div><span class="studio-label">Школа + маленькие шаги</span><h2>Мой учебник</h2></div>${paperArt('backpack', 'lg')}</div>
-      ${activeAssignments().length ? activeAssignments().map((a) => {
+      ${activeAssignments().length ? activeAssignments().slice(0, 2).map((a) => {
         const count = assignmentQueue(a).length;
-        return `<article class="card homework-card"><span class="assignment-label">Задание из учебника</span><b>${esc(a.book)} · стр. ${esc(a.pages)}</b>${a.task ? `<p>${esc(a.task)}</p>` : ''}${a.dueDate ? `<p class="ru">К ${esc(a.dueDate.split('-').reverse().join('.'))}</p>` : ''}<a class="btn sm full homework-start" href="#/homework/${encodeURIComponent(a.id)}">${count ? `Повторить слова · ${count}` : 'На сегодня достаточно ✓'}</a></article>`;
+        return `<article class="card homework-card"><span class="assignment-label">Задание из учебника</span><b>${esc(a.book)} · стр. ${esc(a.pages)}</b>${a.task ? `<p>${esc(a.task)}</p>` : ''}${a.dueDate ? `<p class="ru">К ${esc(a.dueDate.split('-').reverse().join('.'))}</p>` : ''}<a class="btn sm full homework-start" href="#/homework/${encodeURIComponent(a.id)}">${count ? `Повторить слова · ${Math.min(count, LESSON_LIMIT)}` : 'На сегодня достаточно ✓'}</a></article>`;
       }).join('') : `<p class="school-empty">Здесь будут страницы и слова, которые вы выберете вместе со взрослым.</p>`}
+      <a class="btn sm white full" href="#/school">Открыть мой учебник · все задания</a>
       <a class="school-manage" href="#/parents/homework">${activeAssignments().length ? 'Взрослым: изменить или добавить задание' : 'Взрослым: добавить задание из учебника'} <span aria-hidden="true">→</span></a>
     </section>
 
     <div class="h2">Today · <small>Выбери занятие</small></div>
     <div class="plan">
-      ${step(day.words, '#/learn', paperArt('book'), '#FFD23F', 'Words · Слова', q.length ? `${q.length} карточек — посмотри и послушай` : 'На сегодня всё! Можно поиграть')}
+      ${step(day.words, '#/learn', paperArt('book'), '#FFD23F', 'Words · Слова', q.length ? `${Math.min(q.length, LESSON_LIMIT)} карточек — посмотри и послушай` : 'На сегодня всё! Можно поиграть')}
       ${step(day.play, `#/${game[0]}`, paperArt('ball'), '#7FD1AE', `${game[2]}`, game[3])}
       ${step(day.art, '#/paint', paperArt('butterfly'), '#FFB3CF', 'Paint · Раскраска', 'Раскрась по-английски')}
     </div>
@@ -62,5 +65,6 @@ export default function home(el) {
     ${MODE === 'static' && !isStandalone() ? '<div class="note" style="margin-top:20px">📌 Попроси взрослого добавить меня на экран «Домой» — тогда звёзды и рисунки не потеряются.</div>' : ''}
     <p style="text-align:center;margin:28px 0 8px"><a class="ru" href="#/parents" style="text-decoration:underline">Для родителей</a></p>`;
 
-  $('#wod', el)?.addEventListener('click', () => { speak(wod.en); setTimeout(() => speak(wod.ex), 1200); });
+  $('#wod', el)?.addEventListener('click', () => { timers.clear(); speak(wod.en); timers.after(() => speak(wod.ex), 1200); });
+  return () => timers.stop();
 }

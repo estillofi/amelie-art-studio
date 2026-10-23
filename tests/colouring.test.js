@@ -7,6 +7,7 @@ import { openStore } from '../server/store.js';
 import { openFamily } from '../server/family.js';
 import { createApp } from '../server.js';
 import { PICTURES, svgOf } from '../js/colouring/pictures.js';
+import { drawingSignature, groupDrawings } from '../js/colouring/gallery.js';
 
 test('new and legacy drawings retain fills through export, import and SQLite restart', () => {
   const dir = mkdtempSync(join(tmpdir(), 'amelie-colouring-'));
@@ -18,7 +19,7 @@ test('new and legacy drawings retain fills through export, import and SQLite res
       { id: 'old-pets', pic: 'pets', fills: { cat: '#FFD23F', ball: '#3BB273' }, ts: 2 },
       { id: 'old-night', pic: 'night', fills: { moon: '#FFD23F', star: '#FF70A6' }, ts: 3 },
       { id: 'new-dinosaur', pic: 'dino-garden', fills: { dinosaur: '#3BB273', sun: '#FFD23F' }, ts: 4 },
-      { id: 'new-cat', pic: 'cat-dojo', fills: { cat: '#FF9F1C', belt: '#FFD23F' }, ts: 5 },
+      { id: 'new-cat', pic: 'cat-dojo', artVersion: 'ink-v2', fills: { cat: '#FF9F1C', belt: '#FFD23F', pieceh: '#FF70A6' }, ts: 5 },
       { id: 'new-art', pic: 'art-studio', fills: { palette: '#3A86FF' }, ts: 6 },
       { id: 'new-boat', pic: 'paper-boat', fills: { sail: '#FFD23F' }, ts: 7 },
       { id: 'new-bunny', pic: 'bunny-picnic', fills: { carrot: '#FF9F1C' }, ts: 8 },
@@ -31,11 +32,26 @@ test('new and legacy drawings retain fills through export, import and SQLite res
     assert.deepEqual(store.list('gallery'), drawings);
     assert.equal(store.get('profile', 'amelie').stars, 305);
     for (const drawing of drawings) {
-      const svg = svgOf(PICTURES.find((p) => p.id === drawing.pic), drawing.fills);
-      for (const [region, colour] of Object.entries(drawing.fills)) assert.match(svg, new RegExp(`data-w="${region}"[^>]*fill="${colour}"`));
+      const svg = svgOf(PICTURES.find((p) => p.id === drawing.pic), drawing.fills, drawing.artVersion || 'legacy');
+      for (const [region, colour] of Object.entries(drawing.fills)) assert.match(svg, new RegExp(`data-${region.startsWith('piece') ? 'part' : 'w'}="${region}"[^>]*fill="${colour}"`));
     }
     assert.throws(() => store.put('gallery', { id: 'unknown', pic: 'unpublished', fills: {}, ts: 1 }));
   } finally { store?.close(); rmSync(dir, { recursive: true, force: true }); }
+});
+
+test('gallery groups repeated compositions without removing records or mixing artwork versions', () => {
+  const original = [
+    { id: 'first', pic: 'house', fills: { sun: '#FFD23F', roof: '#FF4D4F' }, ts: 1 },
+    { id: 'repeat', pic: 'house', fills: { roof: '#FF4D4F', sun: '#FFD23F' }, ts: 2 },
+    { id: 'new-contours', pic: 'house', artVersion: 'ink-v2', fills: { sun: '#FFD23F', roof: '#FF4D4F' }, ts: 3 },
+  ];
+  const snapshot = structuredClone(original);
+  assert.equal(drawingSignature(original[0]), drawingSignature(original[1]));
+  const groups = groupDrawings(original);
+  assert.equal(groups.length, 2);
+  assert.equal(groups[1].drawing.id, 'repeat');
+  assert.deepEqual(groups[1].saves.map((x) => x.id), ['repeat', 'first']);
+  assert.deepEqual(original, snapshot);
 });
 
 test('personal colouring pack saves for Amelie and is rejected for other profiles through direct API and import', async (t) => {

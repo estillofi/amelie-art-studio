@@ -1,0 +1,9 @@
+{
+  "artVersion": "ink-v2",
+  "originalPngSha256": {
+    "adventures": "36686517ec32fd776a96330dd7e94ac79361c8428fc9e1521ca15cc1f5d84908",
+    "familiar": "f86d5351ecc9edb29e3f68dae170e0456e4feff5567f424b17404d98dc6c464c"
+  },
+  "geometry": "js/colouring/ink-regions.js",
+  "source": "Generated from the corresponding coloured study; prompt in docs/colouring-pack.md"
+}

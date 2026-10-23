@@ -5,6 +5,7 @@ import { S, esc, speak, sfx, addStars, markStep, celebrate, burst, shuffle, save
 export { PICTURES, svgOf } from '../colouring/pictures.js';
 import { PICTURES, svgOf, availablePictures, pictureForProfile } from '../colouring/pictures.js';
 import { SESSION } from '../auth.js';
+import { drawingSignature } from '../colouring/gallery.js';
 
 
 const colours = () => S.words.filter((w) => w.topic === 'colours');
@@ -44,6 +45,35 @@ export function paint(el, picId, mode) {
   let crayon = null;
   let tasks = [];
   let t = 0; let misses = 0; let firstTry = 0;
+  let saving = false;
+
+  const drawing = () => ({ pic: pic.id, artVersion: pic.artVersion, fills: { ...fills } });
+  const alreadySaved = () => S.gallery.some((item) => drawingSignature(item) === drawingSignature(drawing()));
+  function saveState() {
+    const button = $('#save', el);
+    if (!button) return;
+    const empty = !Object.keys(fills).length;
+    const saved = !empty && alreadySaved();
+    button.disabled = saving || empty || saved;
+    button.textContent = saving ? 'Сохраняем…' : saved ? '✓ Уже в галерее' : 'В галерею';
+    $('#save-note', el).textContent = empty ? 'Выбери цвет и раскрась первую деталь.' : saved ? 'Можно раскрасить ещё детали и сохранить новый вариант.' : 'Сохрани свой рисунок, когда захочешь.';
+  }
+
+  function colourRegion(group, colour, part) {
+    if (part) {
+      fills[part] = colour;
+      group.querySelector(`[data-part="${part}"]`).setAttribute('fill', colour);
+      group.querySelector(`[data-texture="${part}"]`).setAttribute('opacity', '.55');
+    } else {
+      fills[group.dataset.w] = colour;
+      group.setAttribute('fill', colour);
+      group.querySelectorAll('[data-part]').forEach((path) => {
+        delete fills[path.dataset.part]; path.setAttribute('fill', colour);
+      });
+      group.querySelectorAll('[data-texture]').forEach((path) => path.setAttribute('opacity', '.55'));
+    }
+    saveState();
+  }
 
   // Each region gets a colour; neighbours in the list never share one.
   function makeTasks() {
@@ -72,10 +102,10 @@ export function paint(el, picId, mode) {
       ${pic.preview === undefined ? '' : `<details class="colour-study-panel"><summary>Идея для раскраски</summary>${previewOf(pic)}<p class="sub">Это пример. В свободном рисовании выбирай любые цвета.</p></details>`}
       <div class="palette">${colours().map((c) => `<button class="crayon ${crayon === c.en ? 'on' : ''}" data-c="${c.en}" style="--c:${c.color}" aria-label="${c.en}"><span>${c.en}</span></button>`).join('')}</div>
       <div class="row" style="margin-top:34px;gap:10px">
-        ${free ? `<button class="btn grow" id="save" style="--c:#7FD1AE">💾 В галерею</button><button class="btn white" id="reset">🧽 Заново</button>`
+        ${free ? `<button class="btn grow" id="save" style="--c:#7FD1AE">В галерею</button><button class="btn white" id="reset">🧽 Заново</button>`
           : `<a class="btn white grow" href="#/colour/${pic.id}/free">🎨 Свободно</a>`}
-      </div>`;
-    wire();
+      </div>${free ? '<p class="save-note" id="save-note" role="status"></p>' : ''}`;
+    wire(); saveState();
   }
 
   function wire() {
@@ -94,10 +124,10 @@ export function paint(el, picId, mode) {
       const g = e.target.closest('.rg'); if (!g) return;
       if (!crayon) { speak('Choose a colour!'); $('.palette', el).animate([{ transform: 'scale(1)' }, { transform: 'scale(1.04)' }, { transform: 'scale(1)' }], 400); return; }
       const c = colours().find((x) => x.en === crayon);
-      if (free) { fills[g.dataset.w] = c.color; g.setAttribute('fill', c.color); sfx.pop(); return; }
+      if (free) { colourRegion(g, c.color, e.target.dataset.part); sfx.pop(); return; }
       const k = tasks[t];
       if (g.dataset.w === k.region && crayon === k.colour.en) {
-        fills[k.region] = c.color; g.setAttribute('fill', c.color);
+        $$('#cv .rg', el).filter((group) => group.dataset.w === k.region).forEach((group) => colourRegion(group, c.color));
         sfx.ok(); burst(g); addStars(1, 'art'); if (!misses) firstTry++;
         t++; misses = 0;
         if (t >= tasks.length) return done();
@@ -110,10 +140,14 @@ export function paint(el, picId, mode) {
       }
     });
     $('#save', el)?.addEventListener('click', async () => {
-      await save('gallery', { id: uid(), pic: pic.id, fills: { ...fills }, ts: Date.now() });
-      addStars(2, 'art'); celebrate('Рисунок в галерее! +2 ⭐', '🖼️');
+      if (saving || !Object.keys(fills).length || alreadySaved()) return;
+      saving = true; saveState();
+      try {
+        await save('gallery', { id: uid(), ...drawing(), ts: Date.now() });
+        addStars(2, 'art'); celebrate('Рисунок в галерее! +2 ⭐', '🖼️');
+      } finally { saving = false; saveState(); }
     });
-    $('#reset', el)?.addEventListener('click', () => { for (const r of regions) delete fills[r]; render(); });
+    $('#reset', el)?.addEventListener('click', () => { for (const r of Object.keys(fills)) delete fills[r]; render(); });
   }
 
   function highlight() {

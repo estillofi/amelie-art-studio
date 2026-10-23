@@ -1,4 +1,6 @@
-// Original region names are retained so saved drawings keep their colours.
+import { INK_ART } from './ink-regions.js';
+
+// Keep the previous geometry to display saved artwork without changing the child's picture.
 const D = 'class="deco"';
 export const CLASSIC_PICTURES = [
   {
@@ -120,20 +122,44 @@ export const ADVENTURE_PICTURES = [
   },
 ];
 
-export const PICTURES = [...CLASSIC_PICTURES.map((p, preview) => ({ ...p, preview, study: 'familiar' })), ...ADVENTURE_PICTURES];
+export const ART_VERSION = 'ink-v2';
+export const PICTURES = [...CLASSIC_PICTURES.map((p, preview) => ({ ...p, preview, study: 'familiar' })), ...ADVENTURE_PICTURES].map((p) => ({
+  ...p, legacySvg: p.svg, svg: INK_ART[p.id].svg, ink: INK_ART[p.id], artVersion: ART_VERSION,
+  labels: { ...p.labels, blanket: 'плед', grass: 'трава', door: 'дверь' },
+}));
 export const PICTURE_IDS = PICTURES.map((p) => p.id);
 export const pictureForProfile = (id, profile) => PICTURES.find((p) => p.id === id && (!p.profile || p.profile === profile));
 export const availablePictures = (profile) => PICTURES.filter((p) => !p.profile || p.profile === profile);
 
 let drawingSerial = 0;
-export function svgOf(pic, fills = {}) {
+function legacySvgOf(pic, fills = {}) {
   const id = `crayon-${++drawingSerial}`;
   const grain = [...pic.svg.matchAll(/<g class="rg" data-w="\w+">([\s\S]*?)<\/g>/g)].map((match) => `<g class="crayon-grain" fill="url(#${id})">${match[1]}</g>`).join('');
   const decorations = [...pic.svg.matchAll(/<g class="deco">([\s\S]*?)<\/g>/g)].map((m) => m[0]).join('');
   const shapes = pic.svg.replace(/<g class="deco">[\s\S]*?<\/g>/g, '');
   const regions = shapes.replace(/<g class="rg" data-w="(\w+)">/g, (m, word) => `<g class="rg" data-w="${word}" role="button" tabindex="0" aria-label="${word}" fill="${fills[word] || '#fffdf7'}">`);
-  return `<svg viewBox="0 0 320 320" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="${pic.en}">
+  return `<svg class="legacy-colouring" viewBox="0 0 320 320" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="${pic.en}">
     <defs><pattern id="${id}" width="43" height="41" patternUnits="userSpaceOnUse"><path d="M2 15q4-3 8-10m7 5 7-5M28 17l8-8M4 36l9-9m9 9 5-9M32 37l7-5M18 24l7-7" stroke="#126c9a" stroke-width=".7" opacity=".1" fill="none"/><path d="M4 22 14 9m-2 30 7-11m11-4 10-8M24 7l5-5M31 39l9-12" stroke="#fffdf7" stroke-width="1.4" opacity=".38" fill="none"/></pattern><filter id="${id}-pencil" x="-3%" y="-3%" width="106%" height="106%"><feTurbulence type="fractalNoise" baseFrequency=".045" numOctaves="2" seed="7" result="paper"/><feDisplacementMap in="SourceGraphic" in2="paper" scale=".8" xChannelSelector="R" yChannelSelector="G"/></filter></defs>
-    <style>.rg *{stroke:#126c9a;stroke-width:2.8;stroke-linejoin:round;stroke-linecap:round}.deco,.crayon-grain{pointer-events:none}.deco *{stroke:#126c9a;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.crayon-grain *{stroke:none}.rg:focus{outline:none;filter:drop-shadow(0 0 2px #126c9a)}</style>
+    <style>.legacy-colouring .rg *{stroke:#126c9a;stroke-width:2.8;stroke-linejoin:round;stroke-linecap:round}.legacy-colouring .deco,.legacy-colouring .crayon-grain{pointer-events:none}.legacy-colouring .deco *{stroke:#126c9a;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.legacy-colouring .crayon-grain *{stroke:none}.legacy-colouring .rg:focus{outline:none;filter:drop-shadow(0 0 2px #126c9a)}</style>
     <g filter="url(#${id}-pencil)">${regions}${grain}${decorations}</g></svg>`;
+}
+
+// The visible lines are the generated illustration itself. Paintable masks follow its enclosed areas.
+export function svgOf(pic, fills = {}, version = ART_VERSION) {
+  if (version !== ART_VERSION) return legacySvgOf({ ...pic, svg: pic.legacySvg }, fills);
+  const a = pic.ink;
+  const id = `wax-${++drawingSerial}`;
+  const regions = a.svg.replace(/<g class="rg" data-w="(\w+)">([\s\S]*?)<\/g>/g, (_, word, shapes) => {
+    const paths = shapes.replace(/<path data-part="(\w+)"([^>]+)\/>/g, (shape, part, attributes) => {
+      const colour = fills[part] || fills[word];
+      const d = attributes.match(/ d="([^"]+)"/)[1];
+      return `<path data-part="${part}"${attributes} fill="${colour || '#fffdf7'}"/><path class="crayon-grain" data-texture="${part}" d="${d}" fill-rule="evenodd" fill="url(#${id})" opacity="${colour ? '.55' : '0'}"/>`;
+    });
+    return `<g class="rg" data-w="${word}" role="button" tabindex="0" aria-label="${word}" fill="${fills[word] || '#fffdf7'}">${paths}</g>`;
+  });
+  return `<svg class="illustrated-colouring" viewBox="0 0 ${a.width} ${a.height}" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="${pic.en}">
+    <defs><pattern id="${id}" width="83" height="79" patternUnits="userSpaceOnUse" patternTransform="rotate(-8)"><path d="m2 18 14-11m-4 31 23-20m-8 36 29-24m-20 46 34-26M58 18 77 3M2 73l18-15m46-17 15-14" fill="none" stroke="#fffdf7" stroke-width="1.5" stroke-linecap="round" opacity=".9"/><path d="m22 9 7-6m18 18 12-8m-49 39 8-6m44 26 11-9m-30-7 4-4" stroke="#fffdf7" stroke-width=".7" opacity=".8"/></pattern></defs>
+    <style>.illustrated-colouring .rg{cursor:pointer}.illustrated-colouring .crayon-grain,.illustrated-colouring .original-ink{pointer-events:none}.illustrated-colouring .rg:focus-visible{outline:none;filter:drop-shadow(0 0 2px #126c9a)}.illustrated-colouring .original-ink{mix-blend-mode:multiply}</style>
+    ${regions}<image class="original-ink" href="assets/colouring/ink/${a.sheet}.webp" x="${-a.x}" y="${-a.y}" width="${a.sheetWidth}" height="${a.sheetHeight}"/>
+  </svg>`;
 }

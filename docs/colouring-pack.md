@@ -1,30 +1,68 @@
-# Личные раскраски Амели
+# Раскраски и сохранённые работы
 
-Подборка `2026.10.23-colouring-1` добавляет шесть сюжетов: `dino-garden`, `cat-dojo`, `art-studio`, `paper-boat`, `bunny-picnic`, `space-friends`. Они доступны при детском входе Амели и родителю, выбравшему её альбом. Демо и Песочница сохраняют три базовые раскраски; прямой запрос сохранения личного рисунка в другой профиль отклоняет сервер.
+Выпуск `2026.10.23-colouring-2` использует сами сгенерированные контурные иллюстрации. Интерактивные области следуют их линиям: это не упрощённая перерисовка персонажей геометрическими фигурами.
 
-Цветные эскизы созданы с референсом `assets/doodles/welcome.webp`, который продолжает направление исходного наивного плаката. Общий лист `assets/colouring/adventures.webp` содержит сетку 3 × 2, без надписей. Исходный PNG остаётся в рабочем каталоге генерации. На карточках и в раскрываемой подсказке используется цветной эскиз; интерактивный рисунок построен из крупных замкнутых SVG-областей по тем же сюжетам.
+Шесть личных сюжетов Амели: `dino-garden`, `cat-dojo`, `art-studio`, `paper-boat`, `bunny-picnic`, `space-friends`. Они доступны Амели и родителю, выбравшему её альбом. Демо и Песочница получают три общих сюжета: дом, питомцы и ночь. Сервер проверяет доступность рисунка при сохранении и импорте.
 
-Три прежних сюжета также получили новые цветные эскизы в `assets/colouring/familiar.webp` (сетка 2 × 2: дом, питомцы, ночь, мотив альбома для ссылки на галерею). Для них используется то же направление синего карандашного контура и воскового штриха.
+## Как устроен рисунок
 
-Контуры и данные находятся в `js/colouring/pictures.js`: общий каталог используется интерфейсом, галереей и серверной проверкой. Три прежних рисунка сохраняют `id`, названия областей и заливки из старых экспортов. Их вывод обновлён: немного неровный синий контур, штриховка и просветы бумаги в цвете. Существующие рисунки, звёзды и интервальные повторения не меняются.
+- Цветные образцы: `assets/colouring/adventures.webp` и `familiar.webp`.
+- Контурные мастера: `assets/colouring/ink/adventures.webp` и `familiar.webp`. Синий контур выводится непосредственно из этих файлов, поверх цвета. Белый фон смешивается с фактурой бумаги.
+- `js/colouring/ink-regions.js`: точные замкнутые маски внутренних областей, полученные из оригинальных PNG-мастеров. Всего 346 отдельных деталей в девяти сюжетах. Полоски, пятнышки, лепестки, внутренние части ушей, лапки, пояс и клеточки пледа доступны отдельно.
+- Свободное рисование сохраняет цвет конкретной детали (`piece…`). Английское задание закрашивает все детали названного предмета. Enter/Space на предмете делает то же самое. Текстура воскового штриха появляется только на закрашенных деталях.
+- `scripts/trace-colouring.py original-adventures.png original-familiar.png` воспроизводит геометрию. Нужны Python, NumPy, SciPy, Pillow и contourpy; рабочему серверу они не нужны. Таблица в скрипте связывает области с существительными. При смене мастера эту таблицу нужно проверить заново. Исходные PNG сохраняются отдельно от приложения; браузер получает оптимизированные WebP.
 
-Для новых предметов добавлены русские подсказки и английская озвучка в задании. Эти слова не добавляются автоматически в интервальное повторение: набор новых карточек по-прежнему выбирает взрослый. Каждый рисунок содержит 5–6 областей. Доступны свободная раскраска, задания «Colour the …», клавиши Enter/Space на области, сохранение в галерею и экспорт/импорт.
+Новые сохранения содержат `artVersion: "ink-v2"`. Сохранения без версии используют прежние SVG-контуры и прежние названия заливок. Обновление иллюстраций не перерисовывает уже готовые работы ребёнка. Идентификаторы картинок, старые записи, даты, звёзды и резервные копии сохраняются.
 
-## Промпт цветных эскизов
+## Галерея и повторное сохранение
+
+В галерее одинаковые композиции показываются одной карточкой с раскрываемым списком дат сохранения. Сравниваются сюжет, версия контуров и заливки с учётом порядка ключей. Исходные записи не удаляются; экспорт по-прежнему содержит все сохранения. Разные варианты цвета и разные версии рисунка не объединяются.
+
+Пустую работу сохранить нельзя. Пока сохранение выполняется, кнопка заблокирована. Уже сохранённая композиция не создаёт новую запись и повторно не начисляет звёзды. После изменения цвета можно сохранить новый вариант. Проверки выполняются также после перехода на другую страницу и возвращения в рисунок.
+
+Новые существительные не попадают в интервальное повторение автоматически: набор карточек выбирает взрослый. Русские подсказки для рисунков находятся в каталоге.
+
+## Арт-дирекшн и промпт мастера
+
+Образец направления — наивный рисунок с выразительными динозаврами, синим контуром и энергичным восковым штрихом. Цветной образец и раскраска должны узнаваемо изображать одних и тех же персонажей, включая пропорции, позы, мордочки и детали. Бумага и картон относятся к окружению интерфейса; в файле контурного мастера фон чистый, чтобы фактура и пользовательская заливка не конфликтовали с ним.
 
 ```text
-Create an original illustration sheet for an eight-year-old child's English colouring app, using the provided picture ONLY as a drawing-material and character-style reference. This is a new sheet of six different scenes, not a copy of the reference composition.
+EDIT THE PROVIDED COLOURED ILLUSTRATION SHEET into its beautiful, publishable,
+uncoloured colouring-book master. Preserve the original scenes, proportions,
+endearing CHARACTER DRAWINGS, expressive faces, poses, contours, arrangement
+and small details. The SAME illustrator has prepared the SAME picture for
+colouring. Do not simplify the drawing into geometric silhouettes or icons.
 
-ART DIRECTION: lively naive editorial hand drawing, uneven cobalt-blue felt-tip contours (#126c9a), wax-crayon and coloured-pencil marks, spontaneous lightly angular asymmetry, short vigorous directional hatching with visible cream paper gaps. Emphasize the analogue pencil texture and searching double contours, as in a naive dinosaur poster; avoid polished baby clip art. Warm sunflower yellow, leaf green, mint, coral, orange, pale sky blue. Friendly small eyes and simple smiles. No glossy gradients, no 3D, no thick black/brown outlines, no smooth vector icons, no kawaii sparkle, no sticker border or shadows, no typography, no captions, no visible grid. Flat uniform warm ivory background #fbf7ed.
+Preserve the kitten's paws, curled striped tail, kimono lapels and tied belt;
+the dinosaur's plump organic silhouette and spots; the rabbit's floppy ears
+and picnic blanket; the palette's paint blobs; the sailboat's portholes and
+happy fish; the rocket's fins, circular window and ringed planet. Every scene
+must remain recognisable beside its original colour study.
 
-EXACT COMPOSITION: landscape canvas, precisely three equal square columns and two equal square rows, SIX wholly separate square scenes. Each scene has a clear 10 percent margin inside its own cell; no object crosses a cell boundary. Similar optical size throughout, few large subjects with closed silhouettes and generous space. Each scene will be redrawn as an interactive colouring page, so keep the objects clearly separated, simple and identifiable.
+ART MATERIAL: rich cobalt-blue pencil/fineliner contours, subtly variable line
+pressure, graceful organic curves, lively friendly faces and tiny human
+imperfections. No generic vector clip art, no polygon redraw, no 3D, no gradients,
+no glossy effects, no heavy black/brown contours. Preserve facial expressions.
 
-Top left: a friendly long-neck GREEN DINOSAUR in a garden, a fir tree on the left, smiling yellow sun upper right, one pale cloud upper left, one large coral flower lower right.
-Top middle: an ORANGE KITTEN standing in a simple white AIKIDO KIMONO with yellow belt, on a mint rectangular mat, one blue ball lower right, one yellow star upper left; large calm smiling face.
-Top right: an artist's still life with one large irregular wooden PALETTE with three paint dabs, one chunky paintbrush diagonally, one red pencil and an open sketchbook, small friendly sun above.
-Bottom left: a RED SAILBOAT with a large yellow triangular sail on pale blue waves, a happy orange fish lower right, sun upper right and a single cloud upper left.
-Bottom middle: a friendly RABBIT with long ears sitting at a picnic, orange carrot to its left, one large red strawberry to its right, simple mint cup below right, butterfly upper left, little patch of grass below.
-Bottom right: a playful RED ROCKET with a yellow flame and circular pale blue window, a yellow crescent moon upper right, one smiling star upper left, and a ringed mint planet lower right.
+Remove ALL coloured fills, painted shading and interior crosshatching. Keep
+blue eyes and mouths crisp. All separately colourable parts must have clearly
+CLOSED continuous outlines: spots, stripes, cheeks, ears, paws, petals, flower
+centres, kimono panels, belt knot, ball panels, brush ferrule, bristles, pencil,
+sketchbook pages, sails, hull, fish, carrot leaves, strawberry leaves, butterfly
+wings, cup handle, rocket body/window/flame, planet ring. Do not fill these
+areas with solid ink. Generous clear interiors, suitable for digital bucket
+colouring and an eight-year-old child.
 
-The entire result should feel drawn by the same person with the same blue pencil and crayons on the same sheet of paper. Strong visual clarity at 160px per scene, not a busy storybook spread.
+LAYOUT: preserve the exact scene order in the reference grid; six equal cells
+in 3 columns by 2 rows for the adventure sheet, four in 2 columns by 2 rows
+for the familiar sheet. Leave clear gutters and margins, no object may intrude
+on its neighbour. No visible grid lines, no frames, no lettering or captions.
+
+BACKGROUND AND OUTPUT: pure white interiors and pure white flat background
+#ffffff, no paper grain, no shadows, no noise or painted texture. Blue linework
+about 3–4 px at original sheet resolution. This file is the final visible
+interactive colouring artwork, not a moodboard. Maximise beauty, legibility
+and fidelity to the supplied generated illustrations.
 ```
+
+Проверки: сохранение/импорт/перезапуск SQLite для старых и новых заливок; группировка без изменения исходных записей; серверные разрешения профилей; реальные нажатия в браузере, задания на цвета, клавиатура, защита пустого и повторного сохранения, мобильная ширина 320/390 px. Дополнительно перед публикацией просматриваются контурные и раскрашенные изображения в браузере.

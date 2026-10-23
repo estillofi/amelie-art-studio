@@ -508,3 +508,11 @@ button.adult-link { background: none; border: 0; font: inherit; font-size: 12px;
 .canvas { background: linear-gradient(#fffdf7dd,#fffdf7dd),var(--paper-grain) center / cover; }
 
 .colour-study.familiar-study { background-image: url('../assets/colouring/familiar.webp'); background-size: 200% 200%; }
+
+/* Detailed ink illustrations and the gallery keep their own original linework. */
+.illustrated-colouring { overflow: hidden; isolation: isolate; mix-blend-mode: multiply; }
+.save-note,.gallery-note { color: #48616b; font-size: 14px; line-height: 1.5; }
+.btn:disabled { opacity: .65; cursor: default; transform: none; }
+.saved-copies { margin-top: 8px; font-size: 12px; color: #48616b; }
+.saved-copies summary { cursor: pointer; }
+.saved-copies span { display: block; margin-top: 5px; }

@@ -224,7 +224,8 @@ def exercise(browser, base, server=False):
     expect(page.locator('#card')).to_contain_text('A is for')
     route('/colour/house/free', '#save')
     page.locator('[data-c="red"]').click()
-    page.locator('#cv [data-w="sun"] circle').click()
+    page.locator('#cv [data-w="sun"]').focus()
+    page.locator('#cv [data-w="sun"]').press('Enter')
     expect(page.locator('#cv [data-w="sun"]')).to_have_attribute('fill', '#FF4D4F')
     page.locator('#save').click()
     page.wait_for_function('async () => {const m=await import("./js/lib.js");return JSON.parse(localStorage.getItem(m.storageKey("gallery")) || "[]").length===1;}')
@@ -369,8 +370,8 @@ def colouring_pack(browser, base):
     page.screenshot(path='/tmp/amelie-new-colouring-pack.png',full_page=True)
     pictures=page.evaluate("async () => (await import('./js/colouring/pictures.js')).ADVENTURE_PICTURES.map(p=>({id:p.id,en:p.en}))")
     def tap(region):
-        point=page.locator(f'#cv .rg[data-w="{region}"]').evaluate('''g => {
-            for(const shape of g.children){
+        point=page.locator(f'#cv .rg[data-w="{region}"]').first.evaluate('''g => {
+            for(const shape of g.querySelectorAll('[data-part]')){
                 if(!shape.isPointInFill)continue;
                 const box=shape.getBBox();
                 for(const fy of [.5,.3,.7,.15,.85])for(const fx of [.5,.3,.7,.15,.85]){
@@ -387,8 +388,10 @@ def colouring_pack(browser, base):
     for picture in pictures:
         page.evaluate('(id)=>location.hash="/colour/"+id+"/free"',picture['id'])
         expect(page.locator('#cv')).to_be_visible()
+        expect(page.locator('#save')).to_be_disabled()
         regions=page.locator('#cv .rg').evaluate_all('(nodes)=>nodes.map(n=>n.dataset.w)')
-        assert 5<=len(regions)<=6,(picture,regions)
+        assert 5 <= len(set(regions)) <= 7, (picture, regions)
+        regions = list(dict.fromkeys(regions))
         for region in regions:
             colour=natural.get(region,'pink')
             page.locator(f'[data-c="{colour}"]').click()
@@ -396,9 +399,14 @@ def colouring_pack(browser, base):
             page.locator('#cv').scroll_into_view_if_needed()
             tap(region)
             fill=data('m.S.words.find(w=>w.en==='+json.dumps(colour)+').color')
-            expect(page.locator(f'#cv .rg[data-w="{region}"]')).to_have_attribute('fill',fill)
+            assert page.locator(f'#cv .rg[data-w="{region}"] [data-part]').evaluate_all('(nodes, colour) => nodes.some(n=>n.getAttribute("fill")===colour)', fill)
         if picture['id']=='dino-garden':page.screenshot(path='/tmp/amelie-new-dino-coloured.png',full_page=True)
-        page.locator('#save').click()
+        before_count=data('m.S.gallery.length');before_stars=data('m.profile().stars')
+        page.locator('#save').evaluate('(button)=>{button.click();button.click();button.click();}')
+        expect(page.locator('#save')).to_be_disabled()
+        expect(page.locator('#save')).to_contain_text('Уже в галерее')
+        assert data('m.S.gallery.length')==before_count+1
+        assert data('m.profile().stars')==before_stars+2
         assert data('await m.flushSaves()'),data('m.SYNC')
     page.evaluate("location.hash='/gallery'");page.reload(wait_until='networkidle')
     expect(page.locator('.pics > .tile')).to_have_count(baseline+6)

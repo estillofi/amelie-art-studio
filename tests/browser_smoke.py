@@ -336,6 +336,96 @@ def family_access(browser, base):
     context.close()
 
 
+def colouring_pack(browser, base):
+    context = browser.new_context(viewport={'width':390,'height':844})
+    page = context.new_page(); errors=[]
+    page.on('pageerror',lambda error:errors.append(str(error)))
+    page.goto(base,wait_until='networkidle');login(page);parents(page)
+    with page.expect_navigation(wait_until='networkidle'):
+        page.locator('#family-profile').select_option('demo')
+    page.evaluate("location.hash='/paint'")
+    expect(page.locator('.colouring-tile')).to_have_count(3)
+    page.evaluate("location.hash='/colour/dino-garden/free'")
+    expect(page.locator('#view')).to_contain_text('Эта история сейчас недоступна')
+    assert page.locator('#cv').count()==0
+    parents(page)
+    with page.expect_navigation(wait_until='networkidle'):
+        page.locator('#family-profile').select_option('amelie')
+    page.locator('.family-panel summary').click()
+    with page.expect_response('**/api/auth/password') as response:
+        page.locator('[data-password="amelie"]').click()
+    access=response.value.json()
+    with page.expect_navigation(wait_until='networkidle'):
+        page.locator('#sign-out').click()
+    login(page,access['login'],access['password'])
+    def data(expr):return page.evaluate('async () => { const m=await import("./js/lib.js");return '+expr+';}')
+    baseline=data('m.S.gallery.length')
+    page.evaluate("location.hash='/paint'")
+    expect(page.locator('.new-colouring .colouring-tile')).to_have_count(6)
+    expect(page.locator('.colouring-tile')).to_have_count(9)
+    for width in [320,390]:
+        page.set_viewport_size({'width':width,'height':844})
+        assert page.evaluate('document.documentElement.scrollWidth<=innerWidth')
+    page.screenshot(path='/tmp/amelie-new-colouring-pack.png',full_page=True)
+    pictures=page.evaluate("async () => (await import('./js/colouring/pictures.js')).ADVENTURE_PICTURES.map(p=>({id:p.id,en:p.en}))")
+    def tap(region):
+        point=page.locator(f'#cv .rg[data-w="{region}"]').evaluate('''g => {
+            for(const shape of g.children){
+                if(!shape.isPointInFill)continue;
+                const box=shape.getBBox();
+                for(const fy of [.5,.3,.7,.15,.85])for(const fx of [.5,.3,.7,.15,.85]){
+                    const p=new DOMPoint(box.x+box.width*fx,box.y+box.height*fy);
+                    if(!shape.isPointInFill(p))continue;
+                    const q=p.matrixTransform(shape.getScreenCTM());
+                    if(document.elementFromPoint(q.x,q.y)?.closest('.rg')===g)return {x:q.x,y:q.y};
+                }
+            }
+            throw new Error('Region has no accessible fill area: '+g.dataset.w);
+        }''')
+        page.mouse.click(point['x'],point['y'])
+    natural={'dinosaur':'green','tree':'green','grass':'green','sun':'yellow','cloud':'blue','cat':'orange','belt':'yellow','mat':'green','water':'blue','carrot':'orange','strawberry':'red','rocket':'red','flame':'orange','moon':'yellow','star':'yellow','planet':'green'}
+    for picture in pictures:
+        page.evaluate('(id)=>location.hash="/colour/"+id+"/free"',picture['id'])
+        expect(page.locator('#cv')).to_be_visible()
+        regions=page.locator('#cv .rg').evaluate_all('(nodes)=>nodes.map(n=>n.dataset.w)')
+        assert 5<=len(regions)<=6,(picture,regions)
+        for region in regions:
+            colour=natural.get(region,'pink')
+            page.locator(f'[data-c="{colour}"]').click()
+            # Scroll the canvas into view after selecting a crayon near its lower edge.
+            page.locator('#cv').scroll_into_view_if_needed()
+            tap(region)
+            fill=data('m.S.words.find(w=>w.en==='+json.dumps(colour)+').color')
+            expect(page.locator(f'#cv .rg[data-w="{region}"]')).to_have_attribute('fill',fill)
+        if picture['id']=='dino-garden':page.screenshot(path='/tmp/amelie-new-dino-coloured.png',full_page=True)
+        page.locator('#save').click()
+        assert data('await m.flushSaves()'),data('m.SYNC')
+    page.evaluate("location.hash='/gallery'");page.reload(wait_until='networkidle')
+    expect(page.locator('.pics > .tile')).to_have_count(baseline+6)
+    for picture in pictures:
+        expect(page.locator('.pics svg[aria-label="'+picture['en']+'"]')).to_be_visible()
+    # Guided colour recognition and translated hints work on the new vocabulary.
+    page.evaluate("location.hash='/colour/dino-garden'")
+    expect(page.locator('#hear')).to_be_visible()
+    for _ in range(6):
+        task=page.locator('.task .en').inner_text()
+        region,colour=re.search(r'Colour the (\w+) (\w+)\.',task).groups()
+        page.locator('#hint').click()
+        assert '→' in page.locator('#hint').inner_text()
+        page.locator(f'[data-c="{colour}"]').click();page.locator('#cv').scroll_into_view_if_needed();tap(region)
+        if _<5:page.wait_for_function('(old)=>document.querySelector(".task .en").textContent!==old',arg=task)
+    expect(page.locator('.task')).to_contain_text('Free painting')
+    # Keyboard access uses the same fill interaction.
+    page.locator('[data-c="red"]').click()
+    page.locator('#cv .rg[data-w="dinosaur"]').focus()
+    page.locator('#cv .rg[data-w="dinosaur"]').press('Enter')
+    expect(page.locator('#cv .rg[data-w="dinosaur"]')).to_have_attribute('fill','#FF4D4F')
+    assert data('await m.flushSaves()')
+    assert not errors,errors
+    context.close()
+    print('PASS: six personal scenes, every fill area tappable, save/reload, guided tasks, keyboard colouring and profile isolation')
+
+
 with tempfile.TemporaryDirectory(prefix='amelie-browser-') as directory, sync_playwright() as p:
     browser = p.chromium.launch(executable_path=os.environ.get('CHROMIUM_PATH', '/usr/bin/chromium'), headless=True, args=['--no-sandbox'])
     env = {**os.environ, 'PORT': '0', 'HOST': '127.0.0.1', 'DATA_DIR': directory, 'APP_USER': 'test-family', 'APP_PASSWORD': 'local-test-only'}
@@ -358,6 +448,7 @@ with tempfile.TemporaryDirectory(prefix='amelie-browser-') as directory, sync_pl
         context.close()
         print('PASS: same-origin prototype progress is preserved until explicit adult migration')
         family_access(browser, base)
+        colouring_pack(browser, base)
     with running(['python3', '-u', '-m', 'http.server', '0', '--bind', '127.0.0.1']) as base:
         exercise(browser, base)
     browser.close()

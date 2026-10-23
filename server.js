@@ -64,6 +64,11 @@ export function createApp({ store = openStore(), user = process.env.APP_USER, pa
         if (['/api/progress/export', '/api/content/import'].includes(path)) family.requireParent(session);
         const collection = path.match(/^\/api\/db\/(\w+)$/)?.[1];
         if (req.method === 'POST' && ['words', 'topics', 'assignments'].includes(collection)) family.requireParent(session);
+        if (req.method === 'POST' && collection === 'gallery') {
+          const item = await body(req);
+          family.checkPicture(session, item?.pic);
+          return send(res, 200, activeStore.put('gallery', item));
+        }
         if (req.method === 'POST' && collection === 'profile' && session.account !== 'parent') {
           const item = await body(req);
           if (!item || typeof item !== 'object' || Array.isArray(item)) throw new ValidationError('Некорректный профиль');

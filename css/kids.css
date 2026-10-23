@@ -492,3 +492,19 @@ button.adult-link { background: none; border: 0; font: inherit; font-size: 12px;
   .top > #sign-out { grid-column: 2; grid-row: 2; justify-self: end; }
   .top:has(#sign-out) > a.adult-link { grid-column: 3; grid-row: 2; justify-self: end; }
 }
+
+/* Colour studies and tactile paper for Amelie's drawing collection. */
+.new-colouring { margin: 24px 0; }
+.new-colouring h2 { color: #126c9a; font: 400 28px/1.2 var(--hand); margin: 5px 0 8px; }
+.colouring-tile { padding: 10px; background: linear-gradient(#fffdf7b0,#fffdf7b0),var(--paper-grain) center / 400px auto; }
+.colouring-tile > svg { display: block; width: 100%; }
+.colour-study { display: block; width: 100%; aspect-ratio: 1; background: url('../assets/colouring/adventures.webp') var(--study-x) var(--study-y) / 300% 200% no-repeat; mix-blend-mode: multiply; }
+.colouring-heading { display: flex; flex-wrap: wrap; gap: 4px 12px; align-items: baseline; margin: 18px 0 12px; }
+.colouring-heading b { font: 400 27px/1.2 var(--hand); color: #126c9a; }
+.colouring-heading span { color: #53626b; font-size: 14px; }
+.colour-study-panel { margin: 20px 0 12px; padding: 12px 16px; background: var(--paper-grain) center / cover; border: 1px dashed #126c9a66; border-radius: 3px 9px 4px 7px; }
+.colour-study-panel summary { cursor: pointer; color: #126c9a; font-size: 15px; }
+.colour-study-panel .colour-study { max-width: 260px; margin: 8px auto; }
+.canvas { background: linear-gradient(#fffdf7dd,#fffdf7dd),var(--paper-grain) center / cover; }
+
+.colour-study.familiar-study { background-image: url('../assets/colouring/familiar.webp'); background-size: 200% 200%; }

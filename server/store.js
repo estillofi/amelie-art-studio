@@ -1,3 +1,4 @@
+import { PICTURE_IDS } from '../js/colouring/pictures.js';
 import { DatabaseSync } from 'node:sqlite';
 import { mkdirSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
@@ -44,7 +45,7 @@ export function validateItem(col, item) {
     requireThat(item.stickers === undefined || (Array.isArray(item.stickers) && item.stickers.every((s) => plain(s) && text(s.s, 30) && integer(s.ts, 0, Number.MAX_SAFE_INTEGER))), 'Некорректные наклейки');
     requireThat(item.days === undefined || (plain(item.days) && Object.entries(item.days).every(([day, steps]) => /^\d{4}-\d{2}-\d{2}$/.test(day) && plain(steps) && Object.entries(steps).every(([key, value]) => ['words', 'play', 'art', 'bonus'].includes(key) && (key === 'bonus' ? typeof value === 'boolean' : integer(value, 0, Number.MAX_SAFE_INTEGER))))), 'Некорректный план занятий');
   } else if (col === 'gallery') {
-    requireThat(['house', 'pets', 'night'].includes(item.pic) && plain(item.fills), 'Некорректный рисунок');
+    requireThat(PICTURE_IDS.includes(item.pic) && plain(item.fills), 'Некорректный рисунок');
     requireThat(Object.entries(item.fills).every(([key, value]) => /^[a-z]+$/.test(key) && COLOR.test(value)), 'Некорректная раскраска');
     requireThat(integer(item.ts, 0, Number.MAX_SAFE_INTEGER), 'Некорректное время рисунка');
   } else if (col === 'assignments') {

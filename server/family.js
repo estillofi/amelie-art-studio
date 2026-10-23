@@ -1,3 +1,4 @@
+import { pictureForProfile } from '../js/colouring/pictures.js';
 import { DatabaseSync, backup } from 'node:sqlite';
 import { randomBytes, scryptSync, timingSafeEqual, createHash } from 'node:crypto';
 import { mkdirSync, chmodSync } from 'node:fs';
@@ -54,6 +55,7 @@ export function openFamily({ dir, parentPassword }) {
     describe,
     store: (session) => stores.get(session.profile),
     requireParent(session) { if (session.account !== 'parent') deny('Нужен вход родителя'); },
+    checkPicture(session, picture) { if (!pictureForProfile(picture, session.profile)) deny('Этот рисунок недоступен в выбранном альбоме'); },
     checkScope(session, scope) { if (scope !== describe(session).scope) deny('Выбран другой профиль. Обновите страницу перед сохранением.', 409); },
     select(session, profile) {
       family.requireParent(session);
@@ -86,6 +88,7 @@ export function openFamily({ dir, parentPassword }) {
       family.requireParent(session);
       const store = family.store(session);
       store.importProgress(data, { dryRun: true });
+      for (const drawing of data.data.gallery) family.checkPicture(session, drawing.pic);
       const normalized = { ...data.data, assignments: data.data.assignments || [] };
       const summary = { stars: normalized.profile[0]?.stars || 0, stickers: normalized.profile[0]?.stickers?.length || 0, drawings: normalized.gallery.length, cards: normalized.progress.length };
       if (dryRun) return { dryRun: true, profile: session.profile, summary };
@@ -98,6 +101,7 @@ export function openFamily({ dir, parentPassword }) {
       const session = { account: 'parent', profile };
       const store = family.store(session);
       const check = store.importProgress(data, { dryRun: true, migrationId });
+      for (const drawing of data.data.gallery) family.checkPicture(session, drawing.pic);
       if (check.alreadyImported) return check;
       if (dryRun) return { dryRun: true, profile };
       const backupName = await family.backup(session, 'before-migration');

@@ -25,6 +25,7 @@ python3 tests/browser_smoke.py
 ## Размещение и контент
 
 - [Railway, VPS, перенос прогресса и резервные копии](docs/deployment.md).
+- [Личные раскраски Амели и направление рисунков](docs/colouring-pack.md).
 - [Семейные входы и безопасный перенос прогресса](docs/family-accounts.md).
 - [Формат тематических наборов и работа через чат](docs/content.md).
 - [Следующие этапы продукта](docs/roadmap.md).

@@ -1,6 +1,10 @@
 import { PICTURE_IDS } from './colouring/pictures.js';
-export const COLLECTIONS = ['topics', 'words', 'progress', 'log', 'profile', 'gallery', 'assignments'];
-export const STATE = ['progress', 'log', 'profile', 'gallery', 'assignments'];
+export const COLLECTIONS = ['topics', 'words', 'progress', 'log', 'profile', 'gallery', 'assignments', 'uploads'];
+export const STATE = ['progress', 'log', 'profile', 'gallery', 'assignments', 'uploads'];
+// A parent's own colouring page: traced line art plus the words for its numbered regions.
+export const UPLOAD_ID = /^u-[a-z0-9]{6,40}$/;
+export const REGION_WORD = /^[a-z]+(?:[ -][a-z]+)?$/;
+export const isUpload = (id) => typeof id === 'string' && UPLOAD_ID.test(id);
 const ID = /^[a-zA-Z0-9_-]{1,100}$/;
 const validId = (v) => typeof v === 'string' && ID.test(v);
 const COLOR = /^#[\da-f]{6}$/i;
@@ -40,8 +44,8 @@ export function validateItem(col, item) {
     requireThat(item.days === undefined || (plain(item.days) && Object.entries(item.days).every(([day, steps]) => /^\d{4}-\d{2}-\d{2}$/.test(day) && plain(steps) && Object.entries(steps).every(([key, value]) => ['words', 'play', 'art', 'bonus'].includes(key) && (key === 'bonus' ? typeof value === 'boolean' : integer(value, 0, Number.MAX_SAFE_INTEGER))))), 'Некорректный план занятий');
     requireThat(item.rewardTrack === undefined || (plain(item.rewardTrack) && item.rewardTrack.version === 2 && integer(item.rewardTrack.nextAt, 1, 10000100) && integer(item.rewardTrack.step, 15, 60) && integer(item.rewardTrack.earned, 0, 1000000) && integer(item.rewardTrack.baseCount, 0, 1000000)), 'Некорректное расписание наклеек');
   } else if (col === 'gallery') {
-    requireThat(PICTURE_IDS.includes(item.pic) && plain(item.fills), 'Некорректный рисунок');
-    requireThat(Object.entries(item.fills).every(([key, value]) => /^[a-z]+$/.test(key) && COLOR.test(value)), 'Некорректная раскраска');
+    requireThat((PICTURE_IDS.includes(item.pic) || isUpload(item.pic)) && plain(item.fills), 'Некорректный рисунок');
+    requireThat(Object.keys(item.fills).length <= 400 && Object.entries(item.fills).every(([key, value]) => (isUpload(item.pic) ? /^r\d{1,4}$/ : /^[a-z]+$/).test(key) && COLOR.test(value)), 'Некорректная раскраска');
     requireThat(integer(item.ts, 0, Number.MAX_SAFE_INTEGER), 'Некорректное время рисунка');
   } else if (col === 'assignments') {
     requireThat(text(item.book, 120) && text(item.pages, 60) && optionalText(item.task, 1000), 'Укажите учебник и страницы; задание — до 1000 символов');
@@ -49,6 +53,14 @@ export function validateItem(col, item) {
     requireThat(typeof item.active === 'boolean' && integer(item.createdAt, 0, Number.MAX_SAFE_INTEGER), 'Некорректное задание');
     requireThat(item.dueDate === undefined || item.dueDate === '' || (typeof item.dueDate === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(item.dueDate) && Number.isFinite(Date.parse(item.dueDate)) && new Date(item.dueDate).toISOString().slice(0, 10) === item.dueDate), 'Некорректная дата задания');
     requireThat(item.picture === undefined || item.picture === '' || PICTURE_IDS.includes(item.picture), 'Неизвестная раскраска задания');
+  } else if (col === 'uploads') {
+    requireThat(isUpload(item.id), 'Некорректный id картинки');
+    requireThat(text(item.en, 60) && text(item.ru, 60), 'Дайте картинке название по-английски и по-русски');
+    requireThat(typeof item.image === 'string' && item.image.length <= 700000 && /^data:image\/png;base64,[A-Za-z0-9+/]+=*$/.test(item.image), 'Контур должен быть PNG до 500 КБ');
+    requireThat(integer(item.width, 64, 1200) && integer(item.height, 64, 1200), 'Некорректный размер картинки');
+    requireThat(Array.isArray(item.regions) && item.regions.length <= 120 && new Set(item.regions.map((r) => r?.n)).size === item.regions.length
+      && item.regions.every((r) => plain(r) && integer(r.n, 1, 4000) && typeof r.en === 'string' && r.en.length <= 30 && REGION_WORD.test(r.en) && text(r.ru, 40) && (r.colour === undefined || r.colour === '' || /^[a-z]{2,12}$/.test(r.colour))), 'Подпишите области простыми английскими словами');
+    requireThat(typeof item.ai === 'boolean' && (item.archived === undefined || typeof item.archived === 'boolean') && integer(item.createdAt, 0, Number.MAX_SAFE_INTEGER), 'Некорректная картинка');
   }
   return item;
 }

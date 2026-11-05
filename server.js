@@ -10,6 +10,7 @@ import { importChildFile } from './scripts/import-child-progress.js';
 import { join } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { openStore, ROOT, COLLECTIONS, ValidationError } from './server/store.js';
+import { openAI } from './server/ai.js';
 
 const MIME = { html: 'text/html; charset=utf-8', css: 'text/css; charset=utf-8', js: 'text/javascript; charset=utf-8', json: 'application/json; charset=utf-8', webmanifest: 'application/manifest+json', png: 'image/png', svg: 'image/svg+xml', webp: 'image/webp', woff2: 'font/woff2', txt: 'text/plain; charset=utf-8' };
 const digest = (v) => createHash('sha256').update(v).digest();
@@ -21,7 +22,7 @@ async function body(req, limit = 8 * 1024 * 1024) {
   try { return JSON.parse(Buffer.concat(chunks).toString('utf8')); } catch { throw new ValidationError('Некорректный JSON'); }
 }
 
-export function createApp({ store = openStore(), user = process.env.APP_USER, password = process.env.APP_PASSWORD, family = null, backups = null } = {}) {
+export function createApp({ store = openStore(), user = process.env.APP_USER, password = process.env.APP_PASSWORD, family = null, backups = null, ai = null } = {}) {
   if (Boolean(user) !== Boolean(password)) throw new Error('Задайте APP_USER и APP_PASSWORD вместе');
   const expected = user ? digest('Basic ' + Buffer.from(`${user}:${password}`).toString('base64')) : null;
   const server = http.createServer(async (req, res) => {
@@ -61,11 +62,12 @@ export function createApp({ store = openStore(), user = process.env.APP_USER, pa
         family.checkScope(session, req.headers['x-amelie-scope']);
         activeStore = family.store(session);
         if (path === '/api/backup/status' && req.method === 'GET') { family.requireParent(session); return send(res, 200, backups?.status() || { enabled: false }); }
+        if (path.startsWith('/api/ai/')) family.requireParent(session);
         if (path === '/api/progress/preview' && req.method === 'POST') return send(res, 200, await family.importProgress(session, await body(req, 32 * 1024 * 1024), { dryRun: true }));
         if (path === '/api/progress/import' && req.method === 'POST') return send(res, 200, await family.importProgress(session, await body(req, 32 * 1024 * 1024)));
         if (['/api/progress/export', '/api/content/import'].includes(path)) family.requireParent(session);
         const collection = path.match(/^\/api\/db\/(\w+)$/)?.[1];
-        if (req.method === 'POST' && ['words', 'topics', 'assignments'].includes(collection)) family.requireParent(session);
+        if (req.method === 'POST' && ['words', 'topics', 'assignments', 'uploads'].includes(collection)) family.requireParent(session);
         if (req.method === 'POST' && collection === 'assignments') {
           const item = await body(req);
           if (item?.picture) family.checkPicture(session, item.picture);
@@ -84,6 +86,15 @@ export function createApp({ store = openStore(), user = process.env.APP_USER, pa
         }
       }
 
+      if (path === '/api/ai/status' && req.method === 'GET') return send(res, 200, ai?.status() || { enabled: false });
+      if (path === '/api/ai/label-picture' && req.method === 'POST') {
+        if (!ai?.enabled) return send(res, 503, { error: 'ИИ не подключён: на сервере нет ключа ANTHROPIC_API_KEY. Подпишите области вручную.' });
+        const value = await body(req, 3 * 1024 * 1024);
+        const words = activeStore.list('words');
+        const vocabulary = [...new Set(words.filter((w) => w.topic !== 'colours').map((w) => w.en.toLowerCase()).filter((en) => /^[a-z]+(?: [a-z]+)?$/.test(en)))].slice(0, 300);
+        const colours = words.filter((w) => w.topic === 'colours' && w.en !== 'white').map((w) => w.en);
+        return send(res, 200, await ai.labelPicture({ image: value?.image, numbers: value?.numbers, vocabulary, colours }));
+      }
       if (path === '/api/progress/export' && req.method === 'GET') return send(res, 200, activeStore.exportProgress());
       if (path === '/api/activity' && req.method === 'POST') return send(res, 200, activeStore.activity(await body(req)));
       if (path === '/api/progress/import' && req.method === 'POST') return send(res, 200, activeStore.importProgress(await body(req, 32 * 1024 * 1024)));
@@ -131,7 +142,9 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
   const backups = family ? automaticBackups(family) : null;
   const runBackup = () => backups?.run().catch((error) => console.error('Automatic backup failed:', error.message));
   if (backups) { await runBackup(); setInterval(runBackup, 3600000).unref(); }
-  const app = createApp({ store, family, backups });
+  const ai = openAI({ db: family?.db || store.db });
+  console.log(`AI labelling: ${ai.enabled ? 'on' : 'off (no ANTHROPIC_API_KEY)'}`);
+  const app = createApp({ store, family, backups, ai });
   app.listen(Number(process.env.PORT || 3000), host, () => console.log(`Amelie listening on ${host}:${app.address().port}`));
   for (const signal of ['SIGINT', 'SIGTERM']) process.on(signal, () => app.close(() => { family?.close(); store.close(); process.exit(0); }));
 }

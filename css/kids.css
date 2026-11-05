@@ -563,3 +563,14 @@ body { background: #F4EEE4; }
 .spotlight .sp-ru { font: 400 24px var(--hand, 'Pangolin', cursive); color: #6E5B4C; }
 .spotlight .sp-en, .spotlight .sp-ru { opacity: 0; animation: sp-fadein .4s .35s ease forwards; }
 @keyframes sp-fadein { to { opacity: 1; } }
+
+/* Own colouring pages (photo → line art → numbered regions) */
+.upload-canvas canvas, .upload-preview canvas { display: block; width: 100%; height: auto; border-radius: 14px; background: #FFFDF7; touch-action: manipulation; cursor: pointer; }
+.upload-tile img, .gallery-picture img { display: block; width: 100%; height: auto; aspect-ratio: auto; border-radius: 10px; background: #FFFDF7; }
+.upload-tile.archived { opacity: .55; }
+.region-rows { display: grid; gap: 10px; margin-top: 12px; }
+.region-row { display: grid; grid-template-columns: 40px 1fr 1fr; gap: 8px; align-items: center; }
+.region-row .select { grid-column: 2 / 4; min-height: 44px; }
+.region-row .input { min-height: 44px; min-width: 0; }
+.region-n { display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: 50%; background: #D7263D; color: #fff; font-weight: 800; }
+.mypics-link { display: grid; gap: 6px; text-decoration: none; color: inherit; margin: 14px 0; }

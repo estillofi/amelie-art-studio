@@ -5,8 +5,8 @@ import { validateItem } from './data-model.js';
 export { STICKERS } from './rewards.js';
 // Shared helpers: data store, DOM, speech, sounds, rewards.
 
-export const COLS = ['words', 'topics', 'progress', 'log', 'profile', 'gallery', 'assignments'];
-export const STATE = ['progress', 'log', 'profile', 'gallery', 'assignments']; // Amelie's own data (everything else is content)
+export const COLS = ['words', 'topics', 'progress', 'log', 'profile', 'gallery', 'assignments', 'uploads'];
+export const STATE = ['progress', 'log', 'profile', 'gallery', 'assignments', 'uploads']; // Amelie's own data (everything else is content)
 export const S = Object.fromEntries(COLS.map((c) => [c, []]));
 
 // Two ways to run:
@@ -28,7 +28,7 @@ const syncStatus = (error = '') => {
   document.dispatchEvent(new CustomEvent('sync', { detail: SYNC }));
 };
 
-async function requestJSON(url, options = {}) {
+export async function requestJSON(url, options = {}) {
   const r = await fetch(url, { cache: 'no-store', signal: AbortSignal.timeout(10000), ...options, headers: { ...scopeHeaders(), ...options.headers } });
   const data = await r.json().catch(() => null);
   if (!r.ok) throw new Error(data?.error || `Не удалось связаться с сервером (${r.status})`);
@@ -110,7 +110,8 @@ export async function loadAll() {
   if (MODE === 'server') for (const entry of pending.filter((x) => x.col === 'activity')) applyLocalActivity(entry.item);
   // Ask the browser not to evict our data (Chrome/Android honour it; on iPhone — add the site to the Home Screen).
   if (MODE === 'static') navigator.storage?.persist?.().catch(() => {});
-  else { for (const c of COLS) lsSet(c, S[c]); flushSaves(); }
+  // Own colouring pages are large and live on the server only; never fill the phone's storage with them.
+  else { for (const c of COLS) if (c !== 'uploads') lsSet(c, S[c]); flushSaves(); }
 }
 
 export const uid = () => globalThis.crypto?.randomUUID?.() || Math.random().toString(16).slice(2, 10) + Date.now().toString(16).slice(-4);
@@ -151,6 +152,7 @@ export async function previewProgress(file) {
 
 export async function importProgress(file) {
   if (file?.data && file.data.assignments === undefined) file = { ...file, data: { ...file.data, assignments: [] } };
+  if (file?.data && file.data.uploads === undefined) file = { ...file, data: { ...file.data, uploads: [] } };
   if (file?.app !== 'amelie-art-studio' || file.version !== 1 || !file.data || [...STATE, 'words'].some((c) => !Array.isArray(file.data[c]) || file.data[c].some((item) => !item || typeof item.id !== 'string'))) throw new Error('Это не файл прогресса Амели');
   if (MODE === 'server') {
     if (!(await flushSaves())) throw new Error('Сначала дождитесь сохранения текущего прогресса');

@@ -6,6 +6,9 @@ export { PICTURES, svgOf } from '../colouring/pictures.js';
 import { PICTURES, svgOf, availablePictures, pictureForProfile } from '../colouring/pictures.js';
 import { SESSION } from '../auth.js';
 import { drawingSignature } from '../colouring/gallery.js';
+import { isUpload } from '../data-model.js';
+import { paintUpload } from './paint-upload.js';
+import { thumbnail } from '../colouring/upload.js';
 
 
 const colours = () => S.words.filter((w) => w.topic === 'colours');
@@ -15,15 +18,18 @@ const wordFor = (en) => S.words.find((w) => w.en === en);
 export function paintHub(el) {
   const pictures = availablePictures(SESSION?.profile);
   const fresh = pictures.filter((p) => p.profile);
+  const mine = S.uploads.filter((u) => !u.archived).sort((a, b) => b.createdAt - a.createdAt);
   const card = (p) => `<a class="tile colouring-tile" href="#/colour/${p.id}">${p.preview === undefined ? svgOf(p) : previewOf(p)}<span class="t en">${esc(p.en)}</span><span class="s">${esc(p.ru)}</span></a>`;
   el.innerHTML = `
     <div class="hello" style="font-size:34px">Colour it!</div>
     <div class="sub">Синие линии, бумага и твои цвета. Послушай задание или рисуй свободно.</div>
     ${fresh.length ? `<section class="new-colouring"><span class="studio-label">Новые рисунки для тебя</span><h2>Маленькие приключения</h2><p class="sub">Котёнок на айкидо, динозавр и ещё четыре истории. Можно начать с любой.</p><div class="pics">${fresh.map(card).join('')}</div></section><div class="h2">Знакомые рисунки</div>` : ''}
+    ${mine.length ? `<section class="new-colouring"><span class="studio-label">От мамы</span><h2>Мамины картинки</h2><div class="pics">${mine.map((u) => `<a class="tile colouring-tile upload-tile" href="#/colour/${u.id}"><img data-thumb="${u.id}" alt="" width="${u.width}" height="${u.height}"><span class="t en">${esc(u.en)}</span><span class="s">${esc(u.ru)}</span></a>`).join('')}</div></section>` : ''}
     <div class="pics" style="margin-top:16px">
       ${pictures.filter((p) => !p.profile).map(card).join('')}
       <a class="tile painted" href="#/gallery" style="--c:#FF70A6"><span class="colour-study familiar-study" style="--study-x:100%;--study-y:100%" aria-hidden="true"></span><span class="t">Моя галерея</span><span class="s">сохранённые рисунки</span></a>
     </div>`;
+  for (const img of el.querySelectorAll('[data-thumb]')) thumbnail(S.uploads.find((u) => u.id === img.dataset.thumb)).then((src) => { img.src = src; }).catch(() => {});
 }
 
 function previewOf(pic) {
@@ -34,6 +40,10 @@ function previewOf(pic) {
 
 // #/colour/<picture>[/free]
 export function paint(el, picId, mode) {
+  if (isUpload(picId)) {
+    const upload = S.uploads.find((u) => u.id === picId);
+    if (upload) return paintUpload(el, upload, mode);
+  }
   const pic = pictureForProfile(picId, SESSION?.profile);
   if (!pic) {
     el.innerHTML = `<div class="card"><div class="h2">Выберем другой рисунок?</div><p>Эта история сейчас недоступна в твоём альбоме.</p><a class="btn" href="#/paint">К раскраскам</a></div>`;

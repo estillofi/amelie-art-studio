@@ -2,6 +2,7 @@ import { S, esc, profile, paperArt } from '../lib.js';
 import { nextReward } from '../rewards.js';
 import { PICTURES, svgOf } from './paint.js';
 import { groupDrawings } from '../colouring/gallery.js';
+import { thumbnail } from '../colouring/upload.js';
 
 export default function gallery(el, sheet) {
   const p = profile();
@@ -27,10 +28,12 @@ export default function gallery(el, sheet) {
     <div class="h2">My pictures · <small>Мои рисунки ${art.length}</small></div>
     ${S.gallery.length > art.length ? `<p class="gallery-note">${S.gallery.length} сохранений · ${art.length} разных рисунков. Одинаковые работы собраны вместе, все сохранения на месте.</p>` : ''}
     ${art.length ? `<div class="pics">${art.map(({ drawing: a, saves }) => {
+      const own = S.uploads.find((x) => x.id === a.pic);
+      if (own) return `<div class="tile gallery-picture" style="padding:8px"><img data-thumb="${own.id}" data-fills="${esc(JSON.stringify(a.fills))}" alt="${esc(own.ru)}" width="${own.width}" height="${own.height}"><span class="s">${esc(own.en)} · ${new Date(a.ts).toLocaleDateString('ru-RU')}</span>${saves.length > 1 ? `<details class="saved-copies"><summary>Сохранений: ${saves.length}</summary>${saves.map((entry) => `<span>${new Date(entry.ts).toLocaleString('ru-RU')}</span>`).join('')}</details>` : ''}</div>`;
       const pic = PICTURES.find((x) => x.id === a.pic);
       return pic ? `<div class="tile gallery-picture" style="padding:8px">${svgOf(pic, a.fills, a.artVersion || 'legacy')}<span class="s">${esc(pic.en)} · ${new Date(a.ts).toLocaleDateString('ru-RU')}</span>${saves.length > 1 ? `<details class="saved-copies"><summary>Сохранений: ${saves.length}</summary>${saves.map((entry) => `<span>${new Date(entry.ts).toLocaleString('ru-RU')}</span>`).join('')}</details>` : ''}</div>` : '';
     }).join('')}</div>`
       : `<div class="note">Здесь появятся твои рисунки. Раскрась картинку и нажми «💾 В галерею».</div>`}
     <a class="btn full" href="#/paint" style="margin-top:16px;--c:#FFB3CF">🎨 Рисовать</a>`;
+  for (const img of el.querySelectorAll('[data-thumb]')) thumbnail(S.uploads.find((u) => u.id === img.dataset.thumb), JSON.parse(img.dataset.fills)).then((src) => { img.src = src; }).catch(() => {});
 }
-

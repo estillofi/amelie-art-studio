@@ -26,6 +26,7 @@ export default function parents(el, section = '') {
     ${SESSION ? `<section class="card family-panel"><div class="field"><label for="family-profile">Чей альбом открыть</label><select class="select" id="family-profile">${SESSION.profiles.map((p) => `<option value="${p.id}" ${p.id === SESSION.profile ? 'selected' : ''}>${esc(p.name)}</option>`).join('')}</select></div><details><summary>Входы и пароли для детей</summary><p class="note">Выдайте каждому отдельный пароль. При замене пароля прежний перестаёт работать. Звёзды и рисунки сохраняются.</p><div id="family-access"></div><p id="access-message" role="status"></p></details></section>` : ''}
     <nav class="parent-tabs" aria-label="Разделы для взрослых"><a href="#/parents/homework" ${section === 'homework' ? 'aria-current="page"' : ''}>Учебник и задания</a><a href="#/parents" ${section !== 'homework' ? 'aria-current="page"' : ''}>Прогресс и настройки</a></nav>
     <div id="parent-homework" ${section === 'homework' ? '' : 'hidden'}>
+      ${MODE === 'server' ? `<a class="card mypics-link" href="#/mypics"><b>Своя раскраска</b><span class="sub">Сфотографируйте раскраску или рисунок — приложение сделает из него задание «Colour the …».</span></a>` : ''}
       <section id="school-homework" aria-label="Задания из учебника"></section>
 
     <details class="new-word-panel"><summary>Нет нужного слова? Добавить новое</summary><form class="card" id="add">

@@ -3,6 +3,25 @@ import { seenWords } from '../srs.js';
 
 const ROUNDS = 8;
 
+// The right card steps forward: it flies from its place to the centre, grows and shows the word in English and Russian.
+export const HOLD_MS = 2500;
+export const clearSpotlights = () => document.querySelectorAll('.spotlight').forEach((x) => x.parentNode.removeChild(x));
+export function spotlight(card, w) {
+  const r = card.getBoundingClientRect();
+  const tw = Math.min(320, window.innerWidth - 48); const th = Math.min(320, window.innerHeight * 0.5);
+  const sp = document.createElement('div');
+  sp.className = 'spotlight';
+  sp.innerHTML = `${wordPic(w, 'lg')}<div class="sp-en">${esc(w.en)}</div><div class="sp-ru">${esc(w.ru)}</div>`;
+  Object.assign(sp.style, { left: `${r.left}px`, top: `${r.top}px`, width: `${r.width}px`, height: `${r.height}px` });
+  document.body.appendChild(sp);
+  card.style.visibility = 'hidden';
+  sp.animate([
+    { left: `${r.left}px`, top: `${r.top}px`, width: `${r.width}px`, height: `${r.height}px` },
+    { left: `${(window.innerWidth - tw) / 2}px`, top: `${(window.innerHeight - th) / 2 - 20}px`, width: `${tw}px`, height: `${th}px` },
+  ], { duration: 450, easing: 'cubic-bezier(.2,.9,.3,1.2)', fill: 'forwards' });
+  setTimeout(() => speak(w.en), 450);
+}
+
 // Words to play with: the ones Amelie has already met; until then — colours and art studio.
 function playPool(topics = null) {
   let pool = seenWords();
@@ -52,10 +71,11 @@ function choiceGame(el, { title, sub, pool, phrase, step = 'play' }) {
     $$('.opt', el).forEach((b) => b.addEventListener('click', () => {
       if (locked) return;
       if (b.dataset.id === w.id) {
-        locked = true; b.classList.add('right'); b.insertAdjacentHTML('beforeend', `<span class="lab">${esc(w.en)}</span>`);
+        locked = true;
         sfx.ok(); burst(b); if (!missed) right++; addStars(1, step);
-        $$('.opt', el).forEach((x) => { x.disabled = true; });
-        after(() => { i++; round(); }, 1100);
+        $$('.opt', el).forEach((x) => { x.disabled = true; if (x !== b) x.classList.add('fade'); });
+        spotlight(b, w);
+        after(() => { clearSpotlights(); i++; round(); }, HOLD_MS);
       } else {
         b.classList.remove('wrong'); void b.offsetWidth; b.classList.add('wrong');
         sfx.bad(); missed = true; after(say, 400);
@@ -119,7 +139,7 @@ export function spell(el) {
         <div class="slots">${[...target].map((ch) => `<span class="slot ${ch === ' ' ? 'gap' : ''}"></span>`).join('')}</div>
       </div>
       <div class="letters" style="margin-top:16px">${letters.map((l, n) => `<button class="letter" data-ch="${l.ch}" style="--c:${colors[n % colors.length]}">${l.ch}</button>`).join('')}</div>
-      <p style="text-align:center;margin-top:16px"><button class="ru" id="hint" style="text-decoration:underline">💡 Подсказка</button></p>`;
+      <div style="text-align:center;margin-top:22px"><button class="hint-btn" id="hint">💡 Подсказка</button></div>`;
     const slots = $$('.slot', el);
     const say = () => speak(w.en);
     $('#hear', el).onclick = say; after(say, 250);

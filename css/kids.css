@@ -533,3 +533,33 @@ button.adult-link { background: none; border: 0; font: inherit; font-size: 12px;
 .lesson-drafts { display:grid; gap:10px; }
 
 .sync-notice { margin:8px 0 16px; padding:10px 14px; background:#ffe39f; color:#4c5146; border-radius:8px; font-size:14px; line-height:1.4; }
+
+
+/* ── November feedback (Ira & Amelie): cleaner paper, readable text, bigger targets ── */
+/* No crumpled-paper grain or torn collage behind everything: plain paper on a calm wall. Torn edges stay. */
+:root { --paper-grain: none; }
+body { background: #F4EEE4; }
+.material-layer { background: #FFFDF7; }
+.tile.painted::before { background: var(--c); background-blend-mode: normal; }
+/* Text never leaves its card */
+.tile .t, .tile .s, .step .tx b, .step .tx span, .w .en, .w .ru, .flash .word, .flash .word-ru, .prompt, .task .en, .opt .lab, .h2, .hello, .sub, .cel-msg, .school-word b, .school-word small { overflow-wrap: anywhere; hyphens: auto; }
+.flash .word { font-size: clamp(30px, 11vw, 46px); }
+/* Tap targets ≥ 48 px with breathing room */
+.icon-btn { min-width: 50px; min-height: 50px; }
+.letter { min-width: 58px; min-height: 64px; }
+.letters { gap: 12px; }
+.task { margin: 10px 0 16px; }
+.hint-btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 52px; padding: 0 18px; font: 400 21px var(--hand, 'Pangolin', cursive); background: #FFFDF7; border: 2px dashed #6E5B4C; border-radius: 14px 28px 18px 30px / 30px 16px 28px 14px; color: inherit; cursor: pointer; }
+.hint-btn:active { transform: translateY(2px); }
+.hint-box { margin: 12px 0 0; padding: 12px 14px; border-radius: 14px; background: #FFF6D6; border: 2px solid #FFD447; font-size: 17px; font-weight: 800; }
+/* Listen & find: the right card steps forward, the others fade */
+.opt { transition: opacity 1s ease; }
+.opt.fade { opacity: 0; pointer-events: none; }
+.spotlight { position: fixed; z-index: 60; background: #FFFDF7; border: 3px solid #3FA796; border-radius: 26px 14px 30px 18px / 18px 30px 16px 28px;
+  box-shadow: 0 0 0 6px rgba(63, 167, 150, .25), 0 14px 30px -10px rgba(58, 46, 38, .45);
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; padding: 14px; text-align: center; }
+.spotlight .paper-art, .spotlight .drawn-color, .spotlight .num { transform: scale(1.25); margin-bottom: 10px; }
+.spotlight .sp-en { font: 700 38px/1.05 var(--read, 'Andika', sans-serif); overflow-wrap: anywhere; }
+.spotlight .sp-ru { font: 400 24px var(--hand, 'Pangolin', cursive); color: #6E5B4C; }
+.spotlight .sp-en, .spotlight .sp-ru { opacity: 0; animation: sp-fadein .4s .35s ease forwards; }
+@keyframes sp-fadein { to { opacity: 1; } }

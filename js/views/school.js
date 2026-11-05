@@ -1,5 +1,7 @@
 import { S, esc, $, $$, speak, wordPic, paperArt, wordById } from '../lib.js';
 import { activeAssignments, assignmentQueue, progOf, LESSON_LIMIT } from '../srs.js';
+import { nextEpisode, episodeStatus } from './path.js';
+import { EPISODES } from '../course.js';
 
 export default function school(el) {
   const active = activeAssignments();
@@ -13,6 +15,8 @@ export default function school(el) {
         return `<button class="school-word" data-say="${esc(id)}">${wordPic(w,'mini')}<span><b>${esc(w.en)}</b><small>${esc(w.ru)} · ${!p ? 'новое' : p.due < new Date().setHours(24,0,0,0) ? 'повторение сегодня' : 'повторение '+new Date(p.due).toLocaleDateString('ru-RU')}</small></span></button>`;
       }).join('')}</div></details>${a.picture ? `<a class="btn white full" href="#/colour/${encodeURIComponent(a.picture)}/free" style="margin-top:12px">Немного порисовать</a>` : ''}</article>`;
   };
-  el.innerHTML=`<span class="studio-label">Школа и свой темп</span><h1 class="hello">Мой учебник</h1><p class="sub">Выберите со взрослым страницы и несколько слов. Сначала послушаем, потом попробуем сами.</p>${active.length ? active.map(card).join('') : `<div class="card school-empty">${paperArt('book','lg')}<p>Здесь появятся задания, которые добавит взрослый. А пока можно открыть знакомые слова.</p><a class="btn" href="#/words">Мои слова</a></div>`}${archived.length ? `<details class="school-archive"><summary>Завершённые задания · ${archived.length}</summary>${archived.slice(0,20).map(card).join('')}${archived.length>20 ? '<p>Остальные задания сохранены в разделе взрослого.</p>' : ''}</details>` : ''}<a class="school-manage" href="#/parents/homework">Взрослым: добавить школьное задание →</a>`;
+  const next = nextEpisode(); const done = EPISODES.filter((e) => episodeStatus(e.id) === 'mastered').length;
+  const pathCard = `<a class="card path-next" href="#/ep/${next.id}">${paperArt(next.art, 'lg')}<span><span class="studio-label">Мой путь · ${done} из ${EPISODES.length}</span><b class="en">${esc(next.en)}</b><span class="ru">${esc(next.ru)}</span></span></a><a class="btn sm white full" href="#/path" style="margin-bottom:18px">Весь путь по учебнику</a>`;
+  el.innerHTML=`${pathCard}<span class="studio-label">Школа и свой темп</span><h1 class="hello">Мой учебник</h1><p class="sub">Выберите со взрослым страницы и несколько слов. Сначала послушаем, потом попробуем сами.</p>${active.length ? active.map(card).join('') : `<div class="card school-empty">${paperArt('book','lg')}<p>Здесь появятся задания, которые добавит взрослый. А пока можно открыть знакомые слова.</p><a class="btn" href="#/words">Мои слова</a></div>`}${archived.length ? `<details class="school-archive"><summary>Завершённые задания · ${archived.length}</summary>${archived.slice(0,20).map(card).join('')}${archived.length>20 ? '<p>Остальные задания сохранены в разделе взрослого.</p>' : ''}</details>` : ''}<a class="school-manage" href="#/parents/homework">Взрослым: добавить школьное задание →</a>`;
   $$('[data-say]',el).forEach((button)=>button.onclick=()=>speak(wordById(button.dataset.say).en));
 }

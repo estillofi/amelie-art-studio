@@ -88,7 +88,7 @@ export function openStore(path = join(process.env.DATA_DIR || join(ROOT, '.local
     },
     importProgress(file, { dryRun = false, migrationId } = {}) {
       requireThat(file?.app === 'amelie-art-studio' && file.version === 1 && plain(file.data), 'Это не файл прогресса Амели');
-      const data = { ...file.data, assignments: file.data.assignments === undefined ? [] : file.data.assignments, uploads: file.data.uploads === undefined ? [] : file.data.uploads };
+      const data = { ...file.data, assignments: file.data.assignments === undefined ? [] : file.data.assignments, uploads: file.data.uploads === undefined ? [] : file.data.uploads, episodes: file.data.episodes === undefined ? [] : file.data.episodes };
       if (data.topics === undefined) data.topics = [];
       requireThat(data.activityEvents === undefined || (Array.isArray(data.activityEvents) && data.activityEvents.length <= 1000000 && data.activityEvents.every((entry) => plain(entry) && validId(entry.id) && typeof entry.body === 'string' && entry.body.length <= 2000)), 'Некорректный журнал сохранённых действий');
       for (const col of [...STATE, 'words', 'topics']) {

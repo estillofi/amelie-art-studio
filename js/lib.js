@@ -5,8 +5,8 @@ import { validateItem } from './data-model.js';
 export { STICKERS } from './rewards.js';
 // Shared helpers: data store, DOM, speech, sounds, rewards.
 
-export const COLS = ['words', 'topics', 'progress', 'log', 'profile', 'gallery', 'assignments', 'uploads'];
-export const STATE = ['progress', 'log', 'profile', 'gallery', 'assignments', 'uploads']; // Amelie's own data (everything else is content)
+export const COLS = ['words', 'topics', 'progress', 'log', 'profile', 'gallery', 'assignments', 'uploads', 'episodes'];
+export const STATE = ['progress', 'log', 'profile', 'gallery', 'assignments', 'uploads', 'episodes']; // Amelie's own data (everything else is content)
 export const S = Object.fromEntries(COLS.map((c) => [c, []]));
 
 // Two ways to run:
@@ -152,7 +152,7 @@ export async function previewProgress(file) {
 
 export async function importProgress(file) {
   if (file?.data && file.data.assignments === undefined) file = { ...file, data: { ...file.data, assignments: [] } };
-  if (file?.data && file.data.uploads === undefined) file = { ...file, data: { ...file.data, uploads: [] } };
+  for (const c of ['uploads', 'episodes']) if (file?.data && file.data[c] === undefined) file = { ...file, data: { ...file.data, [c]: [] } };
   if (file?.app !== 'amelie-art-studio' || file.version !== 1 || !file.data || [...STATE, 'words'].some((c) => !Array.isArray(file.data[c]) || file.data[c].some((item) => !item || typeof item.id !== 'string'))) throw new Error('Это не файл прогресса Амели');
   if (MODE === 'server') {
     if (!(await flushSaves())) throw new Error('Сначала дождитесь сохранения текущего прогресса');

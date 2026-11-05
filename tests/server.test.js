@@ -49,7 +49,7 @@ test('progress import is atomic and round-trips old browser exports', () => {
     store.importProgress(original);
     const exported = store.exportProgress();
     assert.equal(exported.contentSnapshot, true);
-    assert.deepEqual(exported.data, { ...original.data, words: store.list('words'), topics: store.list('topics'), activityEvents: [], assignments: [], uploads: [], profile: [{ rate: 0.85, ...profile }] });
+    assert.deepEqual(exported.data, { ...original.data, words: store.list('words'), topics: store.list('topics'), activityEvents: [], assignments: [], uploads: [], episodes: [], profile: [{ rate: 0.85, ...profile }] });
     const broken = progress(); broken.data.words = [{ ...word, topic: 'missing' }];
     assert.throws(() => store.importProgress(broken));
     assert.equal(store.get('profile', 'amelie').stars, 7);

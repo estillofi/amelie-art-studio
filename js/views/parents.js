@@ -5,6 +5,8 @@ import { RELEASE } from '../release.js';
 import { mountHomework } from './homework.js';
 import { nextReward } from '../rewards.js';
 import { groupDrawings } from '../colouring/gallery.js';
+import { UNITS, EPISODES, BOOK, episodeById } from '../course.js';
+import { episodeStatus, episodeRecord } from './path.js';
 
 let unlocked = false;
 
@@ -27,6 +29,13 @@ export default function parents(el, section = '') {
     <nav class="parent-tabs" aria-label="Разделы для взрослых"><a href="#/parents/homework" ${section === 'homework' ? 'aria-current="page"' : ''}>Учебник и задания</a><a href="#/parents" ${section !== 'homework' ? 'aria-current="page"' : ''}>Прогресс и настройки</a></nav>
     <div id="parent-homework" ${section === 'homework' ? '' : 'hidden'}>
       ${MODE === 'server' ? `<a class="card mypics-link" href="#/mypics"><b>Своя раскраска</b><span class="sub">Сфотографируйте раскраску или рисунок — приложение сделает из него задание «Colour the …».</span></a>` : ''}
+      <section class="card course-panel" aria-label="Курс по учебнику"><div class="h2" style="margin-top:0">Курс по учебнику</div>
+        <p class="sub" style="margin-top:0">Путь Амели по ${esc(BOOK)}: эпизоды по 5–7 минут, до двух новых слов. Выберите тему — Амели увидит её на главной как задание, слова встанут в повторения.</p>
+        <div class="field"><label for="course-ep">Тема</label><select class="select" id="course-ep">${UNITS.map((u) => `<optgroup label="${esc(u.ru)}">${u.episodes.map((e) => `<option value="${e.id}">${esc(e.en)} — ${esc(e.ru)} · ${({ new: 'новый', practising: 'тренируется', mastered: 'получается' })[episodeStatus(e.id)]}</option>`).join('')}</optgroup>`).join('')}</select></div>
+        <div id="course-card"></div>
+        <div class="field"><label for="course-due">Сделать до</label><input class="input" type="date" id="course-due" value="${todayKey(new Date(Date.now() + 2 * DAY))}"></div>
+        <button class="btn sm full" id="course-assign" style="--c:#FFB38A">Задать на дом</button>
+      </section>
       <section id="school-homework" aria-label="Задания из учебника"></section>
 
     <details class="new-word-panel"><summary>Нет нужного слова? Добавить новое</summary><form class="card" id="add">
@@ -53,6 +62,9 @@ export default function parents(el, section = '') {
       <div class="stat" style="border:0"><span>Разных рисунков / сохранений</span><span>${groupDrawings(S.gallery).length} / ${S.gallery.length}</span></div>
     </div>
 
+
+    <div class="h2">Что заметили в эпизодах</div>
+    <div class="card">${observed()}</div>
 
     <div class="h2">Темы</div>
     <div class="card">${S.topics.map((t) => { const st = topicStats(t.id); return `<div class="stat"><span>${t.icon} ${esc(t.ru)}</span><span>${st.learned} выучено · ${st.seen}/${st.total}</span></div>`; }).join('')}</div>
@@ -116,6 +128,21 @@ export default function parents(el, section = '') {
     }).catch((error) => { if ($('#access-message', el)) $('#access-message', el).textContent = error.message; });
   }
   const homework = mountHomework($('#school-homework', el));
+  const showEpisode = () => {
+    const e = episodeById($('#course-ep', el).value);
+    $('#course-card', el).innerHTML = `<div class="course-card"><p><b>Умеет после эпизода:</b> ${esc(e.can)}</p><p><b>Признак, что получилось:</b> ${esc(e.sign)}</p><p><b>Типичная трудность:</b> ${esc(e.trap.ru)}</p><p><b>Как помочь дома:</b> ${esc(e.trap.tip)}</p><p><b>Задание:</b> ${esc(e.home)}</p><p class="sub">Слова: ${[...e.words, ...(e.review || [])].map((id) => esc(S.words.find((w) => w.id === id)?.en || id)).join(', ')}${e.pages ? ` · стр. ${esc(e.pages)}` : ''}</p></div>`;
+  };
+  $('#course-ep', el).value = (EPISODES.find((e) => episodeStatus(e.id) !== 'mastered') || EPISODES[0]).id;
+  showEpisode();
+  $('#course-ep', el).addEventListener('change', showEpisode);
+  $('#course-assign', el).addEventListener('click', async () => {
+    const e = episodeById($('#course-ep', el).value);
+    const wordIds = [...new Set([...e.words, ...(e.review || [])])].filter((id) => S.words.some((w) => w.id === id));
+    try {
+      await save('assignments', { id: uid(), book: BOOK, pages: e.pages || 'подготовка', task: `Эпизод «${e.en}» в разделе «Мой путь». ${e.home}`, wordIds, active: true, createdAt: Date.now(), dueDate: $('#course-due', el).value || '', ...(e.action.kind === 'colour' ? { picture: e.action.picture } : {}) });
+      toast('Задание добавлено: Амели увидит его на главной'); parents(el, 'homework');
+    } catch (error) { toast(error.message); }
+  });
   if (MODE === 'server') fetch('api/backup/status', { headers: SESSION ? { 'X-Amelie-Scope': SESSION.scope } : {}, cache: 'no-store' }).then((r) => r.ok ? r.json() : null).then((status) => {
     const target = $('#backup-status', el); if (!target) return;
     target.textContent = status?.lastSuccess ? `Автокопия: ${new Date(status.lastSuccess).toLocaleString('ru-RU')}. Храним ${status.keep} дневных копий на серверном диске.${status.error ? ' Последняя попытка не удалась: '+status.error : ''}` : 'Автокопия пока не подтверждена. Скачайте файл прогресса.';
@@ -183,6 +210,15 @@ export default function parents(el, section = '') {
     } catch (error) { toast(error.message); }
   });
   return () => document.removeEventListener('sync', updateSync);
+}
+
+// Typical difficulties the episodes caught, most frequent first, with the sign and how to help at home.
+function observed() {
+  const rows = EPISODES.map((e) => ({ e, r: episodeRecord(e.id) })).filter(({ r }) => r && (r.traps || r.helped));
+  if (!rows.length) return '<p class="sub" style="margin:0">Пока ничего. Когда Амели пройдёт эпизоды из раздела «Мой путь», здесь появятся типичные трудности и подсказки, как помочь дома.</p>';
+  rows.sort((a, b) => (b.r.traps + b.r.helped) - (a.r.traps + a.r.helped));
+  return rows.slice(0, 8).map(({ e, r }) => `<div class="obs"><div class="obs-h"><b>${esc(e.trap.ru)}</b><span class="pill">${r.traps}×</span></div>
+    <div class="obs-s">«${esc(e.ru)}» · пройдено ${r.runs}, сама ${r.clean}, с подсказкой ${r.helped}</div><div class="obs-tip">${esc(e.trap.tip)}</div></div>`).join('');
 }
 
 function gate(el) {

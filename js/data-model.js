@@ -1,6 +1,6 @@
 import { PICTURE_IDS } from './colouring/pictures.js';
-export const COLLECTIONS = ['topics', 'words', 'progress', 'log', 'profile', 'gallery', 'assignments', 'uploads'];
-export const STATE = ['progress', 'log', 'profile', 'gallery', 'assignments', 'uploads'];
+export const COLLECTIONS = ['topics', 'words', 'progress', 'log', 'profile', 'gallery', 'assignments', 'uploads', 'episodes'];
+export const STATE = ['progress', 'log', 'profile', 'gallery', 'assignments', 'uploads', 'episodes'];
 // A parent's own colouring page: traced line art plus the words for its numbered regions.
 export const UPLOAD_ID = /^u-[a-z0-9]{6,40}$/;
 export const REGION_WORD = /^[a-z]+(?:[ -][a-z]+)?$/;
@@ -53,6 +53,11 @@ export function validateItem(col, item) {
     requireThat(typeof item.active === 'boolean' && integer(item.createdAt, 0, Number.MAX_SAFE_INTEGER), 'Некорректное задание');
     requireThat(item.dueDate === undefined || item.dueDate === '' || (typeof item.dueDate === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(item.dueDate) && Number.isFinite(Date.parse(item.dueDate)) && new Date(item.dueDate).toISOString().slice(0, 10) === item.dueDate), 'Некорректная дата задания');
     requireThat(item.picture === undefined || item.picture === '' || PICTURE_IDS.includes(item.picture), 'Неизвестная раскраска задания');
+  } else if (col === 'episodes') {
+    // One record per course episode: how it went, never a grade. traps = the episode's typical difficulty showed up.
+    requireThat(/^ep-[a-z0-9]{1,12}$/.test(item.id), 'Некорректный эпизод');
+    requireThat(['runs', 'clean', 'helped', 'traps'].every((k) => integer(item[k], 0, 100000)) && item.clean <= item.runs && integer(item.last, 0, Number.MAX_SAFE_INTEGER), 'Некорректные итоги эпизода');
+    requireThat(typeof item.lastClean === 'boolean', 'Некорректные итоги эпизода');
   } else if (col === 'uploads') {
     requireThat(isUpload(item.id), 'Некорректный id картинки');
     requireThat(text(item.en, 60) && text(item.ru, 60), 'Дайте картинке название по-английски и по-русски');

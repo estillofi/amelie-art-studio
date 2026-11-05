@@ -1,0 +1,1387 @@
+[
+  {
+    "id": "bridge",
+    "n": 0,
+    "bridge": true,
+    "icon": "🌱",
+    "color": "#8BC34A",
+    "en": "Hello, English!",
+    "ru": "Подготовка: «1 класс» за месяц",
+    "can": "Здоровается и называет себя, знает все английские буквы, называет цвета, числа до 10, свой возраст, понимает команды на уроке и рассказывает о семье.",
+    "lessons": [
+      {
+        "id": "b1",
+        "en": "Hello! I’m Amelie.",
+        "ru": "Привет! Я Амели.",
+        "icon": "👋",
+        "can": "Здоровается, прощается и называет своё имя: «Hello! My name is Amelie.»",
+        "words": [
+          "hello-hello",
+          "hello-goodbye",
+          "hello-friend",
+          "hello-teacher"
+        ],
+        "chunks": [
+          {
+            "en": "Hello! I’m Amelie.",
+            "ru": "Привет! Я Амели."
+          },
+          {
+            "en": "What’s your name?",
+            "ru": "Как тебя зовут?"
+          },
+          {
+            "en": "My name is Amelie.",
+            "ru": "Меня зовут Амели."
+          },
+          {
+            "en": "Goodbye, teacher!",
+            "ru": "До свидания, учитель!"
+          }
+        ],
+        "errors": [
+          {
+            "id": "name-is",
+            "ru": "Отвечает «My name Amelie» — пропускает is",
+            "sign": "В ответе на «What’s your name?» нет маленького слова is",
+            "tip": "Говорите вместе и хлопайте на is: My name — хлоп! — IS Amelie."
+          },
+          {
+            "id": "hello-bye",
+            "ru": "Путает hello и goodbye",
+            "sign": "Говорит goodbye при встрече или hello на прощание",
+            "tip": "Играйте в «дверь»: входите в комнату — Hello!, выходите — Goodbye!"
+          }
+        ],
+        "trap": {
+          "q": "What’s your name?",
+          "qru": "Как ответить на вопрос «Как тебя зовут?»",
+          "options": [
+            "My name is Amelie.",
+            "My name Amelie.",
+            "Goodbye, Amelie."
+          ],
+          "answer": 0,
+          "error": "name-is",
+          "hint": "После «My name» всегда стоит маленькое слово is.",
+          "say": "What’s your name?"
+        },
+        "check": {
+          "q": "The lesson is over. What do you say to the teacher?",
+          "qru": "Урок закончился. Что ты скажешь учителю?",
+          "options": [
+            "Hello!",
+            "Goodbye!",
+            "My name is."
+          ],
+          "answer": 1,
+          "error": "hello-bye",
+          "hint": "Когда уходим — прощаемся.",
+          "say": "The lesson is over. What do you say to the teacher?"
+        }
+      },
+      {
+        "id": "b2",
+        "en": "Letters A–H",
+        "ru": "Буквы A–H",
+        "icon": "🔤",
+        "letters": [
+          "A",
+          "B",
+          "C",
+          "D",
+          "E",
+          "F",
+          "G",
+          "H"
+        ],
+        "can": "Узнаёт на слух и называет буквы A–H и слово на каждую: A — apple, C — cat.",
+        "words": [
+          "food-apple",
+          "toys-ball",
+          "animals-cat",
+          "animals-dog",
+          "animals-fish",
+          "colours-green",
+          "picture-house"
+        ],
+        "chunks": [
+          {
+            "en": "A is for apple.",
+            "ru": "A — это apple (яблоко)."
+          },
+          {
+            "en": "C is for cat.",
+            "ru": "C — это cat (кошка)."
+          },
+          {
+            "en": "H is for house.",
+            "ru": "H — это house (дом)."
+          }
+        ],
+        "errors": [
+          {
+            "id": "ru-letters",
+            "ru": "Читает английские буквы как русские: H — «эн», B — «вэ», C — «эс»",
+            "sign": "Называет H, B, C, E русскими именами",
+            "tip": "Покажите: буквы похожи, а имена другие. H — «эйч», B — «би», C — «си»."
+          },
+          {
+            "id": "name-sound",
+            "ru": "Путает имя буквы и её звук (C — «си», а в cat звучит [к])",
+            "sign": "Читает cat как «сиат»",
+            "tip": "Говорите парами: имя буквы — звук в слове. «Си — [к] — cat»."
+          }
+        ],
+        "trap": {
+          "q": "Look: H. How do we say it in English?",
+          "qru": "Как называется эта английская буква: H?",
+          "options": [
+            "«эйч»",
+            "«эн», как русская Н",
+            "«аш»"
+          ],
+          "answer": 0,
+          "error": "ru-letters",
+          "hint": "Английская H похожа на русскую Н, но зовут её «эйч».",
+          "say": "aitch"
+        },
+        "check": {
+          "q": "C is for… which word?",
+          "qru": "Какое слово начинается с C (звук [к])?",
+          "options": [
+            "🐱 cat",
+            "🌳 tree",
+            "🐶 dog"
+          ],
+          "answer": 0,
+          "error": "name-sound",
+          "hint": "Буква C — «си», а в слове cat звучит [к].",
+          "say": "C is for cat"
+        }
+      },
+      {
+        "id": "b3",
+        "en": "Letters I–Q",
+        "ru": "Буквы I–Q",
+        "icon": "🔤",
+        "letters": [
+          "I",
+          "J",
+          "K",
+          "L",
+          "M",
+          "N",
+          "O",
+          "P",
+          "Q"
+        ],
+        "can": "Узнаёт буквы I–Q и не путает зеркальные p и q, b и d.",
+        "words": [
+          "food-ice-cream",
+          "food-juice",
+          "toys-kite",
+          "aikido-left",
+          "family-mummy",
+          "body-nose",
+          "colours-orange",
+          "art-pencil"
+        ],
+        "chunks": [
+          {
+            "en": "K is for kite.",
+            "ru": "K — это kite (воздушный змей)."
+          },
+          {
+            "en": "P is for pencil.",
+            "ru": "P — это pencil (карандаш)."
+          },
+          {
+            "en": "O is for orange.",
+            "ru": "O — это orange (оранжевый)."
+          }
+        ],
+        "errors": [
+          {
+            "id": "mirror",
+            "ru": "Путает зеркальные буквы p–q и b–d",
+            "sign": "Пишет или выбирает q вместо p",
+            "tip": "Сделайте букву из пальцев: у p «животик» справа внизу, у q — слева."
+          },
+          {
+            "id": "j-zh",
+            "ru": "Читает J как русское «Ж»",
+            "sign": "Говорит «жус» вместо juice",
+            "tip": "J — «джей»: звук как в «джинсы»."
+          }
+        ],
+        "trap": {
+          "q": "Find the letter “pee”.",
+          "qru": "Найди букву, которую слышишь",
+          "options": [
+            "p",
+            "q",
+            "b",
+            "d"
+          ],
+          "answer": 0,
+          "error": "mirror",
+          "hint": "У p палочка вниз и кружок справа.",
+          "say": "pee"
+        },
+        "check": {
+          "q": "J is for…?",
+          "qru": "Какое слово начинается с J?",
+          "options": [
+            "🧃 juice",
+            "🦒 giraffe",
+            "🧥 coat"
+          ],
+          "answer": 0,
+          "error": "j-zh",
+          "hint": "J звучит как «дж»: juice — «джус».",
+          "say": "J is for juice"
+        }
+      },
+      {
+        "id": "b4",
+        "en": "Letters R–Z",
+        "ru": "Буквы R–Z",
+        "icon": "🔤",
+        "letters": [
+          "R",
+          "S",
+          "T",
+          "U",
+          "V",
+          "W",
+          "X",
+          "Y",
+          "Z"
+        ],
+        "can": "Узнаёт буквы R–Z, в том числе трудные W («дабл ю») и Y («уай»).",
+        "words": [
+          "art-rainbow",
+          "picture-sun",
+          "picture-tree",
+          "picture-window",
+          "colours-yellow",
+          "picture-star",
+          "colours-red"
+        ],
+        "chunks": [
+          {
+            "en": "R is for rainbow.",
+            "ru": "R — это rainbow (радуга)."
+          },
+          {
+            "en": "S is for sun.",
+            "ru": "S — это sun (солнце)."
+          },
+          {
+            "en": "Y is for yellow.",
+            "ru": "Y — это yellow (жёлтый)."
+          }
+        ],
+        "errors": [
+          {
+            "id": "w-y",
+            "ru": "Не узнаёт W («дабл ю») и Y («уай»)",
+            "sign": "На «double you» выбирает V или U",
+            "tip": "W — это «двойная U»: нарисуйте две U рядом — получится W."
+          },
+          {
+            "id": "r-p",
+            "ru": "Путает английскую R с русской Р",
+            "sign": "Читает P как «р»",
+            "tip": "Русская Р = английская P («пи»). Английская R — «а»."
+          }
+        ],
+        "trap": {
+          "q": "Find the letter “double you”.",
+          "qru": "Найди букву «дабл ю»",
+          "options": [
+            "W",
+            "V",
+            "U",
+            "M"
+          ],
+          "answer": 0,
+          "error": "w-y",
+          "hint": "Double you = две буквы U рядом.",
+          "say": "double you"
+        },
+        "check": {
+          "q": "Which letter is “ar”?",
+          "qru": "Какая буква называется «а» (ар)?",
+          "options": [
+            "R",
+            "P",
+            "B",
+            "K"
+          ],
+          "answer": 0,
+          "error": "r-p",
+          "hint": "Английская R пишется не так, как русская Р.",
+          "say": "ar"
+        }
+      },
+      {
+        "id": "b5",
+        "en": "It’s red!",
+        "ru": "Это красный!",
+        "icon": "🎨",
+        "can": "Называет 6 цветов и отвечает «It’s red.» на вопрос «What colour is it?»",
+        "words": [
+          "colours-red",
+          "colours-blue",
+          "colours-yellow",
+          "colours-green",
+          "colours-pink",
+          "colours-orange"
+        ],
+        "chunks": [
+          {
+            "en": "What colour is it?",
+            "ru": "Какого это цвета?"
+          },
+          {
+            "en": "It’s yellow.",
+            "ru": "Это жёлтый."
+          },
+          {
+            "en": "A red apple.",
+            "ru": "Красное яблоко."
+          },
+          {
+            "en": "I like pink.",
+            "ru": "Я люблю розовый."
+          }
+        ],
+        "errors": [
+          {
+            "id": "it-is",
+            "ru": "Говорит «It yellow» — пропускает ’s (is)",
+            "sign": "Ответ без маленького ’s после It",
+            "tip": "It’s = It is. Тяните «итс-с-с», как змейка."
+          },
+          {
+            "id": "colour-after",
+            "ru": "Ставит цвет после предмета: «an apple red»",
+            "sign": "Говорит предмет, потом цвет — как бывает в других языках",
+            "tip": "Сначала цвет, потом предмет — как в русском: красное яблоко = a red apple."
+          }
+        ],
+        "trap": {
+          "q": "What colour is the sun?",
+          "qru": "Какого цвета солнце? Выбери правильный ответ",
+          "options": [
+            "It’s yellow.",
+            "It yellow.",
+            "Yellow it."
+          ],
+          "answer": 0,
+          "error": "it-is",
+          "hint": "После It нужен ’s: It’s yellow.",
+          "say": "What colour is the sun?"
+        },
+        "check": {
+          "q": "Choose the right words.",
+          "qru": "Как правильно сказать «красное яблоко»?",
+          "options": [
+            "a red apple",
+            "an apple red",
+            "apple a red"
+          ],
+          "answer": 0,
+          "error": "colour-after",
+          "hint": "Цвет — перед предметом.",
+          "say": "a red apple"
+        },
+        "do": {
+          "kind": "colour",
+          "pic": "house"
+        }
+      },
+      {
+        "id": "b6",
+        "en": "I’m eight!",
+        "ru": "Мне восемь!",
+        "icon": "🎂",
+        "can": "Считает до 10 и говорит свой возраст: «How old are you? — I’m eight.»",
+        "words": [
+          "numbers-one",
+          "numbers-two",
+          "numbers-three",
+          "numbers-four",
+          "numbers-five",
+          "numbers-six",
+          "numbers-seven",
+          "numbers-eight",
+          "numbers-nine",
+          "numbers-ten"
+        ],
+        "chunks": [
+          {
+            "en": "How old are you?",
+            "ru": "Сколько тебе лет?"
+          },
+          {
+            "en": "I’m eight.",
+            "ru": "Мне восемь."
+          },
+          {
+            "en": "Three cats.",
+            "ru": "Три кошки."
+          },
+          {
+            "en": "Ten crayons!",
+            "ru": "Десять мелков!"
+          }
+        ],
+        "errors": [
+          {
+            "id": "have-age",
+            "ru": "Говорит «I have eight» — переводит «мне 8» дословно",
+            "sign": "Отвечает о возрасте через have",
+            "tip": "По-английски возраст — через «я есть»: I’m eight = «я — восемь»."
+          },
+          {
+            "id": "three-tree",
+            "ru": "Путает three (три) и tree (дерево)",
+            "sign": "Говорит «три» как «tree», без кончика языка",
+            "tip": "Three — кончик языка между зубами: «th-th-three». Tree — без языка."
+          }
+        ],
+        "trap": {
+          "q": "How old are you?",
+          "qru": "Сколько тебе лет? Выбери правильный ответ",
+          "options": [
+            "I’m eight.",
+            "I have eight.",
+            "I eight years."
+          ],
+          "answer": 0,
+          "error": "have-age",
+          "hint": "Про возраст говорим I’m: I’m eight.",
+          "say": "How old are you?"
+        },
+        "check": {
+          "q": "Listen: three. What is it?",
+          "qru": "Послушай и выбери",
+          "options": [
+            "3️⃣ three",
+            "🌳 tree"
+          ],
+          "answer": 0,
+          "error": "three-tree",
+          "hint": "В слове three язык выглядывает между зубами.",
+          "say": "three"
+        }
+      },
+      {
+        "id": "b7",
+        "en": "Stand up! Sit down!",
+        "ru": "Встань! Сядь!",
+        "icon": "🥋",
+        "can": "Понимает и выполняет команды учителя и сенсея: stand up, sit down, look, listen, turn around.",
+        "words": [
+          "aikido-stand-up",
+          "aikido-sit-down",
+          "class-look",
+          "class-listen",
+          "aikido-turn-around",
+          "aikido-bow",
+          "art-draw"
+        ],
+        "chunks": [
+          {
+            "en": "Stand up, please.",
+            "ru": "Встань, пожалуйста."
+          },
+          {
+            "en": "Sit down on the mat.",
+            "ru": "Сядь на татами."
+          },
+          {
+            "en": "Look and listen!",
+            "ru": "Смотри и слушай!"
+          },
+          {
+            "en": "Bow to your sensei.",
+            "ru": "Поклонись сэнсэю."
+          }
+        ],
+        "errors": [
+          {
+            "id": "look-listen",
+            "ru": "Путает look (смотри) и listen (слушай)",
+            "sign": "На «Listen!» поворачивается смотреть",
+            "tip": "Look — показываем на глаза, listen — на уши. Играйте: вы говорите — она показывает."
+          },
+          {
+            "id": "up-down",
+            "ru": "Путает stand up и sit down",
+            "sign": "Выполняет обратную команду",
+            "tip": "Up — вверх (руки вверх), down — вниз. Как в лифте."
+          }
+        ],
+        "trap": {
+          "q": "Listen!",
+          "qru": "Что просит учитель?",
+          "options": [
+            "👂 слушать",
+            "👀 смотреть"
+          ],
+          "answer": 0,
+          "error": "look-listen",
+          "hint": "Listen — это ушами, look — глазами.",
+          "say": "Listen!"
+        },
+        "check": {
+          "q": "Sit down, please.",
+          "qru": "Что просит сенсей?",
+          "options": [
+            "🧎‍♀️ сесть",
+            "🧍‍♀️ встать"
+          ],
+          "answer": 0,
+          "error": "up-down",
+          "hint": "Down — вниз, значит сесть.",
+          "say": "Sit down, please."
+        },
+        "do": {
+          "kind": "sensei"
+        }
+      },
+      {
+        "id": "b8",
+        "en": "This is my family",
+        "ru": "Это моя семья",
+        "icon": "💛",
+        "can": "Представляет семью: «This is my mummy. She’s an artist.»",
+        "words": [
+          "family-mummy",
+          "family-daddy",
+          "family-sister",
+          "family-brother",
+          "family-grandma",
+          "family-grandpa"
+        ],
+        "chunks": [
+          {
+            "en": "This is my mummy.",
+            "ru": "Это моя мама."
+          },
+          {
+            "en": "She’s an artist.",
+            "ru": "Она художница."
+          },
+          {
+            "en": "This is my brother.",
+            "ru": "Это мой брат."
+          },
+          {
+            "en": "He’s funny.",
+            "ru": "Он смешной."
+          }
+        ],
+        "errors": [
+          {
+            "id": "this-is",
+            "ru": "Говорит «This my mummy» — пропускает is",
+            "sign": "Предложение «This … my …» без is",
+            "tip": "This IS my… — хлопок на is, как в «My name is»."
+          },
+          {
+            "id": "he-she",
+            "ru": "Путает he и she",
+            "sign": "Про бабушку говорит he",
+            "tip": "She — девочки и женщины, he — мальчики и мужчины. Разложите фото семьи на две кучки."
+          }
+        ],
+        "trap": {
+          "q": "Choose the right sentence.",
+          "qru": "Как правильно сказать «Это мой папа»?",
+          "options": [
+            "This is my daddy.",
+            "This my daddy.",
+            "This is daddy my."
+          ],
+          "answer": 0,
+          "error": "this-is",
+          "hint": "This IS my daddy.",
+          "say": "This is my daddy."
+        },
+        "check": {
+          "q": "Look at Grandma. … is kind.",
+          "qru": "Бабушка добрая. Какое слово нужно?",
+          "options": [
+            "She",
+            "He"
+          ],
+          "answer": 0,
+          "error": "he-she",
+          "hint": "Бабушка — она: she.",
+          "say": "Grandma. She is kind."
+        }
+      }
+    ]
+  },
+  {
+    "id": "m1",
+    "n": 1,
+    "icon": "🏡",
+    "color": "#9CC9FF",
+    "en": "My home",
+    "ru": "Мой дом",
+    "can": "Называет комнаты и говорит, где кто находится: «Teddy is in the kitchen.»",
+    "lessons": [
+      {
+        "id": "m1l1",
+        "en": "My rooms",
+        "ru": "Мои комнаты",
+        "icon": "🛋️",
+        "can": "Называет 5 комнат и говорит «I’m in the garden.»",
+        "words": [
+          "picture-house",
+          "home-bedroom",
+          "home-kitchen",
+          "home-bathroom",
+          "home-living-room",
+          "home-garden"
+        ],
+        "chunks": [
+          {
+            "en": "This is my bedroom.",
+            "ru": "Это моя спальня."
+          },
+          {
+            "en": "I paint in the kitchen.",
+            "ru": "Я рисую на кухне."
+          },
+          {
+            "en": "Mummy is in the garden.",
+            "ru": "Мама в саду."
+          }
+        ],
+        "errors": [
+          {
+            "id": "in-missing",
+            "ru": "Пропускает in: «I’m garden»",
+            "sign": "Говорит место без маленького слова in",
+            "tip": "В комнате — значит IN: in the kitchen, in the garden."
+          },
+          {
+            "id": "kitchen-chicken",
+            "ru": "Путает kitchen (кухня) и chicken (курица)",
+            "sign": "Слова звучат похоже — выбирает не то",
+            "tip": "Kitchen — «кИтчен», chicken — «чИкен». Нарисуйте оба: кухня и курица."
+          }
+        ],
+        "trap": {
+          "q": "Where is Mummy? She’s … the kitchen.",
+          "qru": "Где мама? Выбери пропущенное слово",
+          "options": [
+            "in",
+            "on",
+            "—"
+          ],
+          "answer": 0,
+          "error": "in-missing",
+          "hint": "В комнате — in.",
+          "say": "She’s in the kitchen."
+        },
+        "check": {
+          "q": "Listen: kitchen.",
+          "qru": "Послушай и выбери",
+          "options": [
+            "🍳 kitchen",
+            "🐔 chicken"
+          ],
+          "answer": 0,
+          "error": "kitchen-chicken",
+          "hint": "Kitchen — это кухня.",
+          "say": "kitchen"
+        }
+      },
+      {
+        "id": "m1l2",
+        "en": "Where’s Teddy?",
+        "ru": "Где мишка?",
+        "icon": "🧸",
+        "can": "Спрашивает и отвечает, где вещь: «Where’s Teddy? — He’s on the chair.»",
+        "words": [
+          "toys-teddy-bear",
+          "home-chair",
+          "home-bed",
+          "home-box"
+        ],
+        "chunks": [
+          {
+            "en": "Where’s Teddy?",
+            "ru": "Где мишка?"
+          },
+          {
+            "en": "He’s on the chair.",
+            "ru": "Он на стуле."
+          },
+          {
+            "en": "It’s under the bed.",
+            "ru": "Это под кроватью."
+          },
+          {
+            "en": "My crayons are in the box.",
+            "ru": "Мои мелки в коробке."
+          }
+        ],
+        "errors": [
+          {
+            "id": "on-under",
+            "ru": "Путает on (на) и under (под)",
+            "sign": "Выбирает on, когда вещь внизу",
+            "tip": "Играйте мишкой: on — на стул, under — под стул, in — в коробку."
+          },
+          {
+            "id": "where-is",
+            "ru": "Говорит «Where Teddy?» — пропускает ’s",
+            "sign": "Вопрос без ’s после Where",
+            "tip": "Where’s = Where is. Тяните «уэ-э-эрз»."
+          }
+        ],
+        "trap": {
+          "q": "🧸 ⬇️ 🛏️ Teddy is … the bed.",
+          "qru": "Мишка под кроватью. Какое слово?",
+          "options": [
+            "under",
+            "on",
+            "in"
+          ],
+          "answer": 0,
+          "error": "on-under",
+          "hint": "Под — under, на — on.",
+          "say": "Teddy is under the bed."
+        },
+        "check": {
+          "q": "… Teddy? — He’s in the box.",
+          "qru": "Как правильно начать вопрос «Где мишка?»",
+          "options": [
+            "Where’s",
+            "Where",
+            "What’s"
+          ],
+          "answer": 0,
+          "error": "where-is",
+          "hint": "Where’s Teddy?",
+          "say": "Where’s Teddy?"
+        },
+        "do": {
+          "kind": "colour",
+          "pic": "house"
+        }
+      }
+    ]
+  },
+  {
+    "id": "m2",
+    "n": 2,
+    "icon": "🎂",
+    "color": "#FFD447",
+    "en": "Birthday & food",
+    "ru": "День рождения и еда",
+    "can": "Поздравляет с днём рождения, говорит возраст и что любит и не любит есть.",
+    "lessons": [
+      {
+        "id": "m2l1",
+        "en": "Happy birthday!",
+        "ru": "С днём рождения!",
+        "icon": "🎈",
+        "can": "Поздравляет и отвечает на поздравление: «Happy birthday! — Thank you!»",
+        "words": [
+          "food-cake",
+          "toys-balloon",
+          "numbers-eight",
+          "numbers-nine",
+          "numbers-ten"
+        ],
+        "chunks": [
+          {
+            "en": "Happy birthday, Amelie!",
+            "ru": "С днём рождения, Амели!"
+          },
+          {
+            "en": "Thank you!",
+            "ru": "Спасибо!"
+          },
+          {
+            "en": "I’m eight today.",
+            "ru": "Мне сегодня восемь."
+          },
+          {
+            "en": "A cake with eight candles.",
+            "ru": "Торт с восемью свечами."
+          }
+        ],
+        "errors": [
+          {
+            "id": "reply-hb",
+            "ru": "В ответ на «Happy birthday!» тоже говорит «Happy birthday!»",
+            "sign": "Повторяет поздравление вместо «спасибо»",
+            "tip": "На поздравление отвечаем Thank you! — как по-русски «спасибо»."
+          },
+          {
+            "id": "have-age",
+            "ru": "Говорит «I have eight» — переводит «мне 8» дословно",
+            "sign": "Возраст через have",
+            "tip": "Возраст — через I’m: I’m eight."
+          }
+        ],
+        "trap": {
+          "q": "Happy birthday, Amelie!",
+          "qru": "Что ответит Амели?",
+          "options": [
+            "Thank you!",
+            "Happy birthday!",
+            "Goodbye!"
+          ],
+          "answer": 0,
+          "error": "reply-hb",
+          "hint": "На поздравление говорим «спасибо».",
+          "say": "Happy birthday, Amelie!"
+        },
+        "check": {
+          "q": "How old are you today?",
+          "qru": "Сколько тебе лет сегодня?",
+          "options": [
+            "I’m eight.",
+            "I have eight."
+          ],
+          "answer": 0,
+          "error": "have-age",
+          "hint": "I’m eight.",
+          "say": "How old are you today?"
+        }
+      },
+      {
+        "id": "m2l2",
+        "en": "I like pizza!",
+        "ru": "Я люблю пиццу!",
+        "icon": "🍕",
+        "can": "Говорит, что любит и что не любит: «I like ice cream. I don’t like milk.»",
+        "words": [
+          "food-pizza",
+          "food-ice-cream",
+          "food-apple",
+          "food-banana",
+          "food-milk",
+          "food-juice",
+          "food-biscuit"
+        ],
+        "chunks": [
+          {
+            "en": "I like ice cream.",
+            "ru": "Я люблю мороженое."
+          },
+          {
+            "en": "I don’t like milk.",
+            "ru": "Я не люблю молоко."
+          },
+          {
+            "en": "Do you like pizza? — Yes, I do!",
+            "ru": "Ты любишь пиццу? — Да!"
+          }
+        ],
+        "errors": [
+          {
+            "id": "am-like",
+            "ru": "Добавляет am: «I am like pizza»",
+            "sign": "Между I и like появляется am",
+            "tip": "Like — это действие, ему не нужен am: I like."
+          },
+          {
+            "id": "not-like",
+            "ru": "Говорит «I not like milk» — пропускает don’t",
+            "sign": "Отрицание без don’t",
+            "tip": "Не люблю = don’t like. Покачайте головой на don’t."
+          }
+        ],
+        "trap": {
+          "q": "Choose the right sentence.",
+          "qru": "Как сказать «Я люблю пиццу»?",
+          "options": [
+            "I like pizza.",
+            "I am like pizza.",
+            "Me like pizza."
+          ],
+          "answer": 0,
+          "error": "am-like",
+          "hint": "Просто I like — без am.",
+          "say": "I like pizza."
+        },
+        "check": {
+          "q": "Choose the right sentence.",
+          "qru": "Как сказать «Я не люблю молоко»?",
+          "options": [
+            "I don’t like milk.",
+            "I not like milk."
+          ],
+          "answer": 0,
+          "error": "not-like",
+          "hint": "Не люблю — don’t like.",
+          "say": "I don’t like milk."
+        }
+      }
+    ]
+  },
+  {
+    "id": "m3",
+    "n": 3,
+    "icon": "🐸",
+    "color": "#8BC34A",
+    "en": "Animals: I can…",
+    "ru": "Животные: я умею…",
+    "can": "Называет животных и говорит, что они (и она) умеют и не умеют: «A frog can jump. I can’t fly.»",
+    "lessons": [
+      {
+        "id": "m3l1",
+        "en": "I can jump!",
+        "ru": "Я умею прыгать!",
+        "icon": "🤸‍♀️",
+        "can": "Говорит, что умеет и не умеет: «I can roll. I can’t fly.»",
+        "words": [
+          "ican-jump",
+          "ican-run",
+          "ican-swim",
+          "ican-fly",
+          "ican-climb",
+          "aikido-roll"
+        ],
+        "chunks": [
+          {
+            "en": "I can jump.",
+            "ru": "Я умею прыгать."
+          },
+          {
+            "en": "I can roll — like in aikido!",
+            "ru": "Я умею кувыркаться — как на айкидо!"
+          },
+          {
+            "en": "A fish can swim.",
+            "ru": "Рыба умеет плавать."
+          },
+          {
+            "en": "I can’t fly.",
+            "ru": "Я не умею летать."
+          }
+        ],
+        "errors": [
+          {
+            "id": "can-to",
+            "ru": "Добавляет to или -ing: «I can to swim», «I can swimming»",
+            "sign": "После can стоит to или -ing",
+            "tip": "После can — просто действие: can swim, can jump."
+          },
+          {
+            "id": "can-cant",
+            "ru": "Не слышит разницу can и can’t",
+            "sign": "Путает «умею» и «не умею» на слух",
+            "tip": "Can’t длиннее и с «т» в конце. Показывайте 👍 на can и 👎 на can’t."
+          }
+        ],
+        "trap": {
+          "q": "Choose the right sentence.",
+          "qru": "Как сказать «Я умею плавать»?",
+          "options": [
+            "I can swim.",
+            "I can to swim.",
+            "I can swimming."
+          ],
+          "answer": 0,
+          "error": "can-to",
+          "hint": "После can — просто swim.",
+          "say": "I can swim."
+        },
+        "check": {
+          "q": "Listen: I can’t fly.",
+          "qru": "Умеет или не умеет?",
+          "options": [
+            "❌ не умею",
+            "✅ умею"
+          ],
+          "answer": 0,
+          "error": "can-cant",
+          "hint": "Can’t — значит «не умею».",
+          "say": "I can’t fly."
+        },
+        "do": {
+          "kind": "sensei"
+        }
+      },
+      {
+        "id": "m3l2",
+        "en": "I can draw a cat",
+        "ru": "Я умею рисовать кошку",
+        "icon": "🐱",
+        "can": "Говорит, что рисует: «I can draw a cat. Two cats!»",
+        "words": [
+          "animals-cat",
+          "animals-dog",
+          "animals-frog",
+          "animals-fish",
+          "animals-bird",
+          "animals-rabbit",
+          "animals-butterfly"
+        ],
+        "chunks": [
+          {
+            "en": "I can draw a cat.",
+            "ru": "Я умею рисовать кошку."
+          },
+          {
+            "en": "It’s a frog. It’s green.",
+            "ru": "Это лягушка. Она зелёная."
+          },
+          {
+            "en": "Two cats and three fish!",
+            "ru": "Две кошки и три рыбки!"
+          }
+        ],
+        "errors": [
+          {
+            "id": "article-a",
+            "ru": "Пропускает a: «I can draw cat»",
+            "sign": "Перед одним животным нет a",
+            "tip": "Одна кошка — a cat. «a» — как маленький значок «одна штука»."
+          },
+          {
+            "id": "plural-s",
+            "ru": "Не добавляет -s: «two cat»",
+            "sign": "После чисел больше одного — без -s",
+            "tip": "Много — добавляем «с-с-с»: two cats."
+          }
+        ],
+        "trap": {
+          "q": "Choose the right sentence.",
+          "qru": "Как сказать «Я умею рисовать кошку»?",
+          "options": [
+            "I can draw a cat.",
+            "I can draw cat."
+          ],
+          "answer": 0,
+          "error": "article-a",
+          "hint": "Одна кошка — a cat.",
+          "say": "I can draw a cat."
+        },
+        "check": {
+          "q": "🐱🐱🐱 Three …",
+          "qru": "Три кошки — как правильно?",
+          "options": [
+            "cats",
+            "cat"
+          ],
+          "answer": 0,
+          "error": "plural-s",
+          "hint": "Много — с -s: cats.",
+          "say": "three cats"
+        },
+        "do": {
+          "kind": "colour",
+          "pic": "pets"
+        }
+      }
+    ]
+  },
+  {
+    "id": "m4",
+    "n": 4,
+    "icon": "🧸",
+    "color": "#C7A0F0",
+    "en": "Toys: I’ve got…",
+    "ru": "Игрушки: у меня есть…",
+    "can": "Рассказывает, какие у неё игрушки, и описывает мишку: «I’ve got a teddy bear. He’s got big ears.»",
+    "lessons": [
+      {
+        "id": "m4l1",
+        "en": "I’ve got a kite",
+        "ru": "У меня есть змей",
+        "icon": "🪁",
+        "can": "Говорит, что у неё есть, и отвечает на вопрос: «Have you got a ball? — Yes, I have.»",
+        "words": [
+          "toys-ball",
+          "toys-doll",
+          "toys-teddy-bear",
+          "toys-car",
+          "toys-kite",
+          "toys-balloon"
+        ],
+        "chunks": [
+          {
+            "en": "I’ve got a doll.",
+            "ru": "У меня есть кукла."
+          },
+          {
+            "en": "Have you got a kite?",
+            "ru": "У тебя есть воздушный змей?"
+          },
+          {
+            "en": "Yes, I have.",
+            "ru": "Да, есть."
+          },
+          {
+            "en": "No, I haven’t.",
+            "ru": "Нет."
+          }
+        ],
+        "errors": [
+          {
+            "id": "yes-have",
+            "ru": "Отвечает «Yes, I’ve got» или «Yes, I got»",
+            "sign": "Короткий ответ с got",
+            "tip": "Коротко отвечаем без got: Yes, I have. / No, I haven’t."
+          },
+          {
+            "id": "article-a",
+            "ru": "Пропускает a: «I’ve got kite»",
+            "sign": "Перед одной игрушкой нет a",
+            "tip": "Одна игрушка — a kite, a doll."
+          }
+        ],
+        "trap": {
+          "q": "Have you got a ball?",
+          "qru": "Как коротко ответить «Да, есть»?",
+          "options": [
+            "Yes, I have.",
+            "Yes, I’ve got.",
+            "Yes, I got."
+          ],
+          "answer": 0,
+          "error": "yes-have",
+          "hint": "Коротко: Yes, I have.",
+          "say": "Have you got a ball?"
+        },
+        "check": {
+          "q": "Choose the right sentence.",
+          "qru": "Как сказать «У меня есть змей»?",
+          "options": [
+            "I’ve got a kite.",
+            "I’ve got kite."
+          ],
+          "answer": 0,
+          "error": "article-a",
+          "hint": "Один змей — a kite.",
+          "say": "I’ve got a kite."
+        }
+      },
+      {
+        "id": "m4l2",
+        "en": "Teddy’s face",
+        "ru": "Мордочка мишки",
+        "icon": "🐻",
+        "can": "Описывает лицо игрушки: «He’s got big ears and a red nose.»",
+        "words": [
+          "body-head",
+          "body-eyes",
+          "body-ears",
+          "body-nose",
+          "body-mouth",
+          "body-hands"
+        ],
+        "chunks": [
+          {
+            "en": "He’s got big ears.",
+            "ru": "У него большие уши."
+          },
+          {
+            "en": "She’s got blue eyes.",
+            "ru": "У неё голубые глаза."
+          },
+          {
+            "en": "Touch your nose!",
+            "ru": "Дотронься до носа!"
+          }
+        ],
+        "errors": [
+          {
+            "id": "ears-eyes",
+            "ru": "Путает ears (уши) и eyes (глаза)",
+            "sign": "Показывает глаза на «ears»",
+            "tip": "Eyes — «айз», ears — «иэз». Трогайте: eyes — глаза, ears — уши."
+          },
+          {
+            "id": "he-have",
+            "ru": "Говорит «He have got» вместо «He’s got»",
+            "sign": "Про него/неё — have вместо has",
+            "tip": "Про него и про неё — he’s got, she’s got."
+          }
+        ],
+        "trap": {
+          "q": "Touch your ears!",
+          "qru": "До чего дотронуться?",
+          "options": [
+            "👂 уши",
+            "👀 глаза"
+          ],
+          "answer": 0,
+          "error": "ears-eyes",
+          "hint": "Ears — уши.",
+          "say": "Touch your ears!"
+        },
+        "check": {
+          "q": "Choose the right sentence.",
+          "qru": "Как сказать «У него красный нос»?",
+          "options": [
+            "He’s got a red nose.",
+            "He have got a red nose."
+          ],
+          "answer": 0,
+          "error": "he-have",
+          "hint": "Про него — he’s got.",
+          "say": "He’s got a red nose."
+        }
+      }
+    ]
+  },
+  {
+    "id": "m5",
+    "n": 5,
+    "icon": "🌦️",
+    "color": "#7FD1E6",
+    "en": "Weather & clothes",
+    "ru": "Погода и одежда",
+    "can": "Говорит, какая погода, и что на ней надето: «It’s rainy. I’m wearing a coat.»",
+    "lessons": [
+      {
+        "id": "m5l1",
+        "en": "It’s sunny!",
+        "ru": "Солнечно!",
+        "icon": "🌞",
+        "can": "Отвечает на «What’s the weather like?»: «It’s sunny.»",
+        "words": [
+          "weather-sunny",
+          "weather-rainy",
+          "weather-snowy",
+          "weather-windy"
+        ],
+        "chunks": [
+          {
+            "en": "What’s the weather like?",
+            "ru": "Какая погода?"
+          },
+          {
+            "en": "It’s sunny. Let’s paint outside!",
+            "ru": "Солнечно. Давай рисовать на улице!"
+          },
+          {
+            "en": "It’s rainy. I paint at home.",
+            "ru": "Дождливо. Я рисую дома."
+          }
+        ],
+        "errors": [
+          {
+            "id": "it-is",
+            "ru": "Говорит «It sunny» — пропускает ’s",
+            "sign": "Нет ’s после It",
+            "tip": "It’s sunny — как It’s red: змейка «итс-с»."
+          },
+          {
+            "id": "sunny-snowy",
+            "ru": "Путает sunny и snowy",
+            "sign": "Слова начинаются одинаково — выбирает не то",
+            "tip": "Sunny — «санни» ☀️, snowy — «сноуи» ❄️."
+          }
+        ],
+        "trap": {
+          "q": "Choose the right sentence.",
+          "qru": "Как сказать «Дождливо»?",
+          "options": [
+            "It’s rainy.",
+            "It rainy."
+          ],
+          "answer": 0,
+          "error": "it-is",
+          "hint": "It’s rainy.",
+          "say": "It’s rainy."
+        },
+        "check": {
+          "q": "Listen: snowy.",
+          "qru": "Послушай и выбери",
+          "options": [
+            "❄️ snowy",
+            "🌞 sunny"
+          ],
+          "answer": 0,
+          "error": "sunny-snowy",
+          "hint": "Snowy — снежно.",
+          "say": "snowy"
+        }
+      },
+      {
+        "id": "m5l2",
+        "en": "I’m wearing a dress",
+        "ru": "На мне платье",
+        "icon": "👗",
+        "can": "Говорит, что на ней: «I’m wearing a pink dress.» и понимает «Put on your coat!»",
+        "words": [
+          "clothes-hat",
+          "clothes-dress",
+          "clothes-coat",
+          "clothes-shoes",
+          "clothes-t-shirt",
+          "clothes-shorts"
+        ],
+        "chunks": [
+          {
+            "en": "I’m wearing a pink dress.",
+            "ru": "На мне розовое платье."
+          },
+          {
+            "en": "Put on your coat!",
+            "ru": "Надень пальто!"
+          },
+          {
+            "en": "A white T-shirt for painting.",
+            "ru": "Белая футболка для рисования."
+          }
+        ],
+        "errors": [
+          {
+            "id": "am-wearing",
+            "ru": "Говорит «I wearing» — пропускает ’m (am)",
+            "sign": "Нет ’m после I",
+            "tip": "Сейчас на мне — I’m wearing: «айм»."
+          },
+          {
+            "id": "colour-after",
+            "ru": "Ставит цвет после одежды: «a dress pink»",
+            "sign": "Предмет, потом цвет",
+            "tip": "Сначала цвет: a pink dress."
+          }
+        ],
+        "trap": {
+          "q": "Choose the right sentence.",
+          "qru": "Как сказать «На мне шапка»?",
+          "options": [
+            "I’m wearing a hat.",
+            "I wearing a hat."
+          ],
+          "answer": 0,
+          "error": "am-wearing",
+          "hint": "I’m wearing…",
+          "say": "I’m wearing a hat."
+        },
+        "check": {
+          "q": "Choose the right words.",
+          "qru": "Как сказать «жёлтая футболка»?",
+          "options": [
+            "a yellow T-shirt",
+            "a T-shirt yellow"
+          ],
+          "answer": 0,
+          "error": "colour-after",
+          "hint": "Цвет — перед предметом.",
+          "say": "a yellow T-shirt"
+        }
+      }
+    ]
+  }
+]

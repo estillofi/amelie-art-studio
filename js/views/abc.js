@@ -1,7 +1,7 @@
 import { S, esc, speak, sfx, addStars, markStep, celebrate, burst, shuffle, wordPic, $, $$, ICON } from '../lib.js';
 
 // Letter names spelled so the speech engine says them right (British "zed").
-const NAMES = { A: 'ay', B: 'bee', C: 'see', D: 'dee', E: 'ee', F: 'ef', G: 'jee', H: 'aitch', I: 'eye', J: 'jay', K: 'kay', L: 'el', M: 'em', N: 'en', O: 'oh', P: 'pee', Q: 'cue', R: 'ar', S: 'ess', T: 'tee', U: 'you', V: 'vee', W: 'double you', X: 'ex', Y: 'why', Z: 'zed' };
+export const NAMES = { A: 'ay', B: 'bee', C: 'see', D: 'dee', E: 'ee', F: 'ef', G: 'jee', H: 'aitch', I: 'eye', J: 'jay', K: 'kay', L: 'el', M: 'em', N: 'en', O: 'oh', P: 'pee', Q: 'cue', R: 'ar', S: 'ess', T: 'tee', U: 'you', V: 'vee', W: 'double you', X: 'ex', Y: 'why', Z: 'zed' };
 // Letters with no word in the app yet get a classic picture word.
 const EXTRA = { Q: ['queen', 'королева', '👸'], U: ['umbrella', 'зонтик', '☂️'], V: ['violin', 'скрипка', '🎻'], X: ['fox', 'лиса (x в конце)', '🦊'], Z: ['zebra', 'зебра', '🦓'], I: ['ice cream', 'мороженое', '🍦'], J: ['juice', 'сок', '🧃'], K: ['kite', 'воздушный змей', '🪁'], N: ['nose', 'нос', '👃'], O: ['orange', 'оранжевый', '🟠'], E: ['eyes', 'глаза', '👀'], Y: ['yellow', 'жёлтый', '🟡'] };
 const PREFER = ['art', 'colours', 'picture', 'animals', 'aikido'];

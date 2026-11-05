@@ -1,5 +1,6 @@
 import { S, esc, wordPic, speak, profile, todayKey, streak, DAY, $, STAR_STEP, topicOf, MODE, isStandalone } from '../lib.js';
 import { todayQueue, seenWords, learned } from '../srs.js';
+import { nextLesson } from './course.js';
 
 const GAMES = [['listen', '👂', 'Listen & find', 'Послушай и найди'], ['spell', '🔤', 'Spell it', 'Собери слово'], ['sensei', '🥋', 'Sensei says', 'Сенсей говорит']];
 
@@ -7,6 +8,7 @@ export default function home(el) {
   const p = profile();
   const day = (p.days || {})[todayKey()] || {};
   const q = todayQueue();
+  const nl = nextLesson();
   const game = GAMES[Math.floor(Date.now() / DAY) % GAMES.length];
   const pool = seenWords().length ? seenWords() : S.words.filter((w) => w.topic === 'colours' || w.topic === 'art');
   const wod = pool[Math.floor(Date.now() / DAY) % pool.length];
@@ -34,7 +36,8 @@ export default function home(el) {
     <div class="h2">Today · <small>План на сегодня</small></div>
     <div class="plan">
       ${step(day.words, '#/learn', '📒', '#FFD23F', 'Words · Слова', q.length ? `${q.length} карточек — посмотри и послушай` : 'Все карточки на сегодня пройдены!')}
-      ${step(day.play, `#/${game[0]}`, game[1], '#7FD1AE', `${game[2]}`, game[3])}
+      ${nl ? step(nl.homework ? false : day.play, `#/lesson/${nl.lesson.id}`, nl.homework ? '📌' : '🎒', nl.homework ? '#FFB38A' : '#7FD1AE', nl.homework ? 'Homework · Домашка' : 'Lesson · Урок', `${esc(nl.lesson.en)} — ${esc(nl.lesson.ru)}`)
+        : step(day.play, `#/${game[0]}`, game[1], '#7FD1AE', `${game[2]}`, game[3])}
       ${step(day.art, '#/paint', '🖍️', '#FFB3CF', 'Paint · Раскраска', 'Раскрась по-английски')}
     </div>
     ${day.words && day.play && day.art ? '<div class="note" style="margin-top:12px">🏆 Все три задания на сегодня сделаны! Можно рисовать сколько хочешь.</div>' : ''}

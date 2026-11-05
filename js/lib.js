@@ -1,6 +1,6 @@
 // Shared helpers: data store, DOM, speech, sounds, rewards.
 
-export const COLS = ['words', 'topics', 'progress', 'log', 'profile', 'gallery'];
+export const COLS = ['words', 'topics', 'course', 'progress', 'log', 'profile', 'gallery'];
 export const STATE = ['progress', 'log', 'profile', 'gallery']; // Amelie's own data (everything else is content)
 export const S = Object.fromEntries(COLS.map((c) => [c, []]));
 

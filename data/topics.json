@@ -94,5 +94,37 @@
     "icon": "🍎",
     "color": "#FF8A80",
     "order": 11
+  },
+  {
+    "id": "class",
+    "en": "In class",
+    "ru": "На уроке",
+    "icon": "🏫",
+    "color": "#FFC48A",
+    "order": 12
+  },
+  {
+    "id": "home",
+    "en": "My home",
+    "ru": "Мой дом",
+    "icon": "🏡",
+    "color": "#9CC9FF",
+    "order": 13
+  },
+  {
+    "id": "weather",
+    "en": "Weather",
+    "ru": "Погода",
+    "icon": "🌦️",
+    "color": "#7FD1E6",
+    "order": 14
+  },
+  {
+    "id": "clothes",
+    "en": "Clothes",
+    "ru": "Одежда",
+    "icon": "👗",
+    "color": "#F3B9C9",
+    "order": 15
   }
 ]

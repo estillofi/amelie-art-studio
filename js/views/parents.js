@@ -1,5 +1,6 @@
 import { S, esc, profile, saveProfile, save, toast, speak, todayKey, startOfDay, DAY, topicOf, $, MODE, exportProgress, importProgress, isStandalone, isAndroid, installHint } from '../lib.js';
 import { topicStats, seenWords } from '../srs.js';
+import { allLessons, findLesson, lessonStatus, homeworkList } from './course.js';
 
 let unlocked = false;
 
@@ -26,6 +27,23 @@ export default function parents(el) {
       <div class="stat"><span>Звёзды / наклейки</span><span>⭐ ${p.stars || 0} · ${(p.stickers || []).length}</span></div>
       <div class="stat" style="border:0"><span>Рисунков в галерее</span><span>${S.gallery.length}</span></div>
     </div>
+
+    <div class="h2">Курс и домашка</div>
+    <div class="card">
+      <div class="stat"><span>Уроков освоено</span><span>${allLessons().filter((l) => lessonStatus(l.id) === 'mastered').length} из ${allLessons().length}</span></div>
+      <div class="field" style="margin-top:10px"><label>Задать урок на дом</label>
+        <select class="select" id="hwLesson">${S.course.map((m) => `<optgroup label="${esc(m.bridge ? 'Подготовка · ' + m.ru : 'Модуль ' + m.n + ' · ' + m.ru)}">${m.lessons.map((l) => `<option value="${l.id}">${esc(l.en)} — ${esc(l.ru)}${lessonStatus(l.id) === 'mastered' ? ' ✓' : ''}</option>`).join('')}</optgroup>`).join('')}</select></div>
+      <div class="field"><label>Сделать до</label><input class="input" type="date" id="hwDue" value="${todayKey(new Date(Date.now() + 2 * DAY))}"></div>
+      <button class="btn sm full" id="hwAdd" style="--c:#FFB38A">📌 Задать</button>
+      ${homeworkList().length ? `<div style="margin-top:12px">${[...homeworkList()].reverse().map((h) => {
+        const l = findLesson(h.lesson);
+        const st = h.doneAt ? (h.result === 'mastered' ? '✓ сделано, освоено' : '✓ сделано, повторить') : `до ${new Date(h.due).toLocaleDateString('ru-RU')}`;
+        return `<div class="stat"><span>📌 ${esc(l.en)}</span><span style="text-align:right">${st}${h.doneAt ? '' : ` <button class="ru" data-unhw="${h.id}" style="min-height:36px;padding:0 6px;text-decoration:underline">отменить</button>`}</span></div>`;
+      }).join('')}</div>` : ''}
+    </div>
+
+    <div class="h2">Что заметили</div>
+    <div class="card">${observed()}</div>
 
     <div class="h2">Темы</div>
     <div class="card">${S.topics.map((t) => { const st = topicStats(t.id); return `<div class="stat"><span>${t.icon} ${esc(t.ru)}</span><span>${st.learned} выучено · ${st.seen}/${st.total}</span></div>`; }).join('')}</div>
@@ -92,6 +110,14 @@ export default function parents(el) {
       : en.length ? `Английских голосов: ${en.length}. Должно звучать «Hello, Amelie!» с английским произношением.`
         : 'Английский голос не найден — озвучка будет молчать или читать с акцентом. См. инструкцию ниже.';
   };
+  $('#hwAdd', el).onclick = async () => {
+    const lesson = $('#hwLesson', el).value; const due = $('#hwDue', el).value || todayKey();
+    const hw = [...(profile().homework || []), { id: Math.random().toString(16).slice(2, 10), lesson, due, assigned: Date.now() }];
+    await saveProfile({ homework: hw }); toast('Домашка задана — Амели увидит её на главной'); parents(el);
+  };
+  el.querySelectorAll('[data-unhw]').forEach((b) => b.addEventListener('click', async () => {
+    await saveProfile({ homework: (profile().homework || []).filter((h) => h.id !== b.dataset.unhw) }); parents(el);
+  }));
   $('#npd', el).onchange = (e) => { saveProfile({ newPerDay: Number(e.target.value) }); toast('Сохранено'); };
   $('#rate', el).onchange = (e) => { saveProfile({ rate: Number(e.target.value) }); toast('Сохранено'); };
   $('#add', el).addEventListener('submit', async (e) => {
@@ -103,6 +129,22 @@ export default function parents(el) {
     await save('words', { id: `${d.topic}-${en.replace(/\s+/g, '-')}`, topic: d.topic, en, ru: d.ru.trim(), pic: d.pic.trim() || '🖍️', ex: d.ex.trim() || `I like the ${en}.`, exRu: '', order, custom: true });
     toast(`Добавлено в «${topicOf(d.topic).ru}»`); e.target.reset();
   });
+}
+
+// Typical mistakes the lessons caught, most frequent first — with the sign to watch for and how to help at home.
+function observed() {
+  const rows = [];
+  for (const l of allLessons()) {
+    const p = S.progress.find((x) => x.id === `lesson-${l.id}`);
+    for (const [eid, n] of Object.entries(p?.errors || {})) {
+      const e = l.errors.find((x) => x.id === eid);
+      if (e) rows.push({ e, n, l });
+    }
+  }
+  if (!rows.length) return '<p class="sub" style="margin:0">Пока ничего: здесь появятся типичные ошибки, которые уроки заметили у Амели, и как помочь дома.</p>';
+  rows.sort((a, b) => b.n - a.n);
+  return rows.slice(0, 8).map(({ e, n, l }) => `<div class="obs"><div class="obs-h"><b>${esc(e.ru)}</b><span class="pill">${n}×</span></div>
+    <div class="obs-s">Урок «${esc(l.ru)}» · признак: ${esc(e.sign)}</div><div class="obs-tip">💡 ${esc(e.tip)}</div></div>`).join('');
 }
 
 function gate(el) {

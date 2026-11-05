@@ -1098,5 +1098,225 @@
     "exRu": "Печенье, пожалуйста.",
     "order": 7,
     "pic": "🍪"
+  },
+  {
+    "id": "class-look",
+    "topic": "class",
+    "en": "look",
+    "ru": "смотри",
+    "pic": "🔍",
+    "ex": "Look at my picture!",
+    "exRu": "Посмотри на мой рисунок!",
+    "order": 0
+  },
+  {
+    "id": "class-listen",
+    "topic": "class",
+    "en": "listen",
+    "ru": "слушай",
+    "pic": "🎧",
+    "ex": "Listen to the teacher.",
+    "exRu": "Слушай учителя.",
+    "order": 1
+  },
+  {
+    "id": "class-open-your-book",
+    "topic": "class",
+    "en": "open your book",
+    "ru": "открой книгу",
+    "pic": "📘",
+    "ex": "Open your book, please.",
+    "exRu": "Открой книгу, пожалуйста.",
+    "order": 2
+  },
+  {
+    "id": "class-be-quiet",
+    "topic": "class",
+    "en": "be quiet",
+    "ru": "тише",
+    "pic": "🤫",
+    "ex": "Be quiet, please.",
+    "exRu": "Тише, пожалуйста.",
+    "order": 3
+  },
+  {
+    "id": "home-bedroom",
+    "topic": "home",
+    "en": "bedroom",
+    "ru": "спальня",
+    "pic": "🛌",
+    "ex": "I draw in my bedroom.",
+    "exRu": "Я рисую в своей спальне.",
+    "order": 0
+  },
+  {
+    "id": "home-kitchen",
+    "topic": "home",
+    "en": "kitchen",
+    "ru": "кухня",
+    "pic": "🍳",
+    "ex": "Mummy is in the kitchen.",
+    "exRu": "Мама на кухне.",
+    "order": 1
+  },
+  {
+    "id": "home-bathroom",
+    "topic": "home",
+    "en": "bathroom",
+    "ru": "ванная",
+    "pic": "🛁",
+    "ex": "The bathroom is blue.",
+    "exRu": "Ванная голубая.",
+    "order": 2
+  },
+  {
+    "id": "home-living-room",
+    "topic": "home",
+    "en": "living room",
+    "ru": "гостиная",
+    "pic": "🛋️",
+    "ex": "My pictures are in the living room.",
+    "exRu": "Мои рисунки — в гостиной.",
+    "order": 3
+  },
+  {
+    "id": "home-garden",
+    "topic": "home",
+    "en": "garden",
+    "ru": "сад",
+    "pic": "🌷",
+    "ex": "I paint flowers in the garden.",
+    "exRu": "Я рисую цветы в саду.",
+    "order": 4
+  },
+  {
+    "id": "home-chair",
+    "topic": "home",
+    "en": "chair",
+    "ru": "стул",
+    "pic": "🪑",
+    "ex": "Teddy is on the chair.",
+    "exRu": "Мишка на стуле.",
+    "order": 5
+  },
+  {
+    "id": "home-bed",
+    "topic": "home",
+    "en": "bed",
+    "ru": "кровать",
+    "pic": "🛏️",
+    "ex": "My cat is under the bed.",
+    "exRu": "Моя кошка под кроватью.",
+    "order": 6
+  },
+  {
+    "id": "home-box",
+    "topic": "home",
+    "en": "box",
+    "ru": "коробка",
+    "pic": "📦",
+    "ex": "My crayons are in the box.",
+    "exRu": "Мои мелки в коробке.",
+    "order": 7
+  },
+  {
+    "id": "weather-sunny",
+    "topic": "weather",
+    "en": "sunny",
+    "ru": "солнечно",
+    "pic": "🌞",
+    "ex": "It's sunny. Let's paint outside!",
+    "exRu": "Солнечно. Давай рисовать на улице!",
+    "order": 0
+  },
+  {
+    "id": "weather-rainy",
+    "topic": "weather",
+    "en": "rainy",
+    "ru": "дождливо",
+    "pic": "🌧️",
+    "ex": "It's rainy. I paint at home.",
+    "exRu": "Дождливо. Я рисую дома.",
+    "order": 1
+  },
+  {
+    "id": "weather-snowy",
+    "topic": "weather",
+    "en": "snowy",
+    "ru": "снежно",
+    "pic": "❄️",
+    "ex": "It's snowy and white.",
+    "exRu": "Снежно и всё белое.",
+    "order": 2
+  },
+  {
+    "id": "weather-windy",
+    "topic": "weather",
+    "en": "windy",
+    "ru": "ветрено",
+    "pic": "🌬️",
+    "ex": "It's windy. Fly your kite!",
+    "exRu": "Ветрено. Запускай змея!",
+    "order": 3
+  },
+  {
+    "id": "clothes-hat",
+    "topic": "clothes",
+    "en": "hat",
+    "ru": "шляпа, шапка",
+    "pic": "👒",
+    "ex": "Put on your hat!",
+    "exRu": "Надень шапку!",
+    "order": 0
+  },
+  {
+    "id": "clothes-dress",
+    "topic": "clothes",
+    "en": "dress",
+    "ru": "платье",
+    "pic": "👗",
+    "ex": "I'm wearing a pink dress.",
+    "exRu": "На мне розовое платье.",
+    "order": 1
+  },
+  {
+    "id": "clothes-coat",
+    "topic": "clothes",
+    "en": "coat",
+    "ru": "пальто",
+    "pic": "🧥",
+    "ex": "Put on your coat. It's cold.",
+    "exRu": "Надень пальто. Холодно.",
+    "order": 2
+  },
+  {
+    "id": "clothes-shoes",
+    "topic": "clothes",
+    "en": "shoes",
+    "ru": "туфли, обувь",
+    "pic": "👟",
+    "ex": "My shoes are red.",
+    "exRu": "Мои туфли красные.",
+    "order": 3
+  },
+  {
+    "id": "clothes-t-shirt",
+    "topic": "clothes",
+    "en": "t-shirt",
+    "ru": "футболка",
+    "pic": "👕",
+    "ex": "A white T-shirt for painting.",
+    "exRu": "Белая футболка для рисования.",
+    "order": 4
+  },
+  {
+    "id": "clothes-shorts",
+    "topic": "clothes",
+    "en": "shorts",
+    "ru": "шорты",
+    "pic": "🩳",
+    "ex": "Blue shorts for aikido? No, a kimono!",
+    "exRu": "Синие шорты на айкидо? Нет, кимоно!",
+    "order": 5
   }
 ]

@@ -96,13 +96,13 @@ export function paint(el, picId, mode) {
       ${free ? `<div class="task"><div class="tx"><span class="en">Free painting 🎨</span><span class="ru">Раскрашивай как хочешь!</span></div></div>`
         : k ? `<div class="progress"><i style="width:${(t / tasks.length) * 100}%"></i></div>
           <div class="task"><button class="icon-btn" id="hear">${ICON.sound}</button>
-            <div class="tx"><span class="en">Colour the ${esc(k.region)} ${esc(k.colour.en)}.</span>
-            <span class="ru" id="hint">${misses >= 2 ? `${rw?.pic || ''} ${esc(rw?.ru || k.region)} → ${esc(k.colour.ru)}` : '💡 нажми сюда для подсказки'}</span></div></div>` : ''}
+            <div class="tx"><span class="en">Colour the ${esc(k.region)} ${esc(k.colour.en)}.</span></div></div>
+          ${misses >= 2 ? `<div class="hint-box">${rw?.pic || ''} ${esc(rw?.ru || k.region)} → ${esc(k.colour.ru)}</div>` : ''}` : ''}
       <div class="canvas" id="cv">${svgOf(pic, fills)}</div>
       <div class="palette">${colours().map((c) => `<button class="crayon ${crayon === c.en ? 'on' : ''}" data-c="${c.en}" style="--c:${c.color}" aria-label="${c.en}"><span>${c.en}</span></button>`).join('')}</div>
-      <div class="row" style="margin-top:34px;gap:10px">
+      <div class="row" style="margin-top:34px;gap:12px">
         ${free ? `<button class="btn grow" id="save" style="--c:#7FD1AE">💾 В галерею</button><button class="btn white" id="reset">🧽 Заново</button>`
-          : `<a class="btn white grow" href="#/colour/${pic.id}/free">🎨 Свободно</a>`}
+          : `<button class="hint-btn grow" id="hint">💡 Подсказка</button><a class="btn white" href="#/colour/${pic.id}/free">🎨 Свободно</a>`}
       </div>`;
     wire();
   }

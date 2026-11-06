@@ -1,0 +1,270 @@
+{
+  "id": "spotlight-2-1-word-list-v1",
+  "note": "Spotlight 2, part 1, Word List: words the app did not have yet. Applied once per album on server start.",
+  "topics": [
+    {
+      "id": "sp-school",
+      "en": "School things",
+      "ru": "Школьные вещи",
+      "icon": "📒",
+      "color": "#9CC9FF",
+      "order": 20
+    },
+    {
+      "id": "sp-home",
+      "en": "My home",
+      "ru": "Мой дом: комнаты и вещи",
+      "icon": "🏠",
+      "color": "#FFC48A",
+      "order": 21
+    },
+    {
+      "id": "sp-birthday",
+      "en": "My birthday",
+      "ru": "Мой день рождения",
+      "icon": "🎂",
+      "color": "#FFB3CF",
+      "order": 22
+    },
+    {
+      "id": "sp-food",
+      "en": "Yummy food",
+      "ru": "Вкусная еда",
+      "icon": "🍎",
+      "color": "#7FD1AE",
+      "order": 23
+    }
+  ],
+  "words": [
+    {
+      "id": "sp-school-book",
+      "topic": "sp-school",
+      "en": "book",
+      "ru": "книга",
+      "order": 0,
+      "pic": "sketch:book",
+      "ex": "Read the book with me.",
+      "exRu": "Почитай книгу со мной."
+    },
+    {
+      "id": "sp-school-pen",
+      "topic": "sp-school",
+      "en": "pen",
+      "ru": "ручка",
+      "order": 1,
+      "pic": "sketch:pen",
+      "ex": "I draw with a pen.",
+      "exRu": "Я рисую ручкой."
+    },
+    {
+      "id": "sp-school-workbook",
+      "topic": "sp-school",
+      "en": "workbook",
+      "ru": "рабочая тетрадь",
+      "order": 2,
+      "pic": "sketch:workbook",
+      "ex": "Open your workbook, please.",
+      "exRu": "Открой рабочую тетрадь, пожалуйста."
+    },
+    {
+      "id": "sp-home-bed",
+      "topic": "sp-home",
+      "en": "bed",
+      "ru": "кровать",
+      "order": 0,
+      "pic": "sketch:bed",
+      "ex": "My kitten sleeps on the bed.",
+      "exRu": "Мой котёнок спит на кровати."
+    },
+    {
+      "id": "sp-home-chair",
+      "topic": "sp-home",
+      "en": "chair",
+      "ru": "стул",
+      "order": 1,
+      "pic": "sketch:chair",
+      "ex": "Sit on the chair, please.",
+      "exRu": "Сядь на стул, пожалуйста."
+    },
+    {
+      "id": "sp-home-table",
+      "topic": "sp-home",
+      "en": "table",
+      "ru": "стол",
+      "order": 2,
+      "pic": "sketch:table",
+      "ex": "My paints are on the table.",
+      "exRu": "Мои краски на столе."
+    },
+    {
+      "id": "sp-home-radio",
+      "topic": "sp-home",
+      "en": "radio",
+      "ru": "радио",
+      "order": 3,
+      "pic": "sketch:radio",
+      "ex": "Music on the radio!",
+      "exRu": "Музыка по радио!"
+    },
+    {
+      "id": "sp-home-kitchen",
+      "topic": "sp-home",
+      "en": "kitchen",
+      "ru": "кухня",
+      "order": 4,
+      "pic": "sketch:kitchen",
+      "ex": "The cake is in the kitchen.",
+      "exRu": "Торт на кухне."
+    },
+    {
+      "id": "sp-home-bedroom",
+      "topic": "sp-home",
+      "en": "bedroom",
+      "ru": "спальня",
+      "order": 5,
+      "pic": "sketch:bedroom",
+      "ex": "My pictures are in my bedroom.",
+      "exRu": "Мои рисунки в моей спальне."
+    },
+    {
+      "id": "sp-home-bathroom",
+      "topic": "sp-home",
+      "en": "bathroom",
+      "ru": "ванная комната",
+      "order": 6,
+      "pic": "sketch:bathroom",
+      "ex": "The bath is in the bathroom.",
+      "exRu": "Ванна в ванной комнате."
+    },
+    {
+      "id": "sp-home-living-room",
+      "topic": "sp-home",
+      "en": "living room",
+      "ru": "гостиная",
+      "order": 7,
+      "pic": "sketch:living-room",
+      "ex": "We dance in the living room.",
+      "exRu": "Мы танцуем в гостиной."
+    },
+    {
+      "id": "sp-home-garden",
+      "topic": "sp-home",
+      "en": "garden",
+      "ru": "сад",
+      "order": 8,
+      "pic": "sketch:garden",
+      "ex": "Flowers grow in the garden.",
+      "exRu": "В саду растут цветы."
+    },
+    {
+      "id": "sp-home-bath",
+      "topic": "sp-home",
+      "en": "bath",
+      "ru": "ванна",
+      "order": 9,
+      "pic": "sketch:bath",
+      "ex": "A yellow duck in the bath!",
+      "exRu": "Жёлтая уточка в ванне!"
+    },
+    {
+      "id": "sp-birthday-birthday",
+      "topic": "sp-birthday",
+      "en": "birthday",
+      "ru": "день рождения",
+      "order": 0,
+      "pic": "sketch:birthday",
+      "ex": "Happy birthday!",
+      "exRu": "С днём рождения!"
+    },
+    {
+      "id": "sp-birthday-candle",
+      "topic": "sp-birthday",
+      "en": "candle",
+      "ru": "свеча",
+      "order": 1,
+      "pic": "sketch:candle",
+      "ex": "Eight candles on the cake.",
+      "exRu": "Восемь свечей на торте."
+    },
+    {
+      "id": "sp-birthday-party",
+      "topic": "sp-birthday",
+      "en": "party",
+      "ru": "праздник",
+      "order": 2,
+      "pic": "sketch:party",
+      "ex": "A party with balloons!",
+      "exRu": "Праздник с шариками!"
+    },
+    {
+      "id": "sp-birthday-happy",
+      "topic": "sp-birthday",
+      "en": "happy",
+      "ru": "счастливый, радостный",
+      "order": 3,
+      "pic": "sketch:happy",
+      "ex": "I am happy!",
+      "exRu": "Я радуюсь!"
+    },
+    {
+      "id": "sp-birthday-sad",
+      "topic": "sp-birthday",
+      "en": "sad",
+      "ru": "грустный",
+      "order": 4,
+      "pic": "sketch:sad",
+      "ex": "The kitten is sad.",
+      "exRu": "Котёнку грустно."
+    },
+    {
+      "id": "sp-food-chocolate",
+      "topic": "sp-food",
+      "en": "chocolate",
+      "ru": "шоколад",
+      "order": 0,
+      "pic": "sketch:chocolate",
+      "ex": "Yummy chocolate!",
+      "exRu": "Вкусный шоколад!"
+    },
+    {
+      "id": "sp-food-burger",
+      "topic": "sp-food",
+      "en": "burger",
+      "ru": "бургер",
+      "order": 1,
+      "pic": "sketch:burger",
+      "ex": "A big burger, please.",
+      "exRu": "Большой бургер, пожалуйста."
+    },
+    {
+      "id": "sp-food-sandwich",
+      "topic": "sp-food",
+      "en": "sandwich",
+      "ru": "бутерброд",
+      "order": 2,
+      "pic": "sketch:sandwich",
+      "ex": "A sandwich for lunch.",
+      "exRu": "Бутерброд на обед."
+    },
+    {
+      "id": "sp-food-chips",
+      "topic": "sp-food",
+      "en": "chips",
+      "ru": "картошка фри",
+      "order": 3,
+      "pic": "sketch:chips",
+      "ex": "Chips, please!",
+      "exRu": "Картошку фри, пожалуйста!"
+    },
+    {
+      "id": "sp-food-eat",
+      "topic": "sp-food",
+      "en": "eat",
+      "ru": "есть, кушать",
+      "order": 4,
+      "pic": "sketch:eat",
+      "ex": "I eat an apple.",
+      "exRu": "Я ем яблоко."
+    }
+  ]
+}

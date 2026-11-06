@@ -5,9 +5,11 @@ import { UNITS, EPISODES, BOOK } from '../js/course.js';
 import { validateItem } from '../js/data-model.js';
 import { pictureForProfile } from '../js/colouring/pictures.js';
 
-const words = JSON.parse(readFileSync(new URL('../data/words.json', import.meta.url), 'utf8'));
+const words = [...JSON.parse(readFileSync(new URL('../data/words.json', import.meta.url), 'utf8')), ...JSON.parse(readFileSync(new URL('../data/packs/spotlight-2-1.json', import.meta.url), 'utf8')).words];
+const svgSource = readFileSync(new URL('../js/doodles-svg.js', import.meta.url), 'utf8');
 const artSource = readFileSync(new URL('../js/art.js', import.meta.url), 'utf8');
 const doodles = new Set([...artSource.match(/const POSITIONS = \{([\s\S]*?)\n\};/)[1].matchAll(/^\s*"?([a-z-]+)"?\s*:/gm)].map((m) => m[1]));
+for (const m of svgSource.matchAll(/^  '?([a-z-]+)'?: /gm)) doodles.add(m[1]);
 
 test('every episode follows the learning plan and uses only words and drawings that exist', () => {
   assert.ok(EPISODES.length >= 20);
@@ -32,4 +34,12 @@ test('episode records validate', () => {
   assert.ok(validateItem('episodes', { id: 'ep-b1', runs: 2, clean: 1, helped: 3, traps: 1, last: 1, lastClean: true }));
   assert.throws(() => validateItem('episodes', { id: 'ep-b1', runs: 1, clean: 2, helped: 0, traps: 0, last: 1, lastClean: true }));
   assert.throws(() => validateItem('episodes', { id: 'b1', runs: 1, clean: 1, helped: 0, traps: 0, last: 1, lastClean: true }));
+});
+
+test('every textbook pack word has a drawing', () => {
+  const pack = JSON.parse(readFileSync(new URL('../data/packs/spotlight-2-1.json', import.meta.url), 'utf8'));
+  for (const w of pack.words) {
+    validateItem('words', w);
+    assert.ok(doodles.has(w.pic.slice(7)), `${w.id}: drawing ${w.pic}`);
+  }
 });

@@ -117,6 +117,9 @@ test('family server: only a parent uploads and calls AI; the child paints and sa
 
   assert.equal((await request('db/uploads', { ...parent, value: upload() })).status, 200);
   assert.equal((await (await request('ai/status', parent)).json()).enabled, true);
+  const homework = { id: 'hw-own', book: 'Spotlight 2, часть 1', pages: '26', task: '', wordIds: ['hello-hello'], active: true, createdAt: 1, picture: 'u-abc12345' };
+  assert.equal((await request('db/assignments', { ...parent, value: homework })).status, 200, 'own picture in a textbook assignment');
+  assert.equal((await request('db/assignments', { ...parent, value: { ...homework, id: 'hw-missing', picture: 'u-missing99' } })).status, 403);
   const labelled = await (await request('ai/label-picture', { ...parent, value: { image, numbers: [1, 2, 3] } })).json();
   assert.equal(labelled.regions[0].en, 'box');
   assert.match(client.calls[0].messages[0].content[1].text, /Colours: .*red/);
@@ -128,7 +131,7 @@ test('family server: only a parent uploads and calls AI; the child paints and sa
   const preview = await request('progress/preview', { ...parent, value: exported });
   assert.equal(preview.status, 200);
   // An old file without uploads still imports.
-  const old = { ...exported, data: { ...exported.data, uploads: undefined, gallery: [] } };
+  const old = { ...exported, data: { ...exported.data, uploads: undefined, gallery: [], assignments: [] } };
   delete old.data.uploads;
   assert.equal((await request('progress/preview', { ...parent, value: old })).status, 200);
   // A drawing whose own picture is missing from the file is rejected.

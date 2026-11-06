@@ -1,3 +1,4 @@
+import { SVG_DOODLES, svgDoodle } from './doodles-svg.js';
 // One illustration system. Legacy emoji remain storage keys, never platform artwork.
 const POSITIONS = {
   "hello": [
@@ -1380,7 +1381,7 @@ const LEGACY = {
   "🟠": "orange",
   "🟡": "yellow"
 };
-const TOPICS = { hello: 'hello', colours: 'palette', art: 'brush', picture: 'sun', numbers: 'numbers', animals: 'cat', family: 'family', body: 'hands', aikido: 'aikido', ican: 'dance', toys: 'teddy-bear', food: 'apple' };
+const TOPICS = { hello: 'hello', colours: 'palette', art: 'brush', picture: 'sun', numbers: 'numbers', animals: 'cat', family: 'family', body: 'hands', aikido: 'aikido', ican: 'dance', toys: 'teddy-bear', food: 'apple', 'sp-school': 'workbook', 'sp-home': 'chair', 'sp-birthday': 'party', 'sp-food': 'burger' };
 const COLORS = { red: '#FF4D4F', blue: '#3A86FF', yellow: '#FFD23F', green: '#3BB273', orange: '#FF9F1C', purple: '#8E5CF7', pink: '#FF70A6', brown: '#A0522D', black: '#292D32', white: '#FFFFFF', grey: '#9CA3AF' };
 const escape = (value) => String(value ?? '').replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;').replaceAll("'", '&#39;');
 const normalize = (value) => String(value || '').replace(/[\uFE0E\uFE0F]/g, '');
@@ -1391,6 +1392,7 @@ export function art(name, size = '', label = '') {
   name = LEGACY[name] || name;
   if (name === 'numbers') return `<span class=\"paper-art sketch-art drawn-numbers ${size}\" aria-hidden=\"true\">1<span>2</span>3</span>`;
   if (Object.hasOwn(COLORS, name)) return colorArt(COLORS[name], size, label);
+  if (!POSITIONS[name] && Object.hasOwn(SVG_DOODLES, name)) return svgDoodle(name, size, label);
   const [sheet, x, y, width, height, atlasWidth, atlasHeight] = POSITIONS[name] || POSITIONS.question;
   const extent = Math.max(width, height) / .92;
   const style = `width:${width / extent * 100}%;height:${height / extent * 100}%;background-image:url('assets/doodles/${sheet}.webp');background-size:${atlasWidth / width * 100}% ${atlasHeight / height * 100}%;background-position:${x / (atlasWidth - width) * 100}% ${y / (atlasHeight - height) * 100}%`;

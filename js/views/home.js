@@ -2,6 +2,8 @@ import { SESSION } from '../auth.js';
 import { S, esc, wordPic, paperArt, speak, profile, todayKey, DAY, $, topicOf, MODE, isStandalone, viewTimers } from '../lib.js';
 import { nextReward } from '../rewards.js';
 import { todayQueue, seenWords, learned, activeAssignments, assignmentQueue, LESSON_LIMIT } from '../srs.js';
+import { nextEpisode, episodeStatus } from './path.js';
+import { EPISODES } from '../course.js';
 
 const GAMES = [['listen', '👂', 'Listen & find', 'Послушай и найди'], ['spell', '🔤', 'Spell it', 'Собери слово'], ['sensei', '🥋', 'Sensei says', 'Сенсей говорит']];
 
@@ -31,6 +33,7 @@ export default function home(el) {
       <p class="welcome-footnote">${complete ? 'Ты сегодня столько попробовала. Здорово!' : 'Можно заниматься в своём темпе'}</p>
     </section>
 
+    ${(() => { const next = nextEpisode(); const done = EPISODES.filter((e) => episodeStatus(e.id) === 'mastered').length; return `<a class="card path-next path-home" href="#/ep/${next.id}">${paperArt(next.art, 'lg')}<span><span class="studio-label">Мой путь по учебнику · ${done} из ${EPISODES.length}</span><b class="en">${esc(next.en)}</b><span class="ru">${esc(next.ru)} · 5 минут</span></span></a><a class="school-manage" href="#/path" style="display:block;margin:-4px 0 16px">Все темы учебника →</a>`; })()}
     <section class="school-section" aria-label="Задания из учебника">
       <div class="school-heading"><div><span class="studio-label">Школа + маленькие шаги</span><h2>Мой учебник</h2></div>${paperArt('backpack', 'lg')}</div>
       ${activeAssignments().length ? activeAssignments().slice(0, 2).map((a) => {

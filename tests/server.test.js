@@ -15,13 +15,13 @@ test('SQLite keeps state across restart and seeds content only once', () => {
   const dir = mkdtempSync(join(tmpdir(), 'amelie-test-'));
   try {
     let store = openStore(join(dir, 'test.sqlite'));
-    assert.equal(store.list('words').length, 110);
+    assert.equal(store.list('words').length, 133);
     store.put('profile', profile);
     store.importContent({ topics: [topic], words: [word] });
     store.close();
     store = openStore(join(dir, 'test.sqlite'));
-    assert.equal(store.list('topics').length, 13);
-    assert.equal(store.list('words').length, 111);
+    assert.equal(store.list('topics').length, 17);
+    assert.equal(store.list('words').length, 134);
     assert.equal(store.get('profile', 'amelie').stars, 7);
     store.close();
   } finally { rmSync(dir, { recursive: true, force: true }); }
@@ -34,7 +34,7 @@ test('content dry-run validates references and rolls back; import updates by id'
     assert.equal(store.get('topics', topic.id), undefined);
     store.importContent({ topics: [topic], words: [word] });
     store.importContent({ topics: [topic], words: [{ ...word, ru: 'Поклон' }] });
-    assert.equal(store.list('words').length, 111);
+    assert.equal(store.list('words').length, 134);
     assert.equal(store.get('words', word.id).ru, 'Поклон');
     assert.throws(() => store.importContent({ topics: [{ ...topic, id: 'rollback' }], words: [{ ...word, topic: 'missing' }] }));
     assert.equal(store.get('topics', 'rollback'), undefined);

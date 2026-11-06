@@ -1,7 +1,7 @@
 import { applyActivity } from '../js/activity.js';
 import { defaultProfile } from '../js/rewards.js';
 import { DatabaseSync } from 'node:sqlite';
-import { mkdirSync, readFileSync } from 'node:fs';
+import { mkdirSync, readFileSync, readdirSync, existsSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -124,6 +124,16 @@ export function openStore(path = join(process.env.DATA_DIR || join(ROOT, '.local
   if (!db.prepare("SELECT value FROM meta WHERE key='seeded'").get()) {
     store.importContent(Object.fromEntries(['topics', 'words'].map((col) => [col, JSON.parse(readFileSync(join(ROOT, 'data', col + '.json'), 'utf8'))])));
     db.prepare("INSERT INTO meta(key,value) VALUES('seeded','1')").run();
+  }
+  // Content packs (data/packs/*.json) reach every existing album once, on the first start after a deploy.
+  // Upsert by id inside one transaction: progress, drawings and parent edits made later are never touched.
+  const packs = join(ROOT, 'data', 'packs');
+  for (const name of existsSync(packs) ? readdirSync(packs).filter((f) => f.endsWith('.json')).sort() : []) {
+    const pack = JSON.parse(readFileSync(join(packs, name), 'utf8'));
+    const key = 'pack:' + pack.id;
+    if (db.prepare('SELECT value FROM meta WHERE key=?').get(key)) continue;
+    store.importContent({ topics: pack.topics, words: pack.words });
+    db.prepare('INSERT INTO meta(key,value) VALUES(?,?)').run(key, new Date().toISOString());
   }
   return store;
 }

@@ -109,7 +109,7 @@ test('daily snapshots pass SQLite checks, restore credentials/content/results, a
 test('content CLI requires the actual child profile instead of silently updating the unused legacy database',()=>{
  const dir=mkdtempSync(join(tmpdir(),'amelie-content-cli-'));const family=openFamily({dir,parentPassword:'content-cli-test-password'});
  try{assert.throws(()=>execFileSync(process.execPath,['scripts/content.js','docs/content-example.json'],{cwd:new URL('../',import.meta.url),env:{...process.env,DATA_DIR:dir},stdio:'pipe'}),/Command failed/);
- const result=JSON.parse(execFileSync(process.execPath,['scripts/content.js','docs/content-example.json','--profile','demo','--dry-run'],{cwd:new URL('../',import.meta.url),env:{...process.env,DATA_DIR:dir},encoding:'utf8'}));assert.equal(result.profile,'demo');assert.equal(result.dryRun,true);assert.equal(family.store({profile:'demo'}).list('words').length,110);
+ const result=JSON.parse(execFileSync(process.execPath,['scripts/content.js','docs/content-example.json','--profile','demo','--dry-run'],{cwd:new URL('../',import.meta.url),env:{...process.env,DATA_DIR:dir},encoding:'utf8'}));assert.equal(result.profile,'demo');assert.equal(result.dryRun,true);assert.equal(family.store({profile:'demo'}).list('words').length,133);
  }finally{family.close();rmSync(dir,{recursive:true,force:true});}
 });
 

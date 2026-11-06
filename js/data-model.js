@@ -52,7 +52,7 @@ export function validateItem(col, item) {
     requireThat(Array.isArray(item.wordIds) && item.wordIds.length >= 1 && item.wordIds.length <= 50 && item.wordIds.every(validId) && new Set(item.wordIds).size === item.wordIds.length, 'Выберите от 1 до 50 разных слов');
     requireThat(typeof item.active === 'boolean' && integer(item.createdAt, 0, Number.MAX_SAFE_INTEGER), 'Некорректное задание');
     requireThat(item.dueDate === undefined || item.dueDate === '' || (typeof item.dueDate === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(item.dueDate) && Number.isFinite(Date.parse(item.dueDate)) && new Date(item.dueDate).toISOString().slice(0, 10) === item.dueDate), 'Некорректная дата задания');
-    requireThat(item.picture === undefined || item.picture === '' || PICTURE_IDS.includes(item.picture), 'Неизвестная раскраска задания');
+    requireThat(item.picture === undefined || item.picture === '' || PICTURE_IDS.includes(item.picture) || isUpload(item.picture), 'Неизвестная раскраска задания');
   } else if (col === 'episodes') {
     // One record per course episode: how it went, never a grade. traps = the episode's typical difficulty showed up.
     requireThat(/^ep-[a-z0-9]{1,12}$/.test(item.id), 'Некорректный эпизод');
